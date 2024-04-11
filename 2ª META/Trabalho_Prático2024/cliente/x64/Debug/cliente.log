@@ -1,0 +1,14 @@
+﻿  cliente.c
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(27,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(27,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(27,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 4 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(27,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(53,13): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(53,13):
+  considere usar '%zd' na cadeia de formato
+  
+  cliente.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\cliente.exe
