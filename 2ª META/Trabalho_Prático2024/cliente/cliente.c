@@ -41,7 +41,7 @@ int _tmain(int argc, TCHAR* argv[])
 
 		if (hpipe == INVALID_HANDLE_VALUE)
 		{
-			_tprintf(TEXT("[ERRO] Acesso ao bolsa pipe falhou, %d.\n"), GetLastError());
+			_tprintf(TEXT("\n[ERRO] Acesso ao bolsa pipe falhou, %d."), GetLastError());
 			return -1;
 		}
 		//COMANDOS DO CLIENTE

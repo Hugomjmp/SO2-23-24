@@ -1,2 +1,8 @@
 ﻿  bolsa.c
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,54): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,54): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,80): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,80): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(50,7): warning C4113: 'DWORD (__cdecl *)()' difere em listas de parâmetro de 'LPTHREAD_START_ROUTINE'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(64,42): warning C4020: '_wcsicmp': muitos parâmetros reais
   Trabalho_Prático2024.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\bolsa.exe

@@ -6,6 +6,8 @@
 #include <io.h>
 #include <string.h>
 
+
+
 #define BUFFTAM 512
 
 //DADOS DA ESTRUTURA NAMEDPIPE BOLSA
@@ -15,5 +17,9 @@ typedef struct
 {
 	TCHAR login[TAM];
 	TCHAR password[TAM];
+	TCHAR comando[300];
+	TCHAR RESPOSTA[300];
 
 }clienteData;
+
+DWORD WINAPI trataComandosClientes();
