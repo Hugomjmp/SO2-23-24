@@ -7,27 +7,33 @@ int _tmain(int argc, TCHAR* argv[])
 	TCHAR login[20], password[20], comando[200];
 
 	//HANDLES
-	HANDLE hpipe;
+	HANDLE hPipe;
 
 	//Nome do namedpipe
-	LPCTSTR pBolsa = TEXT("..\\bolsa");
+	LPCTSTR pBolsa = TEXT("\\\\.\\pipe\\BOLSA");
 
 	//Codigo para o unicode
 	#ifdef UNICODE
 		_setmode(_fileno(stdin), _O_WTEXT);
 		_setmode(_fileno(stdout), _O_WTEXT);
 	#endif
-
+		_tprintf(TEXT("#################################################################\n"));
+		_tprintf(TEXT("#\t\t\t\t\t\t\t\t#\n"));
+		_tprintf(TEXT("#\t\tBOLSA DE VALORES ONLINE\t\t\t\t#\n"));
+		_tprintf(TEXT("#\t\t\t\t\t\t\t\t#\n"));
+		_tprintf(TEXT("#################################################################\n"));
 		//CREDENCIAIS DO UTILIZADOR
-		_tprintf(TEXT("Login: "));
-		_fgetts(login, 20, stdin);
+		_tprintf(TEXT("\nLogin: "));
+		_tscanf(TEXT("%s"), &login);
 		_tprintf(TEXT("\nPassword: "));
-		_fgetts(password, 20, stdin);
+		_tscanf(TEXT("%s"), &password);
 		// DEBUG...
-		_tprintf(TEXT("\nLi -> Login: %s com tamanho %d e Password: %s com tamanho %d"), login, _tcslen(login)-1, password, _tcslen(password)-1);
+		_tprintf(TEXT("\nLi -> Login: %s com tamanho %d e Password: %s com tamanho %zu"), login, _tcslen(login), password, _tcslen(password));
+		
+		
 		
 		//Inicializar o NAMEDPIPE
-		hpipe = CreateNamedPipe(
+		hPipe = CreateNamedPipe(
 			pBolsa,					  // Nome do pipe
 			PIPE_ACCESS_OUTBOUND,     // acesso em modo de escrita
 			PIPE_TYPE_MESSAGE |       // message type pipe 
@@ -38,8 +44,9 @@ int _tmain(int argc, TCHAR* argv[])
 			BUFFTAM,                  // input buffer size 
 			0,                        // client time-out 
 			NULL);                    // default security attribute 
-
-		if (hpipe == INVALID_HANDLE_VALUE)
+			
+		WaitNamedPipe(hPipe, INFINITE);
+		if (hPipe == INVALID_HANDLE_VALUE)
 		{
 			_tprintf(TEXT("\n[ERRO] Acesso ao bolsa pipe falhou, %d."), GetLastError());
 			return -1;
@@ -49,13 +56,13 @@ int _tmain(int argc, TCHAR* argv[])
 		while ((_tcsicmp(TEXT("exit"), comando)) != 0)
 		{
 			_tprintf(TEXT("\nComando: "));
-			_fgetts(comando, 200, stdin);
-			_tprintf(TEXT("\nLi -> Comando: %s com tamanho %d"), comando, _tcslen(comando) - 1);
-			comando[_tcslen(comando) - 1] = '\0'; //retirar o /0
+			_tscanf(TEXT("%s"), &comando);
+			_tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comando, _tcslen(comando));
+			//comando[_tcslen(comando) - 1] = '\0'; //retirar o /0
 			
 		}
 		
-		CloseHandle(hpipe);
+		CloseHandle(hPipe);
 		return 0;
 }
 

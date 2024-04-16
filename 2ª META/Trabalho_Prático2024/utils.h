@@ -23,3 +23,5 @@ typedef struct
 }clienteData;
 
 DWORD WINAPI trataComandosClientes();
+
+HKEY trataRegedit();

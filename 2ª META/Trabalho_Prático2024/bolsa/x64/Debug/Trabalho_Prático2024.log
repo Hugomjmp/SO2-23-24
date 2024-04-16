@@ -1,8 +1,32 @@
 ﻿  bolsa.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,54): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,54): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,80): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(27,80): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(50,7): warning C4113: 'DWORD (__cdecl *)()' difere em listas de parâmetro de 'LPTHREAD_START_ROUTINE'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(64,42): warning C4020: '_wcsicmp': muitos parâmetros reais
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(46,7): warning C4113: 'DWORD (__cdecl *)()' difere em listas de parâmetro de 'LPTHREAD_START_ROUTINE'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(60,42): warning C4020: '_wcsicmp': muitos parâmetros reais
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(105,3): warning C4047: 'return': 'HKEY' difere em níveis de indireção de 'int'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(108,55): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(108,55): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(108,81): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(108,81): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(110,3): warning C4047: 'return': 'HKEY' difere em níveis de indireção de 'int'
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(755,5): error MSB8084: Saída estruturada inválida de 'CL.exe': Não é possível analisar a notificação JsonRpc: 'Cannot transcode invalid UTF-8 JSON text to UTF-16 string.'.
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(129,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(129,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(133,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(133,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(137,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(137,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(141,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(141,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(145,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(145,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(118,8): warning C4101: 'buf': variável local não referenciada
   Trabalho_Prático2024.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\bolsa.exe
