@@ -1,20 +1,19 @@
 ﻿  bolsa.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(65,27): warning C4047: 'função': 'LPOVERLAPPED' difere em níveis de indireção de 'unsigned int'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(65,27): warning C4024: 'ConnectNamedPipe': tipos diferentes para parâmetro formal e real 2
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(73,12): warning C4477: 'wprintf': a cadeia de formato '%zu' requer um argumento do tipo 'unsigned __int64', mas um argumento variadic 1 tem o tipo 'TCHAR *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(73,12): warning C4477: 'wprintf': a cadeia de formato '%zu' requer um argumento do tipo 'unsigned __int64', mas um argumento variadic 2 tem o tipo 'TCHAR *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(100,42): warning C4020: '_wcsicmp': muitos parâmetros reais
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(145,3): warning C4047: 'return': 'HKEY' difere em níveis de indireção de 'int'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(148,55): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(148,55): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(148,81): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(148,81): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(150,3): warning C4047: 'return': 'HKEY' difere em níveis de indireção de 'int'
-C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(755,5): error MSB8084: Saída estruturada inválida de 'CL.exe': Não é possível analisar a notificação JsonRpc: 'Cannot transcode invalid UTF-8 JSON text to UTF-16 string.'.
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(169,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(169,12):
-  considere usar '%zd' na cadeia de formato
-  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(40,3): warning C4113: 'DWORD (__cdecl *)()' difere em listas de parâmetro de 'LPTHREAD_START_ROUTINE'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(56,42): warning C4020: '_wcsicmp': muitos parâmetros reais
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(47,8): warning C4101: 'nBytes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(7,9): warning C4101: 'hPipe': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(45,7): warning C4101: 'resultado': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(46,14): warning C4101: 'cd': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(103,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(107,55): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(107,55): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(107,81): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(107,81): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(109,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(96,7): warning C4101: 'aux': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(148,12): warning C4098: 'escreveRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(153,12): warning C4098: 'escreveRegedit': função 'void' retornando um valor
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(173,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
   C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(173,12):
   considere usar '%zd' na cadeia de formato
@@ -31,10 +30,17 @@ C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª M
   C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(185,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(158,8): warning C4101: 'buf': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(199,27): warning C4047: 'função': 'LPOVERLAPPED' difere em níveis de indireção de 'unsigned int'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(199,27): warning C4024: 'ConnectNamedPipe': tipos diferentes para parâmetro formal e real 2
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(207,12): warning C4477: 'wprintf': a cadeia de formato '%zu' requer um argumento do tipo 'unsigned __int64', mas um argumento variadic 1 tem o tipo 'TCHAR *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(207,12): warning C4477: 'wprintf': a cadeia de formato '%zu' requer um argumento do tipo 'unsigned __int64', mas um argumento variadic 2 tem o tipo 'TCHAR *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(210,13): warning C4129: 'C': sequência de escape de caractere não reconhecida
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(189,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(189,12):
+  considere usar '%zd' na cadeia de formato
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(163,9): warning C4101: 'hPipe': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(161,8): warning C4101: 'buf': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(162,8): warning C4101: 'nbytes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(223,38): warning C4047: 'função': 'LPOVERLAPPED' difere em níveis de indireção de 'unsigned int'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(223,38): warning C4024: 'ConnectNamedPipe': tipos diferentes para parâmetro formal e real 2
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(200,8): warning C4101: 'nBytes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(202,9): warning C4101: 'hSemClientes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(198,14): warning C4101: 'cd': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(303,1): warning C4715: 'verificaClientes': nem todos os caminhos de controle retornam um valor
   Trabalho_Prático2024.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\bolsa.exe
