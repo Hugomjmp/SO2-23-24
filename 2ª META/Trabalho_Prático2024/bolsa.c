@@ -4,7 +4,7 @@ int _tmain(int argc, TCHAR* argv[])
 {
 	//HANDLES...
 	HKEY hChaveClientes;
-	HANDLE hPipe, hThreadArray[2];
+	HANDLE hPipe, hThreadArray[5];
 
 	//Variáveis
 	DWORD nAções, pAção = 0, nSegundos = 0;
@@ -47,13 +47,53 @@ int _tmain(int argc, TCHAR* argv[])
 						&hPipe,					// argument to thread function
 						0,						// use default creation flags
 						NULL);
-
+	/*hThreadArray[1] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+	hThreadArray[1] = CreateThread(
+		NULL,					// default security attributes
+		0,						// use default stack size
+		verificaClientes,	// thread function name
+		&hPipe,					// argument to thread function
+		0,						// use default creation flags
+		NULL);*/
 	//COMANDO DO ADMINISTRADOR
+	BOOL resultado;
+	clienteData cd;
+	DWORD nBytes;
 	while ((_tcsicmp(TEXT("close"), comandoAdmin)) != 0)
 	{
+		
+		ConnectNamedPipe(hPipe, INFINITE);
+		resultado = ReadFile(
+			hPipe,
+			&cd,
+			sizeof(cd),
+			&nBytes,
+			NULL
+		);
+		_tprintf(TEXT("Recebi login: %zu, password: %zu"), cd.login, cd.password);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		_tprintf(TEXT("\nComando: "));
-		fflush(stdin);
-		_tscanf(TEXT("%s"), comandoAdmin);
+		//fflush(stdin);
+		//_tscanf(TEXT("%s"), comandoAdmin);
 		_tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comandoAdmin, _tcslen(comandoAdmin));
 
 		//TRATA DO COMANNDO ACRESCENTAR UM EMPRESA
@@ -146,4 +186,29 @@ DWORD WINAPI trataComandosClientes(LPVOID hPipe) {
 	}
 	
 	return 0;
+}
+
+DWORD WINAPI verificaClientes(LPVOID hPipe) {
+	
+	FILE* fp;
+	clienteData cd;
+	BOOL resultado;
+	DWORD nBytes;
+	while (1)
+	{
+		ConnectNamedPipe(hPipe, INFINITE);
+		resultado = ReadFile(
+			hPipe,
+			&cd,
+			sizeof(cd),
+			&nBytes,
+			NULL
+		);
+		_tprintf(TEXT("Recebi login: %zu, password: %zu"), cd.login, cd.password);
+	}
+
+	fp = fopen(UTILIZADORES_REGISTADOS, "r");
+	//fread(fp,);
+
+	fclose(fp);
 }

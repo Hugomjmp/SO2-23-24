@@ -7,9 +7,8 @@
 #include <string.h>
 
 
-
 #define BUFFTAM 512
-
+#define UTILIZADORES_REGISTADOS "..\\Trabalho_Prático2024\Clientes.txt"
 //DADOS DA ESTRUTURA NAMEDPIPE BOLSA
 #define TAM 20
 
@@ -22,6 +21,7 @@ typedef struct
 
 }clienteData;
 
-DWORD WINAPI trataComandosClientes();
+DWORD WINAPI trataComandosClientes(LPVOID hPipe);
+DWORD WINAPI verificaClientes(LPVOID hPipe);
 
 HKEY trataRegedit();
