@@ -1,11 +1,10 @@
 #include "..\\utils.h"
 
 
-
 int _tmain(int argc, TCHAR* argv[])
 {
 	//clienteData CD;
-	TCHAR login[20], password[20], comando[200];
+	TCHAR login[TAM], password[TAM], comando[200];
 
 	//variaveis
 	BOOL resultado;
@@ -22,6 +21,7 @@ int _tmain(int argc, TCHAR* argv[])
 	#ifdef UNICODE
 		_setmode(_fileno(stdin), _O_WTEXT);
 		_setmode(_fileno(stdout), _O_WTEXT);
+		//_setmode(_fileno(stderr), _O_WTEXT);
 	#endif
 		_tprintf(TEXT("#################################################################\n"));
 		_tprintf(TEXT("#\t\t\t\t\t\t\t\t#\n"));
@@ -30,7 +30,7 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("#################################################################\n"));
 
 		//Inicializar o NAMEDPIPE
-		hPipe = CreateFile(
+		/*hPipe = CreateFile(
 			pBolsa,							//lpFileName,
 			GENERIC_WRITE | GENERIC_READ,	//dwDesiredAccess,
 			0,								//dwShareMode,
@@ -44,7 +44,7 @@ int _tmain(int argc, TCHAR* argv[])
 			_tprintf(TEXT("\n[ERRO] O servidor Bolsa não está em funcionamento, %d."), GetLastError());
 			return -1;
 		}
-		resultado = WaitNamedPipe(hPipe, INFINITE);
+		resultado = WaitNamedPipe(hPipe, INFINITE);*/
 		//CREDENCIAIS DO UTILIZADOR
 		_tprintf(TEXT("\nLogin: "));
 		_tscanf(TEXT("%s"), &login);
@@ -60,18 +60,18 @@ int _tmain(int argc, TCHAR* argv[])
 			_tprintf(TEXT("\nComando: "));
 			_tscanf(TEXT("%s"), &comando);
 			_tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comando, _tcslen(comando));
-			resultado = WriteFile(
+			/*resultado = WriteFile(
 				hPipe,
 				comando,
 				(_tcslen(comando) + 1) * sizeof(TCHAR),
 				&nBytes,
 				NULL
-			);
+			);*/
 			//comando[_tcslen(comando) - 1] = '\0'; //retirar o /0
 			
 		}
 		
-		CloseHandle(hPipe);
+		//CloseHandle(hPipe);
 		return 0;
 }
 

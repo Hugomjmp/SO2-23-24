@@ -1,0 +1,12 @@
+metromondego 100 0.01
+spaceY 200 500
+AcruxTech 10 25.50
+Quantum 15 40.20
+Stellar 20 18.75
+Nexus 12 35.80
+Horizon 8 50.00
+Vertex 18 28.90
+Zenith 25 15.60
+AlphaTech 9 47.30
+Omega 22 22.10
+Nebula 14 30.75
