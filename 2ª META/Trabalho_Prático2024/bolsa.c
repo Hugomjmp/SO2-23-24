@@ -27,7 +27,7 @@ int _tmain(int argc, TCHAR* argv[])
 #ifdef UNICODE
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
-	//_setmode(_fileno(stderr), _O_WTEXT);
+	_setmode(_fileno(stderr), _O_WTEXT);
 #endif
 
 	//###############################################################
@@ -410,17 +410,21 @@ void escreveRegedit() {
 }
 //---------------------------------------------------------------
 // Por acabar...
-DWORD WINAPI trataComandosClientes() {
-	
+DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
+
 	clienteData cd;
 	TCHAR buf[200];
 	DWORD nbytes;
-	HANDLE hPipe;
+	HANDLE hPipe = (HANDLE)lpParam;
 	_tprintf(TEXT("\nÀ espera de clientes"));
 	//ConnectNamedPipe(hPipe, NULL);
 	_tprintf(TEXT("\nRecebi cliente"));
 	
 	while ((_tcsicmp(TEXT("exit"), cd.comando)) != 0)
+		if (!ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL)) {
+			_tprintf(TEXT("\nErro ao ler do pipe do cliente: %d"), GetLastError());
+			break;
+		}
 	//ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL);
 	//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
 	if (_tcsicmp(TEXT("listc"), cd.comando) == 0)
@@ -447,6 +451,12 @@ DWORD WINAPI trataComandosClientes() {
 	return 0;
 }
 //-------
+
+//###############################################################
+//#																#
+//#				Verificao Clientes através de semaforo			#
+//#																#
+//###############################################################
 DWORD WINAPI verificaClientes() {
 	
 	FILE* fp;
@@ -474,10 +484,46 @@ DWORD WINAPI verificaClientes() {
 		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe, %d.\n"), GetLastError());
 		return -1;
 	}
+	
 	_tprintf(TEXT("[ERRO] antes de esperar.\n"));
-	resultado = ConnectNamedPipe(hPipe, INFINITE);
-		if (resultado);
-	_tprintf(TEXT("[ERRO] depois de esperar.\n"));
+	if (!ConnectNamedPipe(hPipe, INFINITE)) {
+		_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
+		return -1;
+	}
+	_tprintf(TEXT("[INFO] Cliente conectado com sucesso.\n"));
+
+
+	hSemClientes = CreateSemaphore(NULL, 5, 5, TEXT("semaforoClientes"));
+	if (hSemClientes == NULL) {
+		_tprintf(TEXT("[ERRO] Falhou ao criar o semáforo: %d\n"), GetLastError());
+		return -1;
+	}
+
+	fp = fopen(UTILIZADORES_REGISTADOS, "r");
+	if (fp == NULL) {
+		_tprintf(TEXT("[ERRO] Falhou ao abrir o arquivo de clientes registrados.\n"));
+		return -1;
+	}
+
+	while (fgetws(string, 100, fp)) {
+		
+		WaitForSingleObject(hSemClientes, INFINITE);
+
+		
+		_tprintf(TEXT("%s \n"), string);
+
+		
+		ReleaseSemaphore(hSemClientes, 1, NULL);
+	}
+
+	CloseHandle(hSemClientes);
+	fclose(fp);
+	CloseHandle(hPipe);
+
+	return 0;
+}
+
+
 	/*
 	while (1){
 	//ReadFile(hPipe, &receivedInfo, sizeof(LoginInfo), &bytesRead, NULL)
@@ -496,66 +542,6 @@ DWORD WINAPI verificaClientes() {
 
 }*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*
-	hSemClientes = CreateSemaphoreA(
-		NULL,
-		5,
-		5,
-		TEXT("semaforoClientes")
-		);
-		if (hSemClientes == NULL) {
-			_tprintf(TEXT("[ERRO] ao criar o semáforo: %d\n"),GetLastError());
-			return -1;
-		}
-		*/
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	fp = fopen(UTILIZADORES_REGISTADOS, "r"); //abertura do ficheiro Clientes.txt para leitura
-	if (fp == NULL) //verifica se o ficheiro existe
-	{
-		_tprintf(TEXT("[ERRO] ao abrir o ficheiro! \n"));
-		return -1;
-	}
-
-
-
-	while (fgetws(string, 100, fp)) {
-		_tprintf(TEXT("%s \n"), string);
-	}
-
-
-
-	//CloseHandle(hSemClientes);
-	CloseHandle(hPipe);
-	fclose(fp);
-}
 //###############################################################
 //#																#
 //#				Variação aleatoria de preços					#
@@ -600,3 +586,5 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 }
 
 //---------------------------------------------------------------
+
+
