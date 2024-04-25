@@ -1,0 +1,5 @@
+﻿  cliente.c
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(11,8): warning C4101: 'nBytes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,9): warning C4101: 'hPipe': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(10,7): warning C4101: 'resultado': variável local não referenciada
+  cliente.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\Debug\cliente.exe
