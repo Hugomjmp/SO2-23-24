@@ -21,9 +21,13 @@ int _tmain(int argc, TCHAR* argv[])
 	//estruturas
 	clienteData cd;
 	userData user[5][MAX_COLUNA];
-	empresaData empresas[MAX_LINHA][MAX_COLUNA];
+	//empresaData empresas[MAX_LINHA][MAX_COLUNA];
+	empresaData empresas[30];
+
+
+
 	//ControlData* cdata;
-	ControlData* cdata = (ControlData*)malloc(sizeof(ControlData));
+	
 #ifdef UNICODE
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
@@ -58,13 +62,19 @@ int _tmain(int argc, TCHAR* argv[])
 	//#				INICIALIZAR MATRIZ empresas						#
 	//#				com -1, 0, 0.0 em todas as linhas				#
 	//###############################################################
-	for (int i = 0; i < MAX_LINHA; i++) {
-		for (int j = 0; j < MAX_COLUNA; j++) {
-			_tcscpy(empresas[i][j].nomeEmpresa, TEXT("-1"));
-			empresas[i][j].nAções = 0;
-			empresas[i][j].pAção = 0.0;
-		}
+	for (DWORD i = 0; i < MAX_LINHA; i++)
+	{
+		_tcscpy(empresas[i].nomeEmpresa, TEXT("-1"));
+		empresas[i].nAções = 0;
+		empresas[i].pAção = 0.0;
 	}
+	//for (int i = 0; i < MAX_LINHA; i++) {
+	//	for (int j = 0; j < MAX_COLUNA; j++) {
+	//		_tcscpy(empresas[i][j].nomeEmpresa, TEXT("-1"));
+	//		empresas[i][j].nAções = 0;
+	//		empresas[i][j].pAção = 0.0;
+	//	}
+	//}
 	//---------------------------------------------------------------
 	CriaRegedit(); //TRATA DA VARIAVEL NCLIENTES
 	//leRegedit();	//função para tirar depois
@@ -90,7 +100,7 @@ int _tmain(int argc, TCHAR* argv[])
 	//#						Shared Memory	 						#
 	//#																#
 	//###############################################################
-	empresaData* pEmpresas;
+	
 	//CRIA shared memory
 	
 	hMapFile = CreateFileMapping(
@@ -106,19 +116,20 @@ int _tmain(int argc, TCHAR* argv[])
 		return 1;
 	}
 	
-	
-	empresaData(*data)[MAX_COLUNA] = (empresaData(*)[MAX_COLUNA])MapViewOfFile(
+	/*
+	empresaData *empresas = (empresaData*)MapViewOfFile(
 		hMapFile,				// Handle do ficheiro mapeado
 		FILE_MAP_ALL_ACCESS,	// Flags de acesso (ler, escrever)
 		0,						// Início dentro do bloco pretendido
 		0,						// dentro do ficheiro (+signific., -signific.)
 		sizeof(empresaData)		// Tamanho da view pretendida
 	);
-	if (data == NULL) {
+	if (pEmpresas == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
 		CloseHandle(hMapFile);
 		return 1;
 	}
+	*/
 	//CopyMemory(data, empresas, sizeof(empresas));
 
 	//---------------------------------------------------------------
@@ -146,7 +157,7 @@ int _tmain(int argc, TCHAR* argv[])
 		NULL,					// default security attributes
 		0,						// use default stack size
 		variaPreços,			// thread function name
-		empresas,					// argument to thread function
+		empresas,				// argument to thread function
 		0,						// use default creation flags
 		NULL);
 	//###############################################################
@@ -178,10 +189,10 @@ int _tmain(int argc, TCHAR* argv[])
 			DWORD empresaAdiciona = 1;
 			for (DWORD i = 0; i < MAX_LINHA; i++) {
 				if (empresaAdiciona == 1) {
-					if ((_tcsicmp(TEXT("-1"), empresas[i][0].nomeEmpresa)) == 0) {
-						_tcscpy(empresas[i][0].nomeEmpresa, nomeEmpresa);
-						empresas[i][1].nAções = nAções;
-						empresas[i][2].pAção = pAção;
+					if ((_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa)) == 0) {
+						_tcscpy(empresas[i].nomeEmpresa, nomeEmpresa);
+						empresas[i].nAções = nAções;
+						empresas[i].pAção = pAção;
 						empresaAdiciona = 0;
 					}
 				}
@@ -197,17 +208,11 @@ int _tmain(int argc, TCHAR* argv[])
 				return -1;
 			}
 			linha = 0;
-			while (linha < MAX_LINHA && fwscanf(fp, TEXT("%s %lu %f"), &empresas[linha][0].nomeEmpresa, &empresas[linha][1].nAções, &empresas[linha][2].pAção) == 3) {
+			while (linha < MAX_LINHA && fwscanf(fp, TEXT("%s %lu %f"), &empresas[linha].nomeEmpresa, &empresas[linha].nAções, &empresas[linha].pAção) == 3) {
 				linha++;
-			}/*
-			for (DWORD i = 0; i < MAX_LINHA; i++)
-			{
-				_tcscpy(eD[i][0], nomeEmpresa);
-				empresas[i][1].nAções = nAções;
-				empresas[i][2].pAção = pAção;
-			}*/
+			}
 
-			//CopyMemory(eD, empresas, sizeof(empresas));
+			
 			SetEvent(hEvent);
 			//Sleep(500);
 			ResetEvent(hEvent);
@@ -222,7 +227,7 @@ int _tmain(int argc, TCHAR* argv[])
 			_tprintf(TEXT("\n| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 			_tprintf(TEXT("---------------------------------------------------------------------------------\n"));
 			for (DWORD i = 0; i < MAX_LINHA; i++) { //conta quantas empresas estão na tabela
-				if (_tcsicmp(TEXT("-1"), empresas[i][0].nomeEmpresa) != 0)
+				if (_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa) != 0)
 				{
 					contador++;
 				}
@@ -235,29 +240,29 @@ int _tmain(int argc, TCHAR* argv[])
 				}else{
 					_tprintf(TEXT("| %d |"), i + 1);
 				}
-					if (_tcslen(empresas[i][0].nomeEmpresa) <= 5)
+					if (_tcslen(empresas[i].nomeEmpresa) <= 5)
 					{
-						if (_tcscmp(empresas[i][0].nomeEmpresa, TEXT("-1")) == 0) {
-							_tprintf(TEXT(" |\t   \t\t|"), empresas[i][0].nomeEmpresa); // coloca esppaços vazios onde está "-1"
+						if (_tcscmp(empresas[i].nomeEmpresa, TEXT("-1")) == 0) {
+							_tprintf(TEXT(" |\t   \t\t|"), empresas[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
 						}else
-						_tprintf(TEXT(" |\t %s \t\t|"), empresas[i][0].nomeEmpresa);
+						_tprintf(TEXT(" |\t %s \t\t|"), empresas[i].nomeEmpresa);
 					}
 					else {
-						_tprintf(TEXT(" |\t %s \t|"), empresas[i][0].nomeEmpresa);
+						_tprintf(TEXT(" |\t %s \t|"), empresas[i].nomeEmpresa);
 
 					}			
-					_tprintf(TEXT(" |\t %lu \t\t|"), empresas[i][1].nAções);
+					_tprintf(TEXT(" |\t %lu \t\t|"), empresas[i].nAções);
 					//contar os digitos para retificar espaçamento do Preço Ação
 					digitos = 0;
-					numeros = empresas[i][2].pAção;
+					numeros = empresas[i].pAção;
 					while (numeros >= 1) { 
 						numeros /= 10;
 						digitos++;
 					}
 					if (digitos >= 2)
-						_tprintf(TEXT(" |\t %.2f€ \t|"), empresas[i][2].pAção);
+						_tprintf(TEXT(" |\t %.2f€ \t|"), empresas[i].pAção);
 					else
-						_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresas[i][2].pAção);
+						_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresas[i].pAção);
 
 				_tprintf(TEXT("\n---------------------------------------------------------------------------------\n"));
 			}
@@ -269,8 +274,8 @@ int _tmain(int argc, TCHAR* argv[])
 			_tscanf(TEXT("%f"), &pAção);
 
 			for (DWORD i = 0; i < MAX_LINHA; i++) {
-					if ((_tcsicmp(empresas[i][0].nomeEmpresa, nomeEmpresa)) == 0) {
-						empresas[i][2].pAção = pAção;
+					if ((_tcsicmp(empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
+						empresas[i].pAção = pAção;
 					}
 			}
 		}
@@ -326,7 +331,7 @@ int _tmain(int argc, TCHAR* argv[])
 		CloseHandle(hThreadArray[2]); //colocar i depois
 	//}
 	CloseHandle(hEvent);
-	UnmapViewOfFile(data);
+	//UnmapViewOfFile(pEmpresas);
 	CloseHandle(hMapFile);
 	fclose(fpU);
 	return 0;
@@ -548,14 +553,15 @@ DWORD WINAPI verificaClientes() {
 //#																#
 //###############################################################
 DWORD WINAPI variaPreços(LPVOID empresas) {
-	empresaData(*data)[MAX_COLUNA] = (empresaData(*)[MAX_COLUNA])empresas;
+	//empresaData(*data)[MAX_COLUNA] = (empresaData(*)[MAX_COLUNA])empresas;
+	empresaData *empresasArry = (empresaData*)empresas;
 	DWORD contador = 0;
 	DWORD linhaAleatoria = 0;
 	DWORD tipoAlteração = 0;
 	while (1)
 	{
 		for (DWORD i = 0; i < MAX_LINHA; i++) {
-				if (_tcsicmp(TEXT("-1"), data[i][0].nomeEmpresa) != 0)
+				if (_tcsicmp(TEXT("-1"), empresasArry[i].nomeEmpresa) != 0)
 				{
 					contador++;
 				}
@@ -567,13 +573,13 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 			if (tipoAlteração < 25)
 			{
 				linhaAleatoria = rand() % contador;
-				data[linhaAleatoria][2].pAção = data[linhaAleatoria][2].pAção - (data[linhaAleatoria][2].pAção * 0.2); //diminui 20%
+				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção - (empresasArry[linhaAleatoria].pAção * 0.2); //diminui 20%
 				
 			}
 			else
 			{
 				linhaAleatoria = rand() % contador;
-				data[linhaAleatoria][2].pAção = data[linhaAleatoria][2].pAção + (data[linhaAleatoria][2].pAção * 0.2); //aumenta 20%
+				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção + (empresasArry[linhaAleatoria].pAção * 0.2); //aumenta 20%
 				
 			}
 

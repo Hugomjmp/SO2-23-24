@@ -19,16 +19,17 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
 		return 1;
 	}
+
 	hMapFile = OpenFileMapping(
 		FILE_ALL_ACCESS,	// acesso pretendido
 		FALSE,
 		SHM_NAME			// nome dado ao recurso (ficheiro mapeado)
 	);
-	/*if (hMapFile == NULL) {
-		_tprintf(TEXT("Error: CreateFileMapping (%d)\n"), GetLastError());
+	if (hMapFile == NULL) {
+		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
 		//return 1;
-	}*/
-	
+	}
+	/*
 	pEmpresas = (empresaData*)MapViewOfFile(
 		hMapFile,
 		FILE_MAP_ALL_ACCESS,
@@ -37,7 +38,7 @@ int _tmain(int argc, TCHAR* argv[])
 		sizeof(empresaData)
 	);
 	
-	if (eD == NULL) {
+	if (pEmpresas == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
 		
 		//return 1;
@@ -45,16 +46,16 @@ int _tmain(int argc, TCHAR* argv[])
 	
 	//empresaData empresaLida;
 
-	while (1)
+		while (1)
 	{
 		_tprintf(TEXT("\nANTES DO WAIT!!!!"));
 		WaitForSingleObject(hEvent, INFINITE);
 		_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
-		
+		/*
 		_tprintf(TEXT("Nome da Empresa: %s\n"), pEmpresas[0].nomeEmpresa);
 		_tprintf(TEXT("Número de Ações: %lu\n"), pEmpresas[0].nAções);
 		_tprintf(TEXT("Preço da Ação: %.2f\n"), pEmpresas[0].pAção);
-			
+			*/
 
 		
 	}

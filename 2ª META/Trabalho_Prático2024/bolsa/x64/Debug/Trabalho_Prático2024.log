@@ -1,56 +1,52 @@
 ﻿  bolsa.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(173,44): warning C4020: '_wcsicmp': muitos parâmetros reais
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(191,44): warning C4020: '_wcsicmp': muitos parâmetros reais
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(241,53): warning C4474: 'wprintf': excesso de argumentos transmitidos para cadeia de caracteres de formato
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(241,53):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(184,44): warning C4020: '_wcsicmp': muitos parâmetros reais
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(202,44): warning C4020: '_wcsicmp': muitos parâmetros reais
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(246,50): warning C4474: 'wprintf': excesso de argumentos transmitidos para cadeia de caracteres de formato
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(246,50):
   espaços reservados e seus parâmetros esperam 0 argumentos variadic, mas 1 foram fornecidos
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(252,30): warning C4244: '=': conversão de 'float' para 'DWORD', possível perda de dados
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(288,25): warning C4244: '=': conversão de 'float' para 'DWORD', possível perda de dados
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(257,27): warning C4244: '=': conversão de 'float' para 'DWORD', possível perda de dados
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(293,25): warning C4244: '=': conversão de 'float' para 'DWORD', possível perda de dados
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(10,44): warning C4101: 'nBytes': variável local não referenciada
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(14,44): warning C4101: 'string': variável local não referenciada
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(7,9): warning C4101: 'hPipe': variável local não referenciada
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(15,7): warning C4101: 'resultado': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(93,15): warning C4101: 'pEmpresas': variável local não referenciada
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(22,14): warning C4101: 'cd': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(347,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(351,55): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(351,55): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(351,81): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(351,81): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(353,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(340,7): warning C4101: 'aux': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(402,12): warning C4098: 'escreveRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(352,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(356,55): warning C4047: 'função': 'DWORD' difere em níveis de indireção de 'void *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(356,55): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 3
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(356,81): warning C4047: 'função': 'const BYTE *' difere em níveis de indireção de 'LPBYTE *'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(356,81): warning C4024: 'RegSetValueExW': tipos diferentes para parâmetro formal e real 5
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(358,12): warning C4098: 'CriaRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(345,7): warning C4101: 'aux': variável local não referenciada
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(407,12): warning C4098: 'escreveRegedit': função 'void' retornando um valor
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(428,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(428,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(412,12): warning C4098: 'escreveRegedit': função 'void' retornando um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(437,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(437,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(432,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(432,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(441,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(441,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(436,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(436,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(445,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(445,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(440,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(440,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(449,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(449,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(444,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(444,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(453,12): warning C4477: 'wprintf': a cadeia de formato '%d' requer um argumento do tipo 'int', mas um argumento variadic 2 tem o tipo 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(453,12):
   considere usar '%zd' na cadeia de formato
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(418,9): warning C4101: 'hPipe': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(416,8): warning C4101: 'buf': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(417,8): warning C4101: 'nbytes': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(478,38): warning C4047: 'função': 'LPOVERLAPPED' difere em níveis de indireção de 'unsigned int'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(478,38): warning C4024: 'ConnectNamedPipe': tipos diferentes para parâmetro formal e real 2
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(455,8): warning C4101: 'nBytes': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(457,9): warning C4101: 'hSemClientes': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(453,14): warning C4101: 'cd': variável local não referenciada
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(584,71): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(590,71): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(558,1): warning C4715: 'verificaClientes': nem todos os caminhos de controle retornam um valor
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(421,8): warning C4101: 'buf': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(494,31): warning C4047: 'função': 'LPOVERLAPPED' difere em níveis de indireção de 'unsigned int'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(494,31): warning C4024: 'ConnectNamedPipe': tipos diferentes para parâmetro formal e real 2
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(470,8): warning C4101: 'nBytes': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(469,7): warning C4101: 'resultado': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(468,14): warning C4101: 'cd': variável local não referenciada
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(576,81): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(582,81): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
   Trabalho_Prático2024.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\bolsa.exe

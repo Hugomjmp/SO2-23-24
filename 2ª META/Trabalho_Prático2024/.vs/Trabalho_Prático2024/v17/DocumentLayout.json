@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\bolsa.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|solutionrelative:bolsa.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{07B3D143-93A6-40F3-AAC5-8438D3331AB7}|board\\board.vcxproj|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{07B3D143-93A6-40F3-AAC5-8438D3331AB7}|board\\board.vcxproj|solutionrelative:board\\board.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\bolsa.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|solutionrelative:bolsa.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|Itens de Solu\u00E7\u00E3o{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -26,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 129,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
@@ -36,22 +36,35 @@
               "RelativeDocumentMoniker": "utils.h",
               "ToolTip": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\utils.h",
               "RelativeToolTip": "utils.h",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAADIAAAABAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAASAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-04-16T16:34:21.874Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "bolsa.c",
               "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\bolsa.c",
               "RelativeDocumentMoniker": "bolsa.c",
               "ToolTip": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\bolsa.c",
               "RelativeToolTip": "bolsa.c",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAAAAAA",
+              "ViewState": "AQIAAE8AAAAAAAAAAAAewEkBAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2024-04-16T11:38:19.182Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "board.c",
+              "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c",
+              "RelativeDocumentMoniker": "board\\board.c",
+              "ToolTip": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c",
+              "RelativeToolTip": "board\\board.c",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABsAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-04-24T11:06:54.751Z",
               "EditorCaption": ""
             },
             {
@@ -65,19 +78,6 @@
               "ViewState": "AQIAAAYAAAAAAAAAAAAAADIAAAAgAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2024-04-23T17:07:45.28Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "board.c",
-              "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c",
-              "RelativeDocumentMoniker": "board\\board.c",
-              "ToolTip": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c",
-              "RelativeToolTip": "board\\board.c",
-              "ViewState": "AQIAABUAAAAAAAAAAAAAADIAAAAoAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
-              "WhenOpened": "2024-04-24T11:06:54.751Z",
               "EditorCaption": ""
             }
           ]

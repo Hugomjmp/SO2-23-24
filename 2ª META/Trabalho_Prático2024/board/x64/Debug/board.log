@@ -1,10 +1,9 @@
 ﻿  board.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(21,12): warning C4002: muitos argumentos para a invocação de macro de função 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(21,12): warning C4473: 'wprintf' : não há argumentos suficientes transmitidos para a cadeia de caracteres de formato
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(21,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(19,12): warning C4002: muitos argumentos para a invocação de macro de função 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(19,12): warning C4473: 'wprintf' : não há argumentos suficientes transmitidos para a cadeia de caracteres de formato
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(19,12):
   espaços reservados e seus parâmetros esperam 1 argumentos variadic, mas 0 foram fornecidos
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(21,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(19,12):
   o argumento variadic 1 ausente é requerido pela cadeia de formato '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(9,17): warning C4101: 'hMapFile': variável local não referenciada
   board.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\board.exe
