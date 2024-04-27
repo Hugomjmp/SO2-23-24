@@ -14,8 +14,8 @@
 
 //DADOS DA ESTRUTURA NAMEDPIPE BOLSA
 #define TAM 20
-#define MAX_LINHA 30
-#define MAX_COLUNA 3 
+#define MAX_EMPRESAS 30
+
 
  //Shared Memory
 #define SHM_NAME TEXT("SHM_BOLSA")
@@ -24,6 +24,11 @@
 
 //SINCRONIZAÇÃO
 #define EVENT_NAME TEXT("EVENT_BOLSA")
+
+//MUTEX
+#define MUTEX_NAME TEXT("MUTEX_BOLSA")
+
+
 
 //ESTRUTURAS
 typedef struct   

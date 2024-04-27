@@ -4,11 +4,11 @@ int _tmain(int argc, TCHAR* argv[])
 {
 	//HANDLES...
 
-	HANDLE hPipe, hThreadArray[5], hEvent, hMapFile;
+	HANDLE hPipe, hThreadArray[5], hEvent, hMapFile, hMutex;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0;
-	TCHAR digitos = 0;
+	DWORD digitos = 0;
 	
 	float pAção;
 	TCHAR comandoAdmin[200], nomeEmpresa[50], string[100];
@@ -20,10 +20,9 @@ int _tmain(int argc, TCHAR* argv[])
 
 	//estruturas
 	clienteData cd;
-	userData user[5][MAX_COLUNA];
-	//empresaData empresas[MAX_LINHA][MAX_COLUNA];
+	userData user[5];
 	empresaData empresas[30];
-
+	empresaData* emP;
 
 
 	//ControlData* cdata;
@@ -40,11 +39,10 @@ int _tmain(int argc, TCHAR* argv[])
 	//#																#
 	//###############################################################
 	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < MAX_COLUNA; j++) {
-			_tcscpy(user[i][j].user, TEXT("-1"));
-			user[i][j].saldo = 0;
-			user[i][j].estado = 0;
-		}
+			_tcscpy(user[i].user, TEXT("-1"));
+			user[i].saldo = 0;
+			user[i].estado = 0;
+		
 	}
 	//---------------------------------------------------------------
 	fpU = fopen(UTILIZADORES_REGISTADOS, "r"); //abertura do ficheiro Clientes.txt para leitura
@@ -54,7 +52,7 @@ int _tmain(int argc, TCHAR* argv[])
 		return -1;
 	}
 	linha = 0;
-	while (linha < 5 && fwscanf(fpU, TEXT("%s %*s %f"), user[linha][0].user, &user[linha][1].saldo) == 2) {
+	while (linha < 5 && fwscanf(fpU, TEXT("%s %*s %f"), user[linha].user, &user[linha].saldo) == 2) {
 		linha++;
 	}
 	//###############################################################
@@ -62,19 +60,12 @@ int _tmain(int argc, TCHAR* argv[])
 	//#				INICIALIZAR MATRIZ empresas						#
 	//#				com -1, 0, 0.0 em todas as linhas				#
 	//###############################################################
-	for (DWORD i = 0; i < MAX_LINHA; i++)
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
 	{
 		_tcscpy(empresas[i].nomeEmpresa, TEXT("-1"));
 		empresas[i].nAções = 0;
 		empresas[i].pAção = 0.0;
 	}
-	//for (int i = 0; i < MAX_LINHA; i++) {
-	//	for (int j = 0; j < MAX_COLUNA; j++) {
-	//		_tcscpy(empresas[i][j].nomeEmpresa, TEXT("-1"));
-	//		empresas[i][j].nAções = 0;
-	//		empresas[i][j].pAção = 0.0;
-	//	}
-	//}
 	//---------------------------------------------------------------
 	CriaRegedit(); //TRATA DA VARIAVEL NCLIENTES
 	//leRegedit();	//função para tirar depois
@@ -116,23 +107,39 @@ int _tmain(int argc, TCHAR* argv[])
 		return 1;
 	}
 	
-	/*
-	empresaData *empresas = (empresaData*)MapViewOfFile(
+	emP = (empresaData*)MapViewOfFile(
 		hMapFile,				// Handle do ficheiro mapeado
 		FILE_MAP_ALL_ACCESS,	// Flags de acesso (ler, escrever)
 		0,						// Início dentro do bloco pretendido
 		0,						// dentro do ficheiro (+signific., -signific.)
 		sizeof(empresaData)		// Tamanho da view pretendida
 	);
-	if (pEmpresas == NULL) {
+	if (emP == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
 		CloseHandle(hMapFile);
 		return 1;
 	}
-	*/
-	//CopyMemory(data, empresas, sizeof(empresas));
-
 	//---------------------------------------------------------------
+	//###############################################################
+	//#																#
+	//#							MUTEX								#
+	//#																#
+	//###############################################################
+
+	hMutex = CreateMutex(
+		NULL,
+		FALSE,
+		MUTEX_NAME
+	);
+
+	if (hMutex == NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
+
+
+
+
 
 	//CIRAR A THREAD PARA TRATAR OS COMANDOS DOS CLIENTES
 	/*hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
@@ -187,13 +194,25 @@ int _tmain(int argc, TCHAR* argv[])
 			_tscanf(TEXT("%lu"), &nAções);
 			_tscanf(TEXT("%f"), &pAção);
 			DWORD empresaAdiciona = 1;
-			for (DWORD i = 0; i < MAX_LINHA; i++) {
+			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
 				if (empresaAdiciona == 1) {
 					if ((_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa)) == 0) {
+
+						//evento
+						SetEvent(hEvent);
+						//bloqueia no mutex
+						WaitForSingleObject(hMutex, INFINITE);
 						_tcscpy(empresas[i].nomeEmpresa, nomeEmpresa);
 						empresas[i].nAções = nAções;
 						empresas[i].pAção = pAção;
 						empresaAdiciona = 0;
+						//copia dados para a sharedmemory
+						CopyMemory(emP, empresas, sizeof(empresas));
+						//relase ao mutex
+						ReleaseMutex(hMutex);
+						//resetEvento
+						ResetEvent(hEvent);
+
 					}
 				}
 			}
@@ -208,13 +227,18 @@ int _tmain(int argc, TCHAR* argv[])
 				return -1;
 			}
 			linha = 0;
-			while (linha < MAX_LINHA && fwscanf(fp, TEXT("%s %lu %f"), &empresas[linha].nomeEmpresa, &empresas[linha].nAções, &empresas[linha].pAção) == 3) {
+			while (linha < MAX_EMPRESAS && fwscanf(fp, TEXT("%s %lu %f"), &empresas[linha].nomeEmpresa, &empresas[linha].nAções, &empresas[linha].pAção) == 3) {
 				linha++;
 			}
-
-			
+			//evento
 			SetEvent(hEvent);
-			//Sleep(500);
+			//bloqueia no mutex
+			WaitForSingleObject(hMutex, INFINITE);
+			//copia dados para a sharedmemory
+			CopyMemory(emP, empresas, sizeof(empresas));
+			//relase ao mutex
+			ReleaseMutex(hMutex);
+			//resetEvento
 			ResetEvent(hEvent);
 			
 
@@ -226,7 +250,7 @@ int _tmain(int argc, TCHAR* argv[])
 		else if (_tcsicmp(TEXT("listc"), comandoAdmin) == 0) {
 			_tprintf(TEXT("\n| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 			_tprintf(TEXT("---------------------------------------------------------------------------------\n"));
-			for (DWORD i = 0; i < MAX_LINHA; i++) { //conta quantas empresas estão na tabela
+			for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
 				if (_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa) != 0)
 				{
 					contador++;
@@ -273,9 +297,19 @@ int _tmain(int argc, TCHAR* argv[])
 			_tscanf(TEXT("%s"), &nomeEmpresa);
 			_tscanf(TEXT("%f"), &pAção);
 
-			for (DWORD i = 0; i < MAX_LINHA; i++) {
+			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
 					if ((_tcsicmp(empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
+						//evento
+						SetEvent(hEvent);
+						//bloqueia no mutex
+						WaitForSingleObject(hMutex, INFINITE);
 						empresas[i].pAção = pAção;
+						//copia dados para a sharedmemory
+						CopyMemory(emP, empresas, sizeof(empresas));
+						//relase ao mutex
+						ReleaseMutex(hMutex);
+						//resetEvento
+						ResetEvent(hEvent);
 					}
 			}
 		}
@@ -287,21 +321,21 @@ int _tmain(int argc, TCHAR* argv[])
 			{
 				_tprintf(TEXT("| %d  |"), i + 1);
 
-				_tprintf(TEXT(" |\t %s \t\t|"), user[i][0].user); 
+				_tprintf(TEXT(" |\t %s \t\t|"), user[i].user); 
 				//_tprintf(TEXT(" |\t %.2f \t\t|"), user[i][2].saldo);
 				digitos = 0;
-				numeros = user[i][1].saldo;
+				numeros = user[i].saldo;
 				while (numeros >= 1) {
 					numeros /= 10;
 					digitos++;
 				}
 				
 				if (digitos >= 3)
-					_tprintf(TEXT(" |\t %.2f \t|"), user[i][1].saldo);
+					_tprintf(TEXT(" |\t %.2f \t|"), user[i].saldo);
 				else
-					_tprintf(TEXT(" |\t %.2f \t\t|"), user[i][1].saldo);
+					_tprintf(TEXT(" |\t %.2f \t\t|"), user[i].saldo);
 
-				_tprintf(TEXT(" |\t %d \t\t|"), user[i][2].estado);
+				_tprintf(TEXT(" |\t %d \t\t|"), user[i].estado);
 
 				_tprintf(TEXT("\n---------------------------------------------------------------------------------\n"));
 			}
@@ -328,10 +362,11 @@ int _tmain(int argc, TCHAR* argv[])
 	}
 	//for (DWORD i = 0; i < 5; i++)
 	//{
-		CloseHandle(hThreadArray[2]); //colocar i depois
+	CloseHandle(hThreadArray[2]); //colocar i depois
 	//}
+	CloseHandle(hMutex);
 	CloseHandle(hEvent);
-	//UnmapViewOfFile(pEmpresas);
+	UnmapViewOfFile(emP);
 	CloseHandle(hMapFile);
 	fclose(fpU);
 	return 0;
@@ -560,7 +595,7 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 	DWORD tipoAlteração = 0;
 	while (1)
 	{
-		for (DWORD i = 0; i < MAX_LINHA; i++) {
+		for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
 				if (_tcsicmp(TEXT("-1"), empresasArry[i].nomeEmpresa) != 0)
 				{
 					contador++;
