@@ -8,14 +8,14 @@
 #include <string.h>
 
 
-#define NOME TEXT("\\\\.\\pipe\\BOLSA")
+
 #define UTILIZADORES_REGISTADOS "Clientes.txt"
 #define EMPRESAS "Empresas.txt"
 
 //DADOS DA ESTRUTURA NAMEDPIPE BOLSA
 #define TAM 20
 #define MAX_EMPRESAS 30
-
+//Processo Board
 
  //Shared Memory
 #define SHM_NAME TEXT("SHM_BOLSA")
@@ -24,10 +24,14 @@
 
 //SINCRONIZAÇÃO
 #define EVENT_NAME TEXT("EVENT_BOLSA")
+#define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
 
 //MUTEX
 #define MUTEX_NAME TEXT("MUTEX_BOLSA")
+#define MUTEX_NAME_O TEXT("MUTEX_BOARD")
 
+//NAMEDPIPE
+#define NAME_PIPE TEXT("\\\\.\\pipe\\BOLSA")
 
 
 //ESTRUTURAS
@@ -51,17 +55,21 @@ typedef struct {
 	BOOL estado;
 }userData;
 
-typedef struct {
+/*typedef struct {
 	empresaData* sharedMem;
 	HANDLE hMapFile;
-}ControlData;
+}ControlData;*/
 
 //THREADS
 DWORD WINAPI trataComandosClientes();
 DWORD WINAPI verificaClientes();
 DWORD WINAPI variaPreços(LPVOID empresas);
+DWORD WINAPI Organiza_dados(LPVOID empresas);
+DWORD WINAPI SMtoLocal(LPVOID empresas);
+DWORD WINAPI cliente_read();
 
 //Prototipos das funções
 void CriaRegedit();
 DWORD leRegedit();
 void escreveRegedit();
+

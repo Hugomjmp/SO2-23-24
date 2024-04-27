@@ -4,7 +4,8 @@ int _tmain(int argc, TCHAR* argv[])
 {
 	//HANDLES...
 
-	HANDLE hPipe, hThreadArray[5], hEvent, hMapFile, hMutex;
+	HANDLE hPipe, hThreadArray[5] = {NULL,NULL,NULL,NULL,NULL},
+		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0;
@@ -35,7 +36,7 @@ int _tmain(int argc, TCHAR* argv[])
 
 	//###############################################################
 	//#																#
-	//#				INICIALIZAR MATRIZ USER							#
+	//#					INICIALIZAR MATRIZ USER						#
 	//#																#
 	//###############################################################
 	for (int i = 0; i < 5; i++) {
@@ -77,14 +78,20 @@ int _tmain(int argc, TCHAR* argv[])
 	//#						Eventos			 						#
 	//#																#
 	//###############################################################
+	//falta os if's
 
 	hEvent = CreateEvent(
-		NULL,		//lpEventAttributes
-		TRUE,		//bManualReset
-		FALSE,		//bInitialState
-		EVENT_NAME	//lpName
+		NULL,			//lpEventAttributes
+		TRUE,			//bManualReset
+		FALSE,			//bInitialState
+		EVENT_NAME		//lpName
 	);
-
+	hEventRead = CreateEvent(
+		NULL,			//lpEventAttributes
+		TRUE,			//bManualReset
+		FALSE,			//bInitialState
+		EVENT_NAME_O	//lpName
+	);
 	//---------------------------------------------------------------
 	//###############################################################
 	//#																#
@@ -119,6 +126,12 @@ int _tmain(int argc, TCHAR* argv[])
 		CloseHandle(hMapFile);
 		return 1;
 	}
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
+		emP[i].nAções = 0;
+		emP[i].pAção = 0.0;
+	}
 	//---------------------------------------------------------------
 	//###############################################################
 	//#																#
@@ -136,14 +149,29 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
 		return 1;
 	}
+	hMutexRead = CreateMutex(
+		NULL,
+		FALSE,
+		MUTEX_NAME_O
+	);
+
+	if (hMutexRead == NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
+
+	//---------------------------------------------------------------
 
 
 
-
-
+	//###############################################################
+	//#																#
+	//#							Threads								#
+	//#																#
+	//###############################################################
 	//CIRAR A THREAD PARA TRATAR OS COMANDOS DOS CLIENTES
-	/*hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-	hThreadArray[0] = CreateThread(
+	//hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+	/*hThreadArray[0] = CreateThread(
 						NULL,					// default security attributes
 						0,						// use default stack size
 						trataComandosClientes,	// thread function name
@@ -151,14 +179,22 @@ int _tmain(int argc, TCHAR* argv[])
 						0,						// use default creation flags
 						NULL);
 						*/
-	/*hThreadArray[1] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+	/*if (hThreadArray[0] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}*/
+	hThreadArray[1] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
 	hThreadArray[1] = CreateThread(
 		NULL,					// default security attributes
 		0,						// use default stack size
 		verificaClientes,	// thread function name
 		NULL,					// argument to thread function
 		0,						// use default creation flags
-		NULL);*/
+		NULL);
+	if (hThreadArray[1] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
 	hThreadArray[2] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
 	hThreadArray[2] = CreateThread(
 		NULL,					// default security attributes
@@ -167,22 +203,49 @@ int _tmain(int argc, TCHAR* argv[])
 		empresas,				// argument to thread function
 		0,						// use default creation flags
 		NULL);
+	if (hThreadArray[2] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	hThreadArray[3] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+	hThreadArray[3] = CreateThread(
+		NULL,					// default security attributes
+		0,						// use default stack size
+		SMtoLocal,				// thread function name
+		empresas,				// argument to thread function
+		0,						// use default creation flags
+		NULL);
+	if (hThreadArray[3] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	//---------------------------------------------------------------
+	
 	//###############################################################
 	//#																#
 	//#				Processa Comando de Administrador				#
 	//#																#
 	//###############################################################
+	_tprintf(TEXT("\t\t\t#################################################################\n"));
+	_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+	_tprintf(TEXT("\t\t\t#\t\t\tBOLSA DE VALORES SERVER\t\t\t#\n"));
+	_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+	_tprintf(TEXT("\t\t\t#################################################################\n"));
 	while ((_tcsicmp(TEXT("close"), comandoAdmin)) != 0)
 	{
-		_tprintf(TEXT("\n addc - Acrescentar uma empresa "));
-		_tprintf(TEXT("\n adde - Acrescentar empresas via Empresas.txt "));
-		_tprintf(TEXT("\n listc - Listar todas as empresas "));
-		_tprintf(TEXT("\n stock - Redefinir custo das ações de uma empresa "));
-		_tprintf(TEXT("\n users - Listar utilizadores"));
-		_tprintf(TEXT("\n pause - Pausar as operações de compra e venda"));
-		_tprintf(TEXT("\n clear - Limpa o ecrã"));
-		_tprintf(TEXT("\n close - Encerrar a plataforma"));
-		_tprintf(TEXT("\nComando: "));
+		_tprintf(TEXT("\n\t\t\t-----------------------------------------------------------------"));
+		_tprintf(TEXT("\n\t\t\t|\t\t\t\tMENU\t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t-----------------------------------------------------------------"));
+		_tprintf(TEXT("\n\t\t\t| addc - Acrescentar uma empresa \t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t| adde - Acrescentar empresas via Empresas.txt \t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t| listc - Listar todas as empresas \t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t| stock - Redefinir custo das ações de uma empresa \t\t|"));
+		_tprintf(TEXT("\n\t\t\t| users - Listar utilizadores \t\t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t| pause - Pausar as operações de compra e venda \t\t|"));
+		_tprintf(TEXT("\n\t\t\t| clear - Limpa o ecrã \t\t\t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t| close - Encerrar a plataforma \t\t\t\t|"));
+		_tprintf(TEXT("\n\t\t\t-----------------------------------------------------------------"));
+		_tprintf(TEXT("\n\t\t\tComando: "));
 		fflush(stdin);
 		_tscanf(TEXT("%s"), comandoAdmin);
 		//_tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comandoAdmin, _tcslen(comandoAdmin));
@@ -230,14 +293,15 @@ int _tmain(int argc, TCHAR* argv[])
 			while (linha < MAX_EMPRESAS && fwscanf(fp, TEXT("%s %lu %f"), &empresas[linha].nomeEmpresa, &empresas[linha].nAções, &empresas[linha].pAção) == 3) {
 				linha++;
 			}
-			//evento
-			SetEvent(hEvent);
+
 			//bloqueia no mutex
 			WaitForSingleObject(hMutex, INFINITE);
 			//copia dados para a sharedmemory
 			CopyMemory(emP, empresas, sizeof(empresas));
 			//relase ao mutex
 			ReleaseMutex(hMutex);
+			//evento
+			SetEvent(hEvent);
 			//resetEvento
 			ResetEvent(hEvent);
 			
@@ -248,8 +312,8 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
 		else if (_tcsicmp(TEXT("listc"), comandoAdmin) == 0) {
-			_tprintf(TEXT("\n| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
-			_tprintf(TEXT("---------------------------------------------------------------------------------\n"));
+			_tprintf(TEXT("\n\t\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+			_tprintf(TEXT("\t\t\t---------------------------------------------------------------------------------\n"));
 			for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
 				if (_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa) != 0)
 				{
@@ -260,9 +324,9 @@ int _tmain(int argc, TCHAR* argv[])
 			for (DWORD i = 0; i < contador; i++)
 			{
 				if (i < 9) { //corrige o espaçamento do ID
-					_tprintf(TEXT("| %d  |"), i + 1);
+					_tprintf(TEXT("\t\t\t| %d  |"), i + 1);
 				}else{
-					_tprintf(TEXT("| %d |"), i + 1);
+					_tprintf(TEXT("\t\t\t| %d |"), i + 1);
 				}
 					if (_tcslen(empresas[i].nomeEmpresa) <= 5)
 					{
@@ -288,7 +352,7 @@ int _tmain(int argc, TCHAR* argv[])
 					else
 						_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresas[i].pAção);
 
-				_tprintf(TEXT("\n---------------------------------------------------------------------------------\n"));
+				_tprintf(TEXT("\n\t\t\t---------------------------------------------------------------------------------\n"));
 			}
 			contador = 0;
 		}
@@ -315,11 +379,11 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 		//TRATA DO COMANDO LISTAR UTLIZADORES
 		else if (_tcsicmp(TEXT("users"), comandoAdmin) == 0) {
-			_tprintf(TEXT("\n| ID | |\t NOME\t\t| |\t Saldo \t\t| |\t Estado\t\t|\n"));
-			_tprintf(TEXT("---------------------------------------------------------------------------------\n"));
+			_tprintf(TEXT("\n\t\t\t| ID | |\t NOME\t\t| |\t Saldo \t\t| |\t Estado\t\t|\n"));
+			_tprintf(TEXT("\t\t\t---------------------------------------------------------------------------------\n"));
 			for (DWORD i = 0; i < 5; i++)
 			{
-				_tprintf(TEXT("| %d  |"), i + 1);
+				_tprintf(TEXT("\t\t\t| %d  |"), i + 1);
 
 				_tprintf(TEXT(" |\t %s \t\t|"), user[i].user); 
 				//_tprintf(TEXT(" |\t %.2f \t\t|"), user[i][2].saldo);
@@ -337,7 +401,7 @@ int _tmain(int argc, TCHAR* argv[])
 
 				_tprintf(TEXT(" |\t %d \t\t|"), user[i].estado);
 
-				_tprintf(TEXT("\n---------------------------------------------------------------------------------\n"));
+				_tprintf(TEXT("\n\t\t\t---------------------------------------------------------------------------------\n"));
 			}
 		}
 		//TRATA DO COMANDO PAUSAR AS OPERAÇÕES DE COMPRA E VENDA
@@ -350,7 +414,11 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 		else if (_tcsicmp(TEXT("clear"), comandoAdmin) == 0) { //limpa o ecra
 			system("cls");
-			_tprintf(TEXT("\nRecebi Comando: %s %lu com tamanho %zu"), comandoAdmin, nSegundos, _tcslen(comandoAdmin));
+			_tprintf(TEXT("\t\t\t#################################################################\n"));
+			_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+			_tprintf(TEXT("\t\t\t#\t\t\tBOLSA DE VALORES SERVER\t\t\t#\n"));
+			_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+			_tprintf(TEXT("\t\t\t#################################################################\n"));
 
 		}
 		//TRATA DA FALHA DO COMANDO
@@ -360,10 +428,10 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 
 	}
-	//for (DWORD i = 0; i < 5; i++)
-	//{
-	CloseHandle(hThreadArray[2]); //colocar i depois
-	//}
+	for (DWORD i = 0; i < 5; i++)
+		{
+			CloseHandle(hThreadArray[i]);
+		}
 	CloseHandle(hMutex);
 	CloseHandle(hEvent);
 	UnmapViewOfFile(emP);
@@ -501,37 +569,63 @@ DWORD WINAPI verificaClientes() {
 	
 	FILE* fp;
 	clienteData cd;
-	BOOL resultado;
+	BOOL resultado, readResult;
 	DWORD nBytes;
 	TCHAR string[100];
 	HANDLE hSemClientes;
 	HANDLE hPipe;
+	
 
 	//CRIAR O NAMEDPIPE BOLSA PARA INTERAÇÃO DOS CLIENTES
 	hPipe = CreateNamedPipe(
-		NOME,	// Nome do pipe
+		NAME_PIPE,					// Nome do pipe
 		PIPE_ACCESS_DUPLEX,			// acesso em modo de escrita e de leitura
 		PIPE_TYPE_MESSAGE |			// message type pipe 
 		PIPE_READMODE_MESSAGE |		// message-read mode 
 		PIPE_WAIT,					// blocking mode 
-		PIPE_UNLIMITED_INSTANCES,							// max. instances  
-		sizeof(clienteData),					// output buffer size 
-		sizeof(clienteData),					// input buffer size 
+		PIPE_UNLIMITED_INSTANCES,	// max. instances  
+		sizeof(string),		// output buffer size 
+		sizeof(string),		// input buffer size 
 		0,							// client time-out 
 		NULL);						// default security attribute 
-	if (hPipe != INVALID_HANDLE_VALUE)
+	if (hPipe == INVALID_HANDLE_VALUE)
 	{
 		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe, %d.\n"), GetLastError());
 		return -1;
 	}
-	
-	_tprintf(TEXT("[ERRO] antes de esperar.\n"));
-	if (!ConnectNamedPipe(hPipe, INFINITE)) {
+	resultado = ConnectNamedPipe(hPipe, NULL);
+	_tprintf(TEXT("RECEBI: %d.\n"), resultado);
+	if (!resultado) {
 		_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
-		return -1;
-	}
-	_tprintf(TEXT("[INFO] Cliente conectado com sucesso.\n"));
 
+	}
+	//resultado = ConnectNamedPipe(hPipe, NULL);
+	//if (!resultado) {
+	//_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
+	//	return -1;
+	//}
+	//_tprintf(TEXT("aqui1.\n"));
+	while ((_tcsicmp(TEXT("close"), string)) != 0)
+	{
+
+		//_tprintf(TEXT("aqui2.\n"));
+		readResult = ReadFile(
+			hPipe,        // handle to pipe 
+			string,   // buffer to receive data 
+			sizeof(string), // size of buffer 
+			&nBytes, // number of bytes read 
+			NULL);        // not overlapped I/O 
+		if (!readResult)
+		{
+			_tprintf(TEXT("RECEBI: %s\n"), string);
+		}
+		
+	}
+	//_tprintf(TEXT("aqui3.\n"));
+	//_tprintf(TEXT("[ERRO] antes de esperar.\n"));
+
+	//_tprintf(TEXT("[INFO] Cliente conectado com sucesso.\n"));
+	/*
 
 	hSemClientes = CreateSemaphore(NULL, 5, 5, TEXT("semaforoClientes"));
 	if (hSemClientes == NULL) {
@@ -544,7 +638,7 @@ DWORD WINAPI verificaClientes() {
 		_tprintf(TEXT("[ERRO] Falhou ao abrir o arquivo de clientes registrados.\n"));
 		return -1;
 	}
-
+	
 	while (fgetws(string, 100, fp)) {
 		
 		WaitForSingleObject(hSemClientes, INFINITE);
@@ -555,9 +649,9 @@ DWORD WINAPI verificaClientes() {
 		
 		ReleaseSemaphore(hSemClientes, 1, NULL);
 	}
-
-	CloseHandle(hSemClientes);
-	fclose(fp);
+	*/
+	//CloseHandle(hSemClientes);
+	//fclose(fp);
 	CloseHandle(hPipe);
 
 	return 0;
@@ -608,13 +702,15 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 			if (tipoAlteração < 25)
 			{
 				linhaAleatoria = rand() % contador;
-				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção - (empresasArry[linhaAleatoria].pAção * 0.2); //diminui 20%
+				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção - 
+					(empresasArry[linhaAleatoria].pAção * 0.2); //diminui 20%
 				
 			}
 			else
 			{
 				linhaAleatoria = rand() % contador;
-				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção + (empresasArry[linhaAleatoria].pAção * 0.2); //aumenta 20%
+				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção + 
+					(empresasArry[linhaAleatoria].pAção * 0.2); //aumenta 20%
 				
 			}
 
@@ -629,3 +725,73 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 //---------------------------------------------------------------
 
 
+DWORD WINAPI SMtoLocal(LPVOID empresas) {
+	empresaData* empresasArry = (empresaData*)empresas;
+	empresaData* emP;
+	HANDLE hMapFile, hMutexRead, hEventRead;
+
+
+	//###############################################################
+	//#																#
+	//#						Eventos			 						#
+	//#																#
+	//###############################################################
+	hEventRead = OpenEvent(
+		SYNCHRONIZE,	//dwDesiredAccess,
+		FALSE,			//bInheritHandle,
+		EVENT_NAME_O	//lpName
+	);
+	if (hEventRead == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	//###############################################################
+	//#																#
+	//#							MUTEX								#
+	//#																#
+	//###############################################################
+	hMutexRead = OpenMutex(
+		MUTEX_ALL_ACCESS,
+		FALSE,
+		MUTEX_NAME_O);
+
+	if (hMutexRead == NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
+
+	hMapFile = OpenFileMapping(
+		FILE_MAP_ALL_ACCESS,	// acesso pretendido 
+		FALSE,
+		SHM_NAME			// nome dado ao recurso (ficheiro mapeado)
+	);
+	if (hMapFile == NULL) {
+		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
+		return 1;
+	}
+	emP = (empresaData*)MapViewOfFile(
+		hMapFile,
+		FILE_MAP_ALL_ACCESS,
+		0,
+		0,
+		sizeof(empresaData)
+	);
+	if (emP == NULL) {
+		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
+		return 1;
+	}
+	
+	while (1)
+	{
+		//_tprintf(TEXT("\nANTES DO WAIT!!!!"));
+		WaitForSingleObject(hEventRead, INFINITE);
+		//_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
+		WaitForSingleObject(hMutexRead, INFINITE);
+		//_tprintf(TEXT("\nPASSEI O MUTEX!!!!"));
+		CopyMemory(empresasArry, emP, sizeof(emP) * MAX_EMPRESAS);
+		ReleaseMutex(hMutexRead);
+		//_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
+
+	}
+	return 1;
+}
