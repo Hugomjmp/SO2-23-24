@@ -5,12 +5,12 @@ int _tmain(int argc, TCHAR* argv[])
 	//HANDLES...
 
 	HANDLE hPipe, hThreadArray[5] = {NULL,NULL,NULL,NULL,NULL},
-		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead;
+		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0;
 	DWORD digitos = 0;
-	
+	DWORD NCLIENTES = leRegedit();
 	float pAção;
 	TCHAR comandoAdmin[200], nomeEmpresa[50], string[100];
 	BOOL resultado;
@@ -20,11 +20,12 @@ int _tmain(int argc, TCHAR* argv[])
 	FILE* fp,*fpU;
 
 	//estruturas
-	clienteData cd;
-	userData user[5];
+	clienteData cliData;
+	userData users[5];
 	empresaData empresas[30];
 	empresaData* emP;
-
+	ControlData ctrlData = {.empresas = empresas, .users = users};
+	
 
 	//ControlData* cdata;
 	
@@ -40,9 +41,10 @@ int _tmain(int argc, TCHAR* argv[])
 	//#																#
 	//###############################################################
 	for (int i = 0; i < 5; i++) {
-			_tcscpy(user[i].user, TEXT("-1"));
-			user[i].saldo = 0;
-			user[i].estado = 0;
+			_tcscpy(users[i].username, TEXT("-1"));
+			_tcscpy(users[i].password, TEXT("-2"));
+			users[i].saldo = 0;
+			users[i].estado = 0;
 		
 	}
 	//---------------------------------------------------------------
@@ -53,7 +55,7 @@ int _tmain(int argc, TCHAR* argv[])
 		return -1;
 	}
 	linha = 0;
-	while (linha < 5 && fwscanf(fpU, TEXT("%s %*s %f"), user[linha].user, &user[linha].saldo) == 2) {
+	while (linha < 5 && fwscanf(fpU, TEXT("%s %s %f"), users[linha].username, users[linha].password, &users[linha].saldo) == 3) {
 		linha++;
 	}
 	//###############################################################
@@ -69,8 +71,8 @@ int _tmain(int argc, TCHAR* argv[])
 	}
 	//---------------------------------------------------------------
 	CriaRegedit(); //TRATA DA VARIAVEL NCLIENTES
-	//leRegedit();	//função para tirar depois
-	escreveRegedit();//função para tirar depois
+	
+	//escreveRegedit();//função para tirar depois
 
 
 	//###############################################################
@@ -95,6 +97,28 @@ int _tmain(int argc, TCHAR* argv[])
 	//---------------------------------------------------------------
 	//###############################################################
 	//#																#
+	//#						Semaforos		 						#
+	//#																#
+	//###############################################################
+
+	hSemClientes = CreateSemaphore(
+		NULL,
+		0,
+		NCLIENTES,
+		SEM_CLIENT_NAME);
+	if (hSemClientes == NULL) {
+		_tprintf(TEXT("[ERRO] Falhou ao criar o semáforo: %d\n"), GetLastError());
+		return -1;
+	}
+
+
+
+
+
+
+	//---------------------------------------------------------------
+	//###############################################################
+	//#																#
 	//#						Shared Memory	 						#
 	//#																#
 	//###############################################################
@@ -115,11 +139,11 @@ int _tmain(int argc, TCHAR* argv[])
 	}
 	
 	emP = (empresaData*)MapViewOfFile(
-		hMapFile,				// Handle do ficheiro mapeado
-		FILE_MAP_ALL_ACCESS,	// Flags de acesso (ler, escrever)
-		0,						// Início dentro do bloco pretendido
-		0,						// dentro do ficheiro (+signific., -signific.)
-		sizeof(empresaData)		// Tamanho da view pretendida
+			hMapFile,				// Handle do ficheiro mapeado
+			FILE_MAP_ALL_ACCESS,	// Flags de acesso (ler, escrever)
+			0,						// Início dentro do bloco pretendido
+			0,						// dentro do ficheiro (+signific., -signific.)
+			sizeof(empresaData)		// Tamanho da view pretendida
 	);
 	if (emP == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
@@ -170,25 +194,12 @@ int _tmain(int argc, TCHAR* argv[])
 	//#																#
 	//###############################################################
 	//CIRAR A THREAD PARA TRATAR OS COMANDOS DOS CLIENTES
-	//hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-	/*hThreadArray[0] = CreateThread(
-						NULL,					// default security attributes
-						0,						// use default stack size
-						trataComandosClientes,	// thread function name
-						&hPipe,					// argument to thread function
-						0,						// use default creation flags
-						NULL);
-						*/
-	/*if (hThreadArray[0] == NULL) {
-		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
-		return 1;
-	}*/
 	hThreadArray[1] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
 	hThreadArray[1] = CreateThread(
 		NULL,					// default security attributes
 		0,						// use default stack size
 		verificaClientes,	// thread function name
-		NULL,					// argument to thread function
+		&ctrlData,					// argument to thread function
 		0,						// use default creation flags
 		NULL);
 	if (hThreadArray[1] == NULL) {
@@ -312,8 +323,8 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
 		else if (_tcsicmp(TEXT("listc"), comandoAdmin) == 0) {
-			_tprintf(TEXT("\n\t\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
-			_tprintf(TEXT("\t\t\t---------------------------------------------------------------------------------\n"));
+			_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+			_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
 			for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
 				if (_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa) != 0)
 				{
@@ -324,16 +335,16 @@ int _tmain(int argc, TCHAR* argv[])
 			for (DWORD i = 0; i < contador; i++)
 			{
 				if (i < 9) { //corrige o espaçamento do ID
-					_tprintf(TEXT("\t\t\t| %d  |"), i + 1);
+					_tprintf(TEXT("\t\t| %d  |"), i + 1);
 				}else{
-					_tprintf(TEXT("\t\t\t| %d |"), i + 1);
+					_tprintf(TEXT("\t\t| %d |"), i + 1);
 				}
 					if (_tcslen(empresas[i].nomeEmpresa) <= 5)
 					{
 						if (_tcscmp(empresas[i].nomeEmpresa, TEXT("-1")) == 0) {
 							_tprintf(TEXT(" |\t   \t\t|"), empresas[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
 						}else
-						_tprintf(TEXT(" |\t %s \t\t|"), empresas[i].nomeEmpresa);
+							_tprintf(TEXT(" |\t %s \t\t|"), empresas[i].nomeEmpresa);
 					}
 					else {
 						_tprintf(TEXT(" |\t %s \t|"), empresas[i].nomeEmpresa);
@@ -352,7 +363,7 @@ int _tmain(int argc, TCHAR* argv[])
 					else
 						_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresas[i].pAção);
 
-				_tprintf(TEXT("\n\t\t\t---------------------------------------------------------------------------------\n"));
+				_tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
 			}
 			contador = 0;
 		}
@@ -379,31 +390,34 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 		//TRATA DO COMANDO LISTAR UTLIZADORES
 		else if (_tcsicmp(TEXT("users"), comandoAdmin) == 0) {
-			_tprintf(TEXT("\n\t\t\t| ID | |\t NOME\t\t| |\t Saldo \t\t| |\t Estado\t\t|\n"));
-			_tprintf(TEXT("\t\t\t---------------------------------------------------------------------------------\n"));
+			_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Saldo \t\t| |\t Estado\t\t|\n"));
+			_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
 			for (DWORD i = 0; i < 5; i++)
 			{
-				_tprintf(TEXT("\t\t\t| %d  |"), i + 1);
+				_tprintf(TEXT("\t\t| %d  |"), i + 1);
 
-				_tprintf(TEXT(" |\t %s \t\t|"), user[i].user); 
+				_tprintf(TEXT(" |\t %s \t\t|"), users[i].username);
 				//_tprintf(TEXT(" |\t %.2f \t\t|"), user[i][2].saldo);
 				digitos = 0;
-				numeros = user[i].saldo;
+				numeros = users[i].saldo;
 				while (numeros >= 1) {
 					numeros /= 10;
 					digitos++;
 				}
 				
 				if (digitos >= 3)
-					_tprintf(TEXT(" |\t %.2f \t|"), user[i].saldo);
+					_tprintf(TEXT(" |\t %.2f€ \t|"), users[i].saldo);
 				else
-					_tprintf(TEXT(" |\t %.2f \t\t|"), user[i].saldo);
-
-				_tprintf(TEXT(" |\t %d \t\t|"), user[i].estado);
-
-				_tprintf(TEXT("\n\t\t\t---------------------------------------------------------------------------------\n"));
+					_tprintf(TEXT(" |\t %.2f€ \t|"), users[i].saldo);
+				if(users[i].estado == 1)
+					_tprintf(TEXT(" |\t ONLINE \t|"));
+				else
+					_tprintf(TEXT(" |\t OFFLINE \t|"));
+				
+				_tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
 			}
 		}
+
 		//TRATA DO COMANDO PAUSAR AS OPERAÇÕES DE COMPRA E VENDA
 		else if (_tcsicmp(TEXT("pause"), comandoAdmin) == 0) {
 			_tscanf(TEXT("%lu"), &nSegundos);
@@ -503,13 +517,25 @@ void escreveRegedit() {
 	DWORD valor;
 	valor = leRegedit();
 	valor--;
-	resultado = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Trabalho_Pratico2024"), 0, KEY_SET_VALUE, &hChaveClientes); //abre a chave
+	resultado = RegOpenKeyEx(
+			HKEY_CURRENT_USER, 
+			TEXT("Software\\Trabalho_Pratico2024"), 
+			0, 
+			KEY_SET_VALUE, 
+			&hChaveClientes
+	); //abre a chave
 	if (resultado != ERROR_SUCCESS)
 	{
 		_tprintf(TEXT("Erro ao abrir a chave (%d)\n"), GetLastError());
 		return -1;
 	}
-	resultado = RegSetValueEx(hChaveClientes, TEXT("NCLIENTES"),0,REG_DWORD,(LPBYTE)&valor,tam);//le o conteudo
+	resultado = RegSetValueEx(
+			hChaveClientes, 
+			TEXT("NCLIENTES"),
+			0,
+			REG_DWORD,
+			(LPBYTE)&valor,tam
+	);//le o conteudo
 	if (resultado != ERROR_SUCCESS) {
 		_tprintf(TEXT("Erro ao escrever o valor (%d)\n"), GetLastError());
 		return -1;
@@ -518,44 +544,94 @@ void escreveRegedit() {
 }
 //---------------------------------------------------------------
 // Por acabar...
-DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
+DWORD WINAPI trataComandosClientes(LPVOID ctrlData) {
+	ControlData* cdata = (ControlData*)ctrlData;
+	clienteData cliente;
+	DWORD nBytes;
+	HANDLE writeResult, hPipe;
 
-	clienteData cd;
-	TCHAR buf[200];
-	DWORD nbytes;
-	HANDLE hPipe = (HANDLE)lpParam;
-	_tprintf(TEXT("\nÀ espera de clientes"));
-	//ConnectNamedPipe(hPipe, NULL);
-	_tprintf(TEXT("\nRecebi cliente"));
-	
-	while ((_tcsicmp(TEXT("exit"), cd.comando)) != 0)
-		if (!ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL)) {
+
+	hPipe = CreateFile(
+		NAME_PIPE,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL
+	);
+	if (hPipe == NULL) {
+		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"), NAME_PIPE);
+		return -1;
+	}
+
+
+	while ((_tcsicmp(TEXT("exit"), cliente.comando)) != 0){
+		if (!ReadFile(
+			hPipe,
+			&cliente,
+			sizeof(clienteData),
+			&nBytes,
+			NULL))
+		{
 			_tprintf(TEXT("\nErro ao ler do pipe do cliente: %d"), GetLastError());
 			break;
 		}
-	//ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL);
-	//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
-	if (_tcsicmp(TEXT("listc"), cd.comando) == 0)
-	{
-		_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cd.comando, _tcslen(cd.comando) - 1);
+		//ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL);
+		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
+		if (_tcsicmp(TEXT("listc"), cliente.comando) == 0)
+		{
+			writeResult = WriteFile(
+				hPipe,
+				&cliente,
+				sizeof(clienteData),
+				&nBytes,
+				NULL
+			);
+			FlushFileBuffers(cdata->hPipe[0]);
+			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
+		}
+		//TRATA DO COMANDO COMPRAR AÇÕES
+		else if (_tcsicmp(TEXT("buy"), cliente.comando) == 0) {
+			writeResult = WriteFile(
+				hPipe,
+				&cliente,
+				sizeof(clienteData),
+				&nBytes,
+				NULL
+			);
+			FlushFileBuffers(cdata->hPipe[0]);
+			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
+		}
+		//TRATA DO COMANDO VENDER AÇÕES
+		else if (_tcsicmp(TEXT("sell"), cliente.comando) == 0) {
+			writeResult = WriteFile(
+				hPipe,
+				&cliente,
+				sizeof(clienteData),
+				&nBytes,
+				NULL
+			);
+			FlushFileBuffers(cdata->hPipe[0]);
+			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
+		}
+		//TRATA DO COMANDO BALANCE
+		else if (_tcsicmp(TEXT("balance"), cliente.comando) == 0) {
+			writeResult = WriteFile(
+				hPipe,
+				&cliente,
+				sizeof(clienteData),
+				&nBytes,
+				NULL
+			);
+			FlushFileBuffers(hPipe);
+			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
+		}
+		//TRATA DA FALHA DO COMANDO
+		else {
+			_tprintf(TEXT("\nComando do cliente: %s introduzido com tamanho %d, não existe!"), cliente.comando, _tcslen(cliente.comando) - 1);
+		}
 	}
-	//TRATA DO COMANDO COMPRAR AÇÕES
-	else if (_tcsicmp(TEXT("buy"), cd.comando) == 0) {
-		_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cd.comando, _tcslen(cd.comando) - 1);
-	}
-	//TRATA DO COMANDO VENDER AÇÕES
-	else if (_tcsicmp(TEXT("sell"), cd.comando) == 0) {
-		_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cd.comando, _tcslen(cd.comando) - 1);
-	}
-	//TRATA DO COMANDO BALANCE
-	else if (_tcsicmp(TEXT("balance"), cd.comando) == 0) {
-		_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cd.comando, _tcslen(cd.comando) - 1);
-	}
-	//TRATA DA FALHA DO COMANDO
-	else {
-		_tprintf(TEXT("\nComando do cliente: %s introduzido com tamanho %d, não existe!"), cd.comando, _tcslen(cd.comando) - 1);
-	}
-	
 	return 0;
 }
 //-------
@@ -565,15 +641,20 @@ DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
 //#				Verificao Clientes através de semaforo			#
 //#																#
 //###############################################################
-DWORD WINAPI verificaClientes() {
+DWORD WINAPI verificaClientes(LPVOID ctrlData) {
+	ControlData* cdata = (ControlData*)ctrlData;
 	
+
+	//userData* userArray = (userData*)users;
 	FILE* fp;
-	clienteData cd;
-	BOOL resultado, readResult;
+	clienteData cliData;
+	BOOL resultado, readResult, writeResult;
 	DWORD nBytes;
 	TCHAR string[100];
 	HANDLE hSemClientes;
 	HANDLE hPipe;
+	HANDLE hThreadArray[5];
+	DWORD NCLIENTES = leRegedit();
 	
 
 	//CRIAR O NAMEDPIPE BOLSA PARA INTERAÇÃO DOS CLIENTES
@@ -584,8 +665,8 @@ DWORD WINAPI verificaClientes() {
 		PIPE_READMODE_MESSAGE |		// message-read mode 
 		PIPE_WAIT,					// blocking mode 
 		PIPE_UNLIMITED_INSTANCES,	// max. instances  
-		sizeof(string),		// output buffer size 
-		sizeof(string),		// input buffer size 
+		sizeof(clienteData),		// output buffer size 
+		sizeof(clienteData),		// input buffer size 
 		0,							// client time-out 
 		NULL);						// default security attribute 
 	if (hPipe == INVALID_HANDLE_VALUE)
@@ -593,33 +674,128 @@ DWORD WINAPI verificaClientes() {
 		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe, %d.\n"), GetLastError());
 		return -1;
 	}
-	resultado = ConnectNamedPipe(hPipe, NULL);
-	_tprintf(TEXT("RECEBI: %d.\n"), resultado);
+
+	//SEMAFOROS
+	hSemClientes = OpenSemaphore(
+		EVENT_MODIFY_STATE,
+		FALSE,
+		SEM_CLIENT_NAME
+	);
+	if (hSemClientes == NULL) {
+		_tprintf(TEXT("Erro ao abrir o semáforo. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	resultado = ConnectNamedPipe(hPipe, NULL); //espera que o cliente entre
 	if (!resultado) {
 		_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
-
 	}
-	//resultado = ConnectNamedPipe(hPipe, NULL);
-	//if (!resultado) {
-	//_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
-	//	return -1;
-	//}
-	//_tprintf(TEXT("aqui1.\n"));
-	while ((_tcsicmp(TEXT("close"), string)) != 0)
+	_tprintf(TEXT("empresa %s.\n"), cdata->empresas[0].nomeEmpresa);
+	
+	while (1)
+	{
+		
+			resultado = ReadFile( //recebe as credenciais
+				hPipe,					// handle to pipe 
+				&cliData,				// buffer to receive data 
+				sizeof(clienteData),	// size of buffer 
+				&nBytes,				// number of bytes read 
+				NULL);					// not overlapped I/O 
+			_tprintf(TEXT("RECEBI: \n"));
+			if (nBytes != 0) {
+				_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
+				_tprintf(TEXT("RECEBI password: %s\n"), cliData.password);
+				for (DWORD i = 0; i < MAX_CLIENTES; i++)
+				{
+					_tprintf(TEXT("empresa %s.\n"), cdata->empresas[i].nomeEmpresa);
+					_tprintf(TEXT("user %s.\n"), cdata->users[i].username);
+					if (_tcsicmp(cdata->users[i].username, cliData.login) == 0 && _tcsicmp(cdata->users[i].password, cliData.password) == 0)
+					{
+						_tprintf(TEXT("VAGAS: %lu\n"), NCLIENTES);
+						if (NCLIENTES > 0)//VERIFICA SE TEM VAGAS...
+						{
+							cdata->users[i].estado = 1;
+							_tcscpy(cliData.RESPOSTA, cdata->users[i].username);
+
+							writeResult = WriteFile(
+								hPipe,
+								&cliData,
+								sizeof(clienteData),
+								&nBytes,
+								NULL
+							);
+							FlushFileBuffers(hPipe);
+							ReleaseSemaphore(
+								hSemClientes,
+								1,
+								NULL
+							);
+							//CRIA A THREAD PARA O CLIENTE USAR COMANDOS
+							hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+							hThreadArray[0] = CreateThread(
+								NULL,					// default security attributes
+								0,						// use default stack size
+								trataComandosClientes,		// thread function name
+								&cdata,					// argument to thread function
+								0,						// use default creation flags
+								NULL);
+							if (hThreadArray[0] == NULL) {
+								_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+								return 1;
+							}
+
+						}
+
+					}
+					else
+					{
+						_tcscpy(cliData.RESPOSTA, TEXT("FAIL"));
+						writeResult = WriteFile(
+							hPipe,
+							&cliData,
+							sizeof(clienteData),
+							&nBytes,
+							NULL
+						);
+						FlushFileBuffers(hPipe);
+					}
+				}
+			}
+			
+	}
+
+
+
+
+
+		
+		
+	
+	
+
+
+
+
+
+		//_tprintf(TEXT("aqui1.\n"));
+	while (_tcsicmp(TEXT("close"), cliData.comando) != 0)
 	{
 
 		//_tprintf(TEXT("aqui2.\n"));
 		readResult = ReadFile(
 			hPipe,        // handle to pipe 
-			string,   // buffer to receive data 
-			sizeof(string), // size of buffer 
+			&cliData,   // buffer to receive data 
+			sizeof(clienteData), // size of buffer 
 			&nBytes, // number of bytes read 
 			NULL);        // not overlapped I/O 
 		if (!readResult)
 		{
-			_tprintf(TEXT("RECEBI: %s\n"), string);
+			//_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
+			//_tprintf(TEXT("RECEBI login: %s\n"), cliData.password);
 		}
-		
+		if (nBytes != 0) {
+			_tprintf(TEXT("RECEBI comando: %s\n"), cliData.comando);
+		}
+
 	}
 	//_tprintf(TEXT("aqui3.\n"));
 	//_tprintf(TEXT("[ERRO] antes de esperar.\n"));
@@ -627,11 +803,7 @@ DWORD WINAPI verificaClientes() {
 	//_tprintf(TEXT("[INFO] Cliente conectado com sucesso.\n"));
 	/*
 
-	hSemClientes = CreateSemaphore(NULL, 5, 5, TEXT("semaforoClientes"));
-	if (hSemClientes == NULL) {
-		_tprintf(TEXT("[ERRO] Falhou ao criar o semáforo: %d\n"), GetLastError());
-		return -1;
-	}
+	
 
 	fp = fopen(UTILIZADORES_REGISTADOS, "r");
 	if (fp == NULL) {
@@ -681,6 +853,7 @@ DWORD WINAPI verificaClientes() {
 //#				Variação aleatoria de preços					#
 //#																#
 //###############################################################
+//falta mandar para a SHARED MEMORY!!
 DWORD WINAPI variaPreços(LPVOID empresas) {
 	//empresaData(*data)[MAX_COLUNA] = (empresaData(*)[MAX_COLUNA])empresas;
 	empresaData *empresasArry = (empresaData*)empresas;

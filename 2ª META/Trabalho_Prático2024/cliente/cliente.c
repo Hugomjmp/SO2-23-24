@@ -6,7 +6,7 @@ int _tmain(int argc, TCHAR* argv[])
     TCHAR login[TAM], password[TAM], comando[200];
 
     //variaveis
-    BOOL resultado;
+    BOOL resultado, writeResult;
     DWORD nBytes;
 
     //HANDLES
@@ -16,6 +16,10 @@ int _tmain(int argc, TCHAR* argv[])
 
     //Nome do namedpipe
     LPCTSTR pBolsa = TEXT("\\\\.\\pipe\\BOLSA");
+
+    //ESTRUTURAS
+    clienteData cliData;
+
 
     //Codigo para o unicode
 #ifdef UNICODE
@@ -78,23 +82,45 @@ int _tmain(int argc, TCHAR* argv[])
     }
 
     //CREDENCIAIS DO UTILIZADOR
-    _tprintf(TEXT("\nLogin: "));
-    _tscanf(TEXT("%s"), &login);
-    _tprintf(TEXT("\nPassword: "));
-    _tscanf(TEXT("%s"), &password);
+
+        _tprintf(TEXT("\nLogin: "));
+        _tscanf(TEXT("%s"), &cliData.login);
+        _tprintf(TEXT("\nPassword: "));
+        _tscanf(TEXT("%s"), &cliData.password);
+        writeResult = WriteFile(
+            hPipe,
+            &cliData,
+            sizeof(clienteData),
+            &nBytes,
+            NULL
+        );
+
+        FlushFileBuffers(hPipe);
+        
+        resultado = ReadFile(
+            hPipe,        // handle to pipe 
+            &cliData,   // buffer to receive data 
+            sizeof(clienteData), // size of buffer 
+            &nBytes, // number of bytes read 
+            NULL);        // not overlapped I/O */
+    //    _tprintf(TEXT("O cliente %s não existe ou tem as creedenciais erradas!"), cliData.RESPOSTA);
+
+
+    //_tprintf(TEXT("O cliente %s ligado com sucesso!"), cliData.RESPOSTA);
     // DEBUG...
-    _tprintf(TEXT("\nLi -> Login: %s com tamanho %d e Password: %s com tamanho %zu"), login, _tcslen(login), password, _tcslen(password));
+    //_tprintf(TEXT("\nLi -> Login: %s com tamanho %d e Password: %s com tamanho %zu"), 
+    //    cliData.login, _tcslen(cliData.login), cliData.password, _tcslen(cliData.password));
 
     //COMANDOS DO CLIENTE
-    while ((_tcsicmp(TEXT("exit"), comando)) != 0)
+    while ((_tcsicmp(TEXT("exit"), cliData.comando)) != 0)
     {
         _tprintf(TEXT("\nComando: "));
-        _tscanf(TEXT("%s"), comando);
-        _tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comando, _tcslen(comando));
-        resultado = WriteFile(
+        _tscanf(TEXT("%s"), cliData.comando);
+        _tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), cliData.comando, _tcslen(comando));
+        writeResult = WriteFile(
             hPipe,
-            comando,
-            sizeof(comando),
+            &cliData,
+            sizeof(clienteData),
             &nBytes,
             NULL
         );

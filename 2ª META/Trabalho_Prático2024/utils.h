@@ -13,8 +13,9 @@
 #define EMPRESAS "Empresas.txt"
 
 //DADOS DA ESTRUTURA NAMEDPIPE BOLSA
-#define TAM 20
+#define TAM 30
 #define MAX_EMPRESAS 30
+#define MAX_CLIENTES 5
 //Processo Board
 
  //Shared Memory
@@ -25,6 +26,10 @@
 //SINCRONIZAÇÃO
 #define EVENT_NAME TEXT("EVENT_BOLSA")
 #define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
+
+//SEMAFOROS
+#define SEM_CLIENT_NAME TEXT("SEM_VAGA")
+
 
 //MUTEX
 #define MUTEX_NAME TEXT("MUTEX_BOLSA")
@@ -50,19 +55,21 @@ typedef struct {
 }empresaData;
 
 typedef struct {
-	TCHAR user[50];
+	TCHAR username[TAM];
+	TCHAR password[TAM];
 	float saldo;
 	BOOL estado;
 }userData;
 
-/*typedef struct {
-	empresaData* sharedMem;
-	HANDLE hMapFile;
-}ControlData;*/
+typedef struct {
+	empresaData* empresas;
+	userData* users;
+	HANDLE hPipe[5];
+}ControlData;
 
 //THREADS
-DWORD WINAPI trataComandosClientes();
-DWORD WINAPI verificaClientes();
+DWORD WINAPI trataComandosClientes(LPVOID ctrlData);
+DWORD WINAPI verificaClientes(LPVOID ctrlData);
 DWORD WINAPI variaPreços(LPVOID empresas);
 DWORD WINAPI Organiza_dados(LPVOID empresas);
 DWORD WINAPI SMtoLocal(LPVOID empresas);
