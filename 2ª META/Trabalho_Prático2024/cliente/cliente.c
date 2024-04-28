@@ -27,23 +27,7 @@ int _tmain(int argc, TCHAR* argv[])
     _setmode(_fileno(stdout), _O_WTEXT);
     //_setmode(_fileno(stderr), _O_WTEXT);
 #endif
-    //###############################################################
-    //#																#
-    //#							Threads								#
-    //#																#
-    //###############################################################
-    hThread = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-    hThread = CreateThread(
-        NULL,					// default security attributes
-        0,						// use default stack size
-        cliente_read,			// thread function name
-        NULL,				// argument to thread function
-        0,						// use default creation flags
-        NULL);
-    if (hThread == NULL) {
-        _tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
-        return 1;
-    }
+
     //---------------------------------------------------------------
     //###############################################################
     //#																#
@@ -65,7 +49,23 @@ int _tmain(int argc, TCHAR* argv[])
     }
 
     //---------------------------------------------------------------
-
+    //###############################################################
+    //#																#
+    //#							Threads								#
+    //#																#
+    //###############################################################
+    hThread = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+    hThread = CreateThread(
+        NULL,					// default security attributes
+        0,						// use default stack size
+        cliente_read,			// thread function name
+        /*hPipe*/NULL,				// argument to thread function
+        0,						// use default creation flags
+        NULL);
+    if (hThread == NULL) {
+        _tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+        return 1;
+    }
 
 
     _tprintf(TEXT("#################################################################\n"));
@@ -125,6 +125,7 @@ int _tmain(int argc, TCHAR* argv[])
             NULL
         );
         FlushFileBuffers(hPipe);
+
         //comando[_tcslen(comando) - 1] = '\0'; //retirar o /0
         /*
         if (!ReleaseSemaphore(
@@ -144,7 +145,17 @@ int _tmain(int argc, TCHAR* argv[])
 }
 
 //TRATA DE RECEBER DADOS DO NAMEDPIPE
-DWORD WINAPI cliente_read() {
+DWORD WINAPI cliente_read(LPVOID lparam) {
+    /*DWORD resultado, nBytes;
+    HANDLE hPipe = (HANDLE)lparam;
+    clienteData cliData;
 
+    resultado = ReadFile(
+        hPipe,        // handle to pipe 
+        &cliData,   // buffer to receive data 
+        sizeof(clienteData), // size of buffer 
+        &nBytes, // number of bytes read 
+        NULL);        // not overlapped I/O 
+    _tprintf(TEXT("\nResposta: %s "), cliData.comando);*/
 }
 

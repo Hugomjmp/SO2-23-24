@@ -544,27 +544,12 @@ void escreveRegedit() {
 }
 //---------------------------------------------------------------
 // Por acabar...
-DWORD WINAPI trataComandosClientes(LPVOID ctrlData) {
-	ControlData* cdata = (ControlData*)ctrlData;
+DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
+	//ControlData* cdata = (ControlData*)ctrlData;
 	clienteData cliente;
 	DWORD nBytes;
-	HANDLE writeResult, hPipe;
-
-
-	hPipe = CreateFile(
-		NAME_PIPE,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL
-	);
-	if (hPipe == NULL) {
-		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"), NAME_PIPE);
-		return -1;
-	}
-
+	HANDLE writeResult;
+	HANDLE hPipe = (HANDLE)lpParam;
 
 	while ((_tcsicmp(TEXT("exit"), cliente.comando)) != 0){
 		if (!ReadFile(
@@ -588,7 +573,7 @@ DWORD WINAPI trataComandosClientes(LPVOID ctrlData) {
 				&nBytes,
 				NULL
 			);
-			FlushFileBuffers(cdata->hPipe[0]);
+			FlushFileBuffers(hPipe);
 			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
 		}
 		//TRATA DO COMANDO COMPRAR AÇÕES
@@ -600,7 +585,7 @@ DWORD WINAPI trataComandosClientes(LPVOID ctrlData) {
 				&nBytes,
 				NULL
 			);
-			FlushFileBuffers(cdata->hPipe[0]);
+			FlushFileBuffers(hPipe);
 			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
 		}
 		//TRATA DO COMANDO VENDER AÇÕES
@@ -612,7 +597,7 @@ DWORD WINAPI trataComandosClientes(LPVOID ctrlData) {
 				&nBytes,
 				NULL
 			);
-			FlushFileBuffers(cdata->hPipe[0]);
+			FlushFileBuffers(hPipe);
 			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
 		}
 		//TRATA DO COMANDO BALANCE
@@ -735,7 +720,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 								NULL,					// default security attributes
 								0,						// use default stack size
 								trataComandosClientes,		// thread function name
-								&cdata,					// argument to thread function
+								hPipe,					// argument to thread function
 								0,						// use default creation flags
 								NULL);
 							if (hThreadArray[0] == NULL) {
