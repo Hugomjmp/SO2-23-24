@@ -28,6 +28,7 @@
 #define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
 
 //SEMAFOROS
+#define SEM_BOLSA TEXT("SEM_BOLSA")
 #define SEM_CLIENT_NAME TEXT("SEM_VAGA")
 
 
@@ -79,4 +80,5 @@ DWORD WINAPI cliente_read();
 void CriaRegedit();
 DWORD leRegedit();
 void escreveRegedit();
+void mostra_tabela(empresaData* empresasBoard);
 

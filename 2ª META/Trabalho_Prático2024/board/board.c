@@ -2,12 +2,10 @@
 
 int _tmain(int argc, TCHAR* argv[])
 {
-	HANDLE hThreadArray;
+	HANDLE hThread;
 	empresaData empresasBoard[MAX_EMPRESAS];
 	TCHAR comandoBoard[200];
-	DWORD contador = 0, numeros;
-	DWORD digitos = 0;
-	DWORD Nempresas = 0;
+
 #ifdef UNICODE
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
@@ -21,8 +19,8 @@ int _tmain(int argc, TCHAR* argv[])
 
 	//---------------------------------------------------------------
 
-	hThreadArray = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-	hThreadArray = CreateThread(
+	hThread = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
+	hThread = CreateThread(
 		NULL,					// default security attributes
 		0,						// use default stack size
 		Organiza_dados,			// thread function name
@@ -32,66 +30,22 @@ int _tmain(int argc, TCHAR* argv[])
 	//---------------------------------------------------------------
 		while ((_tcsicmp(TEXT("close"), comandoBoard)) != 0)
 	{
-
-		_tprintf(TEXT("\n list N - Mostrar as N empresas mais valiosas (até 10 empresas"));
-		_tprintf(TEXT("\n close - Fechar o programa"));
-		fflush(stdin);
-		_tprintf(TEXT("\n Comando: "));
-		_tscanf(TEXT("%s"), comandoBoard);
-		if (_tcsicmp(TEXT("list"), comandoBoard, _tcslen(TEXT("list"))) == 0)
-		{
-			_tscanf(TEXT("%lu"), &Nempresas);
-			_tprintf(TEXT("\n| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
-			_tprintf(TEXT("---------------------------------------------------------------------------------\n"));
-			for (DWORD i = 0; i < Nempresas; i++)
+			_tprintf(TEXT("\n\t\t close - Fechar o programa\n"));
+			fflush(stdin);
+			//_tprintf(TEXT("\n Comando: "));
+			_tscanf(TEXT("%s"), comandoBoard);
+			if ((_tcsicmp(TEXT("close"), comandoBoard)) != 0)
 			{
-				if (i < 9) { //corrige o espaçamento do ID
-					_tprintf(TEXT("| %d  |"), i + 1);
-				}
-				else {
-					_tprintf(TEXT("| %d |"), i + 1);
-				}
-				if (_tcslen(empresasBoard[i].nomeEmpresa) <= 5)
-				{
-					if (_tcscmp(empresasBoard[i].nomeEmpresa, TEXT("-1")) == 0) {
-						_tprintf(TEXT(" |\t   \t\t|"), empresasBoard[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
-					}
-					else
-						_tprintf(TEXT(" |\t %s \t\t|"), empresasBoard[i].nomeEmpresa);
-				}
-				else {
-					_tprintf(TEXT(" |\t %s \t|"), empresasBoard[i].nomeEmpresa);
-
-				}
-
-				_tprintf(TEXT(" |\t %lu \t\t|"), empresasBoard[i].nAções);
-				//contar os digitos para retificar espaçamento do Preço Ação
-				digitos = 0;
-				numeros = empresasBoard[i].pAção;
-				while (numeros >= 1) {
-					numeros /= 10;
-					digitos++;
-				}
-				if (digitos >= 2)
-					_tprintf(TEXT(" |\t %.2f€ \t|"), empresasBoard[i].pAção);
-				else
-					_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresasBoard[i].pAção);
-				_tprintf(TEXT("\n---------------------------------------------------------------------------------\n"));
+				break;
 			}
-
-		}
-		else if (_tcsicmp(TEXT("close"), comandoBoard, _tcslen(TEXT("close"))) == 0)
-		{
-			break;
-		}
-		else
-		{
-			_tprintf(TEXT("\nComando: %s introduzido com tamanho %zu, não existe!"), comandoBoard, _tcslen(comandoBoard));
-		}
+			else
+			{
+				_tprintf(TEXT("\nComando: %s introduzido com tamanho %zu, não existe!"), comandoBoard, _tcslen(comandoBoard));
+}
 		//-------------------
 		
 	}
-		CloseHandle(hThreadArray);
+		CloseHandle(hThread);
 	return 0;
 }
 
@@ -124,18 +78,6 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
 		return 1;
 	}
-	/*
-	hEventWrite = CreateEvent(
-		NULL,			//lpEventAttributes
-		TRUE,			//bManualReset
-		FALSE,			//bInitialState
-		EVENT_NAME_O	//lpName
-	);
-	if (hEventWrite == NULL) {
-		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
-		return 1;
-	}
-	*/
 	//###############################################################
 	//#																#
 	//#							MUTEX								#
@@ -194,11 +136,9 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 			empresasBoard[i] = emP[i];
 		}
 
-		//_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
-
-
-		//REORGANIZAÇÃO....
-
+		//REORGANIZAÇÃO.... está a duplicar... problema aqui
+		
+		//bolha
 		for (int i = 0; i < MAX_EMPRESAS - 1; i++) {
 			for (int j = 0; j < MAX_EMPRESAS - i - 1; j++) {
 				if (empresasBoard[j].pAção < empresasBoard[j + 1].pAção) {
@@ -208,22 +148,96 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 				}
 			}
 		}
+
+		/*
+		for (int i = 0; i < MAX_EMPRESAS - 1; i++) {
+			for (int j = 0; j < MAX_EMPRESAS - i - 1; j++) {
+				if (empresasBoard[j].pAção < empresasBoard[j + 1].pAção) {
+					empresaData temp = empresasBoard[j];
+					empresasBoard[j] = empresasBoard[j + 1];
+					empresasBoard[j + 1] = temp;
+				}
+			}
+		}*/
+		/*
+		for (DWORD i = 0; i < MAX_EMPRESAS - 1; i++) {
+			DWORD maxIndex = i;
+			for (DWORD j = i + 1; j < MAX_EMPRESAS; j++) {
+				if (empresasBoard[j].pAção > empresasBoard[maxIndex].pAção) {
+					maxIndex = j;
+				}
+			}
+			if (maxIndex != i) {
+				empresaData temp = empresasBoard[i];
+				empresasBoard[i] = empresasBoard[maxIndex];
+				empresasBoard[maxIndex] = temp;
+			}
+		}*/
+
+
+
 		ReleaseMutex(hMutex);
-		
-		_tprintf(TEXT("\n1"));
-		WaitForSingleObject(hMutexWrite,INFINITE);
-		_tprintf(TEXT("\n2"));
-		CopyMemory(emP, empresasBoard, sizeof(empresasBoard) * MAX_EMPRESAS);
-		_tprintf(TEXT("\n3"));
+		mostra_tabela(empresasBoard);
+		WaitForSingleObject(hMutexWrite, INFINITE);
+		CopyMemory(emP, empresasBoard, sizeof(empresaData) * MAX_EMPRESAS);
 		ReleaseMutex(hMutexWrite);
-		_tprintf(TEXT("\n4"));
 		SetEvent(hEventWrite);
-		_tprintf(TEXT("\n5"));
+		Sleep(500);
 		ResetEvent(hEventWrite);
-		
+		Sleep(1000);
 		
 
 	}
 	UnmapViewOfFile(emP);
 	CloseHandle(hMapFile);
+}
+
+
+
+
+
+
+void mostra_tabela(empresaData* empresasBoard){
+	DWORD Nempresas = 10;
+	DWORD contador = 0, numeros;
+	DWORD digitos = 0;
+	_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
+	for (DWORD i = 0; i < Nempresas; i++)
+	{
+		if (i < 9) { //corrige o espaçamento do ID
+			_tprintf(TEXT("\t\t| %d  |"), i + 1);
+		}
+		else {
+			_tprintf(TEXT("\t\t| %d |"), i + 1);
+		}
+		if (_tcslen(empresasBoard[i].nomeEmpresa) <= 5)
+		{
+			if (_tcscmp(empresasBoard[i].nomeEmpresa, TEXT("-1")) == 0) {
+				_tprintf(TEXT(" |\t   \t\t|"), empresasBoard[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
+			}
+			else
+				_tprintf(TEXT(" |\t %s \t\t|"), empresasBoard[i].nomeEmpresa);
+		}
+		else {
+			_tprintf(TEXT(" |\t %s \t|"), empresasBoard[i].nomeEmpresa);
+
+		}
+
+		_tprintf(TEXT(" |\t %lu \t\t|"), empresasBoard[i].nAções);
+		//contar os digitos para retificar espaçamento do Preço Ação
+		digitos = 0;
+		numeros = empresasBoard[i].pAção;
+		while (numeros >= 1) {
+			numeros /= 10;
+			digitos++;
+		}
+		if (digitos >= 2)
+			_tprintf(TEXT(" |\t %.2f€ \t|"), empresasBoard[i].pAção);
+		else
+			_tprintf(TEXT(" |\t %.2f€ \t\t|"), empresasBoard[i].pAção);
+		_tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
+		
+	}
+	_tprintf(TEXT("\n\t\t close - Fechar o programa\n"));
 }

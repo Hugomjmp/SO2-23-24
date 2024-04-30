@@ -1,5 +1,13 @@
 #include "..\\utils.h"
 
+
+//###############################################################
+//#																#
+//#				Main vai tratar da escrita do Cliente			#
+//#																#
+//###############################################################
+
+
 int _tmain(int argc, TCHAR* argv[])
 {
     //clienteData CD;
@@ -20,7 +28,7 @@ int _tmain(int argc, TCHAR* argv[])
     //ESTRUTURAS
     clienteData cliData;
 
-
+    OVERLAPPED ov;
     //Codigo para o unicode
 #ifdef UNICODE
     _setmode(_fileno(stdin), _O_WTEXT);
@@ -40,7 +48,7 @@ int _tmain(int argc, TCHAR* argv[])
         0,
         NULL,
         OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
+        FILE_FLAG_OVERLAPPED,
         NULL
         );
     if (hPipe == NULL) {
@@ -87,26 +95,37 @@ int _tmain(int argc, TCHAR* argv[])
         _tscanf(TEXT("%s"), &cliData.login);
         _tprintf(TEXT("\nPassword: "));
         _tscanf(TEXT("%s"), &cliData.password);
+
+        ZeroMemory(&ov, sizeof(OVERLAPPED));
+
         writeResult = WriteFile(
             hPipe,
             &cliData,
             sizeof(clienteData),
             &nBytes,
-            NULL
+            &ov
         );
 
         FlushFileBuffers(hPipe);
         
         resultado = ReadFile(
-            hPipe,        // handle to pipe 
-            &cliData,   // buffer to receive data 
-            sizeof(clienteData), // size of buffer 
-            &nBytes, // number of bytes read 
-            NULL);        // not overlapped I/O */
+            hPipe,                  // handle to pipe 
+            &cliData,               // buffer to receive data 
+            sizeof(clienteData),    // size of buffer 
+            &nBytes,                // number of bytes read 
+            &ov);                   // overlapped I/O */
+        if (resultado) {
+            _tprintf(TEXT("O cliente %s ligado com sucesso!"), cliData.RESPOSTA);
+        }
+        else {
+            if (GetLastError() == ERROR_IO_PENDING) {
+
+            }
+        }
     //    _tprintf(TEXT("O cliente %s não existe ou tem as creedenciais erradas!"), cliData.RESPOSTA);
 
 
-    //_tprintf(TEXT("O cliente %s ligado com sucesso!"), cliData.RESPOSTA);
+    //
     // DEBUG...
     //_tprintf(TEXT("\nLi -> Login: %s com tamanho %d e Password: %s com tamanho %zu"), 
     //    cliData.login, _tcslen(cliData.login), cliData.password, _tcslen(cliData.password));
@@ -144,18 +163,24 @@ int _tmain(int argc, TCHAR* argv[])
     return 0;
 }
 
+
+//###############################################################
+//#																#
+//#				Thread vai receber os dados do Bolsa			#
+//#																#
+//###############################################################
 //TRATA DE RECEBER DADOS DO NAMEDPIPE
 DWORD WINAPI cliente_read(LPVOID lparam) {
-    /*DWORD resultado, nBytes;
+    //DWORD resultado, nBytes;
     HANDLE hPipe = (HANDLE)lparam;
-    clienteData cliData;
+    //clienteData cliData;
 
-    resultado = ReadFile(
-        hPipe,        // handle to pipe 
-        &cliData,   // buffer to receive data 
-        sizeof(clienteData), // size of buffer 
-        &nBytes, // number of bytes read 
-        NULL);        // not overlapped I/O 
-    _tprintf(TEXT("\nResposta: %s "), cliData.comando);*/
+    //resultado = ReadFile(
+    //    hPipe,        // handle to pipe 
+    //    &cliData,   // buffer to receive data 
+    //    sizeof(clienteData), // size of buffer 
+    //    &nBytes, // number of bytes read 
+    //    NULL);        // not overlapped I/O 
+    //_tprintf(TEXT("\nResposta: %s "), cliData.comando);*/
 }
 

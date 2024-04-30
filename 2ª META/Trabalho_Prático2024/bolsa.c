@@ -5,7 +5,7 @@ int _tmain(int argc, TCHAR* argv[])
 	//HANDLES...
 
 	HANDLE hPipe, hThreadArray[5] = {NULL,NULL,NULL,NULL,NULL},
-		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes;
+		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes, hSemBolsa;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0;
@@ -70,6 +70,15 @@ int _tmain(int argc, TCHAR* argv[])
 		empresas[i].pAção = 0.0;
 	}
 	//---------------------------------------------------------------
+	//verifica se o bolsa já está a funcionar
+	hSemBolsa = CreateSemaphore(NULL, 1, 1, SEM_BOLSA);
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		_tprintf(TEXT("[ERRO] O Bolsa já se encontra a executar\n"));
+		system("pause");
+		CloseHandle(hSemBolsa);
+		return -1;
+	}
+	
 	CriaRegedit(); //TRATA DA VARIAVEL NCLIENTES
 	
 	//escreveRegedit();//função para tirar depois
@@ -110,11 +119,6 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("[ERRO] Falhou ao criar o semáforo: %d\n"), GetLastError());
 		return -1;
 	}
-
-
-
-
-
 
 	//---------------------------------------------------------------
 	//###############################################################
@@ -262,7 +266,8 @@ int _tmain(int argc, TCHAR* argv[])
 		//_tprintf(TEXT("\nLi -> Comando: %s com tamanho %zu"), comandoAdmin, _tcslen(comandoAdmin));
 
 		//TRATA DO COMANNDO ACRESCENTAR UM EMPRESA
-		if (_tcsicmp(TEXT("addc"), comandoAdmin, _tcslen(TEXT("addc"))) == 0)
+		if (_tcsicmp(TEXT("addc"), comandoAdmin) == 0)
+			
 		{
 			_tscanf(TEXT("%s"), &nomeEmpresa);
 			_tscanf(TEXT("%lu"), &nAções);
@@ -272,8 +277,6 @@ int _tmain(int argc, TCHAR* argv[])
 				if (empresaAdiciona == 1) {
 					if ((_tcsicmp(TEXT("-1"), empresas[i].nomeEmpresa)) == 0) {
 
-						//evento
-						SetEvent(hEvent);
 						//bloqueia no mutex
 						WaitForSingleObject(hMutex, INFINITE);
 						_tcscpy(empresas[i].nomeEmpresa, nomeEmpresa);
@@ -281,9 +284,13 @@ int _tmain(int argc, TCHAR* argv[])
 						empresas[i].pAção = pAção;
 						empresaAdiciona = 0;
 						//copia dados para a sharedmemory
-						CopyMemory(emP, empresas, sizeof(empresas));
+						CopyMemory(emP, empresas, sizeof(empresaData)* MAX_EMPRESAS);
 						//relase ao mutex
 						ReleaseMutex(hMutex);
+						
+						//evento
+						SetEvent(hEvent);
+						Sleep(500);
 						//resetEvento
 						ResetEvent(hEvent);
 
@@ -292,7 +299,7 @@ int _tmain(int argc, TCHAR* argv[])
 			}
 		}
 		//TRATA DO COMANNDO ACRESCENTAR UM EMPRESA via file txt
-		if (_tcsicmp(TEXT("adde"), comandoAdmin, _tcslen(TEXT("adde"))) == 0)
+		if (_tcsicmp(TEXT("adde"), comandoAdmin) == 0)
 		{
 			fp = fopen(EMPRESAS, "r"); //abertura do ficheiro Clientes.txt para leitura
 			if (fp == NULL) //verifica se o ficheiro existe
@@ -308,7 +315,7 @@ int _tmain(int argc, TCHAR* argv[])
 			//bloqueia no mutex
 			WaitForSingleObject(hMutex, INFINITE);
 			//copia dados para a sharedmemory
-			CopyMemory(emP, empresas, sizeof(empresas));
+			CopyMemory(emP, empresas, sizeof(empresaData) * MAX_EMPRESAS);
 			//relase ao mutex
 			ReleaseMutex(hMutex);
 			//evento
@@ -380,7 +387,7 @@ int _tmain(int argc, TCHAR* argv[])
 						WaitForSingleObject(hMutex, INFINITE);
 						empresas[i].pAção = pAção;
 						//copia dados para a sharedmemory
-						CopyMemory(emP, empresas, sizeof(empresas));
+						CopyMemory(emP, empresas, sizeof(empresaData)* MAX_EMPRESAS);
 						//relase ao mutex
 						ReleaseMutex(hMutex);
 						//resetEvento
@@ -435,10 +442,12 @@ int _tmain(int argc, TCHAR* argv[])
 			_tprintf(TEXT("\t\t\t#################################################################\n"));
 
 		}
+		else if ((_tcsicmp(TEXT("close"), comandoAdmin) == 0)) {
+		}
 		//TRATA DA FALHA DO COMANDO
 		else {
-			if((_tcsicmp(TEXT("close"), comandoAdmin) != 0))
-			_tprintf(TEXT("\nComando: %s introduzido com tamanho %zu, não existe!"), comandoAdmin, _tcslen(comandoAdmin));
+			
+			//_tprintf(TEXT("\nComando: %s introduzido com tamanho %zu, não existe!"), comandoAdmin, _tcslen(comandoAdmin));
 		}
 
 	}
@@ -545,7 +554,7 @@ void escreveRegedit() {
 //---------------------------------------------------------------
 // Por acabar...
 DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
-	//ControlData* cdata = (ControlData*)ctrlData;
+	ControlData* cdata = (ControlData*)lpParam;
 	clienteData cliente;
 	DWORD nBytes;
 	HANDLE writeResult;
@@ -566,10 +575,11 @@ DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
 		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
 		if (_tcsicmp(TEXT("listc"), cliente.comando) == 0)
 		{
+			
 			writeResult = WriteFile(
 				hPipe,
-				&cliente,
-				sizeof(clienteData),
+				&cdata->empresas,
+				sizeof(cdata->empresas),
 				&nBytes,
 				NULL
 			);
@@ -628,24 +638,23 @@ DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
 //###############################################################
 DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 	ControlData* cdata = (ControlData*)ctrlData;
-	
-
-	//userData* userArray = (userData*)users;
+	OVERLAPPED ov;
 	FILE* fp;
 	clienteData cliData;
 	BOOL resultado, readResult, writeResult;
 	DWORD nBytes;
 	TCHAR string[100];
 	HANDLE hSemClientes;
-	HANDLE hPipe;
+	//HANDLE hPipe[6];
 	HANDLE hThreadArray[5];
 	DWORD NCLIENTES = leRegedit();
 	
 
-	//CRIAR O NAMEDPIPE BOLSA PARA INTERAÇÃO DOS CLIENTES
-	hPipe = CreateNamedPipe(
+	//CRIAR O NAMEDPIPE BOLSA PARA A DETEÇÃO DOS CLIENTES...
+	cdata->hPipe[0] = CreateNamedPipe(
 		NAME_PIPE,					// Nome do pipe
-		PIPE_ACCESS_DUPLEX,			// acesso em modo de escrita e de leitura
+		PIPE_ACCESS_DUPLEX |		// acesso em modo de escrita e de leitura
+		FILE_FLAG_OVERLAPPED, 
 		PIPE_TYPE_MESSAGE |			// message type pipe 
 		PIPE_READMODE_MESSAGE |		// message-read mode 
 		PIPE_WAIT,					// blocking mode 
@@ -654,9 +663,9 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 		sizeof(clienteData),		// input buffer size 
 		0,							// client time-out 
 		NULL);						// default security attribute 
-	if (hPipe == INVALID_HANDLE_VALUE)
+	if (cdata->hPipe[0] == INVALID_HANDLE_VALUE)
 	{
-		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe, %d.\n"), GetLastError());
+		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe[0], %d.\n"), GetLastError());
 		return -1;
 	}
 
@@ -670,29 +679,29 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 		_tprintf(TEXT("Erro ao abrir o semáforo. Código de erro: %d\n", GetLastError()));
 		return 1;
 	}
-	resultado = ConnectNamedPipe(hPipe, NULL); //espera que o cliente entre
-	if (!resultado) {
-		_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
-	}
-	_tprintf(TEXT("empresa %s.\n"), cdata->empresas[0].nomeEmpresa);
+
+	//_tprintf(TEXT("empresa %s.\n"), cdata->empresas[0].nomeEmpresa);
 	
 	while (1)
 	{
-		
-			resultado = ReadFile( //recebe as credenciais
-				hPipe,					// handle to pipe 
+		resultado = ConnectNamedPipe(cdata->hPipe[0], NULL); //espera que o cliente entre
+		if (!resultado) {
+			_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
+		}
+			resultado = ReadFile(		//recebe as credenciais
+				cdata->hPipe[0],		// handle to pipe 
 				&cliData,				// buffer to receive data 
 				sizeof(clienteData),	// size of buffer 
 				&nBytes,				// number of bytes read 
-				NULL);					// not overlapped I/O 
+				&ov);					// overlapped I/O 
 			_tprintf(TEXT("RECEBI: \n"));
 			if (nBytes != 0) {
 				_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
 				_tprintf(TEXT("RECEBI password: %s\n"), cliData.password);
 				for (DWORD i = 0; i < MAX_CLIENTES; i++)
 				{
-					_tprintf(TEXT("empresa %s.\n"), cdata->empresas[i].nomeEmpresa);
-					_tprintf(TEXT("user %s.\n"), cdata->users[i].username);
+					//_tprintf(TEXT("empresa %s.\n"), cdata->empresas[i].nomeEmpresa);
+					//_tprintf(TEXT("user %s.\n"), cdata->users[i].username);
 					if (_tcsicmp(cdata->users[i].username, cliData.login) == 0 && _tcsicmp(cdata->users[i].password, cliData.password) == 0)
 					{
 						_tprintf(TEXT("VAGAS: %lu\n"), NCLIENTES);
@@ -702,13 +711,13 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 							_tcscpy(cliData.RESPOSTA, cdata->users[i].username);
 
 							writeResult = WriteFile(
-								hPipe,
+								cdata->hPipe[0],
 								&cliData,
 								sizeof(clienteData),
 								&nBytes,
 								NULL
 							);
-							FlushFileBuffers(hPipe);
+							FlushFileBuffers(cdata->hPipe[0]);
 							ReleaseSemaphore(
 								hSemClientes,
 								1,
@@ -720,7 +729,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 								NULL,					// default security attributes
 								0,						// use default stack size
 								trataComandosClientes,		// thread function name
-								hPipe,					// argument to thread function
+								cdata->hPipe[0],					// argument to thread function
 								0,						// use default creation flags
 								NULL);
 							if (hThreadArray[0] == NULL) {
@@ -735,103 +744,24 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 					{
 						_tcscpy(cliData.RESPOSTA, TEXT("FAIL"));
 						writeResult = WriteFile(
-							hPipe,
+							cdata->hPipe[0],
 							&cliData,
 							sizeof(clienteData),
 							&nBytes,
 							NULL
 						);
-						FlushFileBuffers(hPipe);
+						FlushFileBuffers(cdata->hPipe[0]);
 					}
 				}
 			}
 			
 	}
 
-
-
-
-
-		
-		
-	
-	
-
-
-
-
-
-		//_tprintf(TEXT("aqui1.\n"));
-	while (_tcsicmp(TEXT("close"), cliData.comando) != 0)
-	{
-
-		//_tprintf(TEXT("aqui2.\n"));
-		readResult = ReadFile(
-			hPipe,        // handle to pipe 
-			&cliData,   // buffer to receive data 
-			sizeof(clienteData), // size of buffer 
-			&nBytes, // number of bytes read 
-			NULL);        // not overlapped I/O 
-		if (!readResult)
-		{
-			//_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
-			//_tprintf(TEXT("RECEBI login: %s\n"), cliData.password);
-		}
-		if (nBytes != 0) {
-			_tprintf(TEXT("RECEBI comando: %s\n"), cliData.comando);
-		}
-
-	}
-	//_tprintf(TEXT("aqui3.\n"));
-	//_tprintf(TEXT("[ERRO] antes de esperar.\n"));
-
-	//_tprintf(TEXT("[INFO] Cliente conectado com sucesso.\n"));
-	/*
-
-	
-
-	fp = fopen(UTILIZADORES_REGISTADOS, "r");
-	if (fp == NULL) {
-		_tprintf(TEXT("[ERRO] Falhou ao abrir o arquivo de clientes registrados.\n"));
-		return -1;
-	}
-	
-	while (fgetws(string, 100, fp)) {
-		
-		WaitForSingleObject(hSemClientes, INFINITE);
-
-		
-		_tprintf(TEXT("%s \n"), string);
-
-		
-		ReleaseSemaphore(hSemClientes, 1, NULL);
-	}
-	*/
-	//CloseHandle(hSemClientes);
-	//fclose(fp);
-	CloseHandle(hPipe);
+	CloseHandle(cdata->hPipe[0]);
 
 	return 0;
 }
 
-
-	/*
-	while (1){
-	//ReadFile(hPipe, &receivedInfo, sizeof(LoginInfo), &bytesRead, NULL)
-	resultado = ReadFile(
-		hPipe,
-		&cd,
-		sizeof(clienteData),
-		&nBytes,
-		NULL
-	);
-	if (resultado != ERROR_SUCCESS) {
-		_tprintf(TEXT("[ERRO] Falhou ao ler o NamedPipe, %d.\n"), GetLastError());
-		return -1;
-	}
-	_tprintf(TEXT("Recebi login: %zu, password: %zu"), cd.login, cd.password);
-
-}*/
 
 //###############################################################
 //#																#
@@ -842,9 +772,64 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 DWORD WINAPI variaPreços(LPVOID empresas) {
 	//empresaData(*data)[MAX_COLUNA] = (empresaData(*)[MAX_COLUNA])empresas;
 	empresaData *empresasArry = (empresaData*)empresas;
+	empresaData* emP;
 	DWORD contador = 0;
 	DWORD linhaAleatoria = 0;
 	DWORD tipoAlteração = 0;
+
+	HANDLE hMutex, hEvent, hMapFile;
+
+
+	//###############################################################
+	//#																#
+	//#						Eventos			 						#
+	//#																#
+	//###############################################################
+	hEvent = OpenEvent(
+		EVENT_MODIFY_STATE,	//dwDesiredAccess,
+		FALSE,			//bInheritHandle,
+		EVENT_NAME	//lpName
+	);
+	if (hEvent == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	//###############################################################
+	//#																#
+	//#							MUTEX								#
+	//#																#
+	//###############################################################
+	hMutex = OpenMutex(
+		MUTEX_ALL_ACCESS,
+		FALSE,
+		MUTEX_NAME);
+
+	if (hMutex == NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
+
+	hMapFile = OpenFileMapping(
+		FILE_MAP_ALL_ACCESS,	// acesso pretendido 
+		FALSE,
+		SHM_NAME			// nome dado ao recurso (ficheiro mapeado)
+	);
+	if (hMapFile == NULL) {
+		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
+		return 1;
+	}
+	emP = (empresaData*)MapViewOfFile(
+		hMapFile,
+		FILE_MAP_ALL_ACCESS,
+		0,
+		0,
+		sizeof(empresaData)
+	);
+
+
+
+
+
 	while (1)
 	{
 		for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
@@ -862,14 +847,36 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 				linhaAleatoria = rand() % contador;
 				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção - 
 					(empresasArry[linhaAleatoria].pAção * 0.2); //diminui 20%
-				
+				//bloqueia no mutex
+				WaitForSingleObject(hMutex, INFINITE);
+				//copia dados para a sharedmemory
+				CopyMemory(emP, empresasArry, sizeof(empresaData) * MAX_EMPRESAS);
+				//relase ao mutex
+				ReleaseMutex(hMutex);
+
+				//evento
+				SetEvent(hEvent);
+				Sleep(500);
+				//resetEvento
+				ResetEvent(hEvent);
 			}
 			else
 			{
 				linhaAleatoria = rand() % contador;
 				empresasArry[linhaAleatoria].pAção = empresasArry[linhaAleatoria].pAção + 
 					(empresasArry[linhaAleatoria].pAção * 0.2); //aumenta 20%
-				
+				//bloqueia no mutex
+				WaitForSingleObject(hMutex, INFINITE);
+				//copia dados para a sharedmemory
+				CopyMemory(emP, empresasArry, sizeof(empresaData) * MAX_EMPRESAS);
+				//relase ao mutex
+				ReleaseMutex(hMutex);
+
+				//evento
+				SetEvent(hEvent);
+				Sleep(500);
+				//resetEvento
+				ResetEvent(hEvent);
 			}
 
 		}
@@ -877,12 +884,16 @@ DWORD WINAPI variaPreços(LPVOID empresas) {
 		contador = 0;
 		Sleep(10000); //10segundos alterar se for o caso
 	}
-	return 0;
+	return 30;
 }
 
 //---------------------------------------------------------------
 
-
+//###############################################################
+//#																#
+//#				Coloca valores atualizados no array				#
+//#							de empresas							#
+//###############################################################
 DWORD WINAPI SMtoLocal(LPVOID empresas) {
 	empresaData* empresasArry = (empresaData*)empresas;
 	empresaData* emP;
@@ -946,10 +957,14 @@ DWORD WINAPI SMtoLocal(LPVOID empresas) {
 		//_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
 		WaitForSingleObject(hMutexRead, INFINITE);
 		//_tprintf(TEXT("\nPASSEI O MUTEX!!!!"));
-		CopyMemory(empresasArry, emP, sizeof(emP) * MAX_EMPRESAS);
+		for (DWORD i = 0; i < MAX_EMPRESAS; i++) //copia o que tem na shared memory para um array local
+		{
+			empresasArry[i] = emP[i];
+		}
+		//CopyMemory(empresasArry, emP, sizeof(emP) * MAX_EMPRESAS);
 		ReleaseMutex(hMutexRead);
 		//_tprintf(TEXT("\nPASSEI O WAIT!!!!"));
-
+		Sleep(1000);
 	}
 	return 1;
 }
