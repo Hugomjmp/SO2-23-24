@@ -62,21 +62,26 @@ typedef struct {
 	float saldo;
 	BOOL estado;
 }userData;
-
 typedef struct {
 	empresaData* empresas;
 	userData* users;
 }ControlData;
-
+//ver se é necessário manter isto
 typedef struct {
 	HANDLE hPipe[5];
 	HANDLE hTrinco;
 }tDataInfo;
+//----------
 
 typedef struct {
 	tDataInfo* ptd;
 	DWORD id;
+	empresaData* empresas;
+	userData* users;
 }tDataInfo_EXTRA;
+
+
+
 typedef struct {
 	HANDLE hPipe;
 	BOOL continua;

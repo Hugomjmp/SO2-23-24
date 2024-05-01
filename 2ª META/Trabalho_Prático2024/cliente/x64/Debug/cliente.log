@@ -2,12 +2,13 @@
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(19,11): warning C4101: 'nBytes': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(15,11): warning C4101: 'string': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(18,21): warning C4101: 'writeResult': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(59,11): warning C4101: 'buf': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(25,12): warning C4101: 'hEvent': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(23,12): warning C4101: 'hSemaphore': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(18,10): warning C4101: 'resultado': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(31,17): warning C4101: 'cliData': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,38): warning C4101: 'comando': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,23): warning C4101: 'password': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,11): warning C4101: 'login': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(142,1): warning C4716: 'cliente_read': must return a value
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(179,11): warning C4101: 'buf': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(173,1): warning C4716: 'cliente_read': must return a value
   cliente.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\cliente.exe

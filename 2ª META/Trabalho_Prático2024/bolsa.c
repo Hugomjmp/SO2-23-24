@@ -21,7 +21,7 @@ int _tmain(int argc, TCHAR* argv[])
 
 	//estruturas
 	clienteData cliData;
-	userData users[5];
+	userData users[6];
 	empresaData empresas[30];
 	empresaData* emP;
 	ControlData ctrlData = {.empresas = empresas, .users = users};
@@ -40,7 +40,7 @@ int _tmain(int argc, TCHAR* argv[])
 	//#					INICIALIZAR MATRIZ USER						#
 	//#																#
 	//###############################################################
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 6; i++) {
 			_tcscpy(users[i].username, TEXT("-1"));
 			_tcscpy(users[i].password, TEXT("-2"));
 			users[i].saldo = 0;
@@ -55,7 +55,7 @@ int _tmain(int argc, TCHAR* argv[])
 		return -1;
 	}
 	linha = 0;
-	while (linha < 5 && fwscanf(fpU, TEXT("%s %s %f"), users[linha].username, users[linha].password, &users[linha].saldo) == 3) {
+	while (linha < 6 && fwscanf(fpU, TEXT("%s %s %f"), users[linha].username, users[linha].password, &users[linha].saldo) == 3) {
 		linha++;
 	}
 	//###############################################################
@@ -568,33 +568,150 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	HANDLE hPipesloc;
 	TCHAR buf[256];
 	DWORD n, i = 0, id, ret;
-
+	clienteData cliData;
+	DWORD NCLIENTES = leRegedit();
+	TCHAR nomeEmpresa[50];
+	float nAções;
 	WaitForSingleObject(ptd_extra->ptd->hTrinco, INFINITE);
 	id = ptd_extra->id;
 	hPipesloc = ptd_extra->ptd->hPipe[id];
 	ReleaseMutex(ptd_extra->ptd->hTrinco);
-
+	//_tprintf(TEXT("\nEscrever no pipe! %s\n"), ptd_extra->users[0].username);
 	do {
 		//RECEBE PEDIDO...
-		ret = ReadFile(hPipesloc, buf, sizeof(buf), &n, NULL);
-		buf[n / sizeof(TCHAR)] = _T('\0');
+		//ret = ReadFile(hPipesloc, buf, sizeof(buf), &n, NULL);
+		ret = ReadFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL);
+		//buf[n / sizeof(TCHAR)] = _T('\0');
 		if (!ret || !n) {
 			_tprintf(TEXT("[ERRO] %d %d... (ReadFile)\n"), ret, n);
 			break;
 		}
 
-		_tprintf(TEXT("[SERVIDOR] Recebi %d bytes: '%s' do cliente %d... (ReadFile)\n"), n, buf, id);
+		//_tprintf(TEXT("[SERVIDOR] Recebi %d bytes: '%s' do cliente %d... (ReadFile)\n"), n, buf, id);
+		_tprintf(TEXT("[SERVIDOR] Recebi %d bytes: '%s' '%s' do cliente %d... (ReadFile)\n"), n, cliData.login, cliData.password, id);
 		//PROCESSA PEDIDO
-		CharUpperBuff(buf, (DWORD)_tcslen(buf));
+		//CharUpperBuff(buf, (DWORD)_tcslen(buf));
+		//_tcscpy(buf,ptd_extra->users[0].username);
+		
 		//ENVIA RESPOSTA...
-		if (!WriteFile(hPipesloc, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, NULL)) {
+		/*		if (!WriteFile(hPipesloc, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, NULL)) {
 			_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
 			exit(-1);
+		}*/
+		for (DWORD i = 0; i < MAX_CLIENTES; i++)
+		{
+			if (_tcsicmp(ptd_extra->users[i].username, cliData.login) == 0 && _tcsicmp(ptd_extra->users[i].password, cliData.password) == 0)
+			{
+				ptd_extra->users[i].estado = 1;
+				//_tcscpy(cliData.RESPOSTA, ptd_extra->users[i].username);
+				_tcscpy(cliData.RESPOSTA, TEXT("1"));
+				if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+					exit(-1);
+				}
+			}
 		}
 
-		_tprintf(TEXT("[SERVIDOR] Enviei %d bytes ao cliente %d... (WriteFile)\n"), n, id);
-	} while (_tcscmp(buf, TEXT("SAIR")) != 0);
 
+		_tprintf(TEXT("[SERVIDOR] Enviei %d bytes ao cliente %d... (WriteFile)\n"), n, id);
+	} while (/*_tcscmp(buf, TEXT("SAIR")) != 0*/ptd_extra->users[i].estado != 1);
+	do {
+		//RECEBE PEDIDO...
+		//ret = ReadFile(hPipesloc, buf, sizeof(buf), &n, NULL);
+		ret = ReadFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL);
+		//buf[n / sizeof(TCHAR)] = _T('\0');
+		if (!ret || !n) {
+			_tprintf(TEXT("[ERRO] %d %d... (ReadFile)\n"), ret, n);
+			break;
+		}
+
+		//_tprintf(TEXT("[SERVIDOR] Recebi %d bytes: '%s' do cliente %d... (ReadFile)\n"), n, buf, id);
+		_tprintf(TEXT("[SERVIDOR] Recebi %d bytes: '%s' do cliente %d... (ReadFile)\n"), n, cliData.comando, id);
+		//PROCESSA PEDIDO
+		//CharUpperBuff(buf, (DWORD)_tcslen(buf));
+		//_tcscpy(buf,ptd_extra->users[0].username);
+
+		//ENVIA RESPOSTA...
+		/*		if (!WriteFile(hPipesloc, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, NULL)) {
+			_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+			exit(-1);
+		}*/
+		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
+		if (_tcsicmp(TEXT("listc"), cliData.comando) == 0) {
+			_tcscpy(cliData.RESPOSTA, cliData.comando);
+			if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+				_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+				exit(-1);
+			}
+		}
+		//TRATA DO COMANDO COMPRAR AÇÕES 
+		//-------------------ACABAR-------------------------//
+		else if (_tcsncmp(TEXT("buy"), cliData.comando, _tcslen(TEXT("buy"))) == 0) {
+			_tprintf(TEXT("\nCOMANDO: %s\n"), cliData.comando);
+			_stscanf(cliData.comando, TEXT("buy %s %f"), nomeEmpresa, &nAções);
+			_tprintf(TEXT("\nnomeEmpresa: %s\n"), nomeEmpresa);
+			_tprintf(TEXT("nAções: %.2f\n"), nAções);
+			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
+				if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
+					_tprintf(TEXT("EMPRESA: %s\n"), ptd_extra->empresas[i].nomeEmpresa);
+					ptd_extra->empresas[i].nAções += nAções;
+				}
+			}
+			
+			_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
+			if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+				_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+				exit(-1);
+			}
+		}
+		//TRATA DO COMANDO VENDER AÇÕES
+		//-------------------ACABAR-------------------------//
+		else if (_tcsncmp(TEXT("sell"), cliData.comando, _tcslen(TEXT("sell"))) == 0) {
+			_tprintf(TEXT("\nCOMANDO: %s\n"), cliData.comando);
+			_stscanf(cliData.comando, TEXT("sell %s %f"), nomeEmpresa, &nAções);
+			_tprintf(TEXT("\nnomeEmpresa: %s\n"), nomeEmpresa);
+			_tprintf(TEXT("nAções: %.2f\n"), nAções);
+			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
+				if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
+					_tprintf(TEXT("EMPRESA: %s\n"), ptd_extra->empresas[i].nomeEmpresa);
+					ptd_extra->empresas[i].nAções -= nAções;
+					ptd_extra->empresas
+				}
+			}
+
+			_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
+			if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+				_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+				exit(-1);
+			}
+		}
+		//TRATA DO COMANDO BALANCE
+		else if (_tcsicmp(TEXT("balance"), cliData.comando) == 0) {
+			for (DWORD i = 0; i < 6; i++)
+			{
+				if (_tcsicmp(ptd_extra->users[i].username, cliData.login) == 0)
+				{
+					
+					_stprintf(cliData.RESPOSTA, TEXT("O seu saldo é de %.2f€"), ptd_extra->users[i].saldo);
+					if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+						_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+						exit(-1);
+					}
+				}
+			}
+
+
+		}
+		//TRATA DA FALHA DO COMANDO
+		else {
+			_tprintf(TEXT("\nComando do cliente: %s introduzido com tamanho %d, não existe!"), cliData.comando, _tcslen(cliData.comando) - 1);
+		}
+
+
+
+
+		_tprintf(TEXT("[SERVIDOR] Enviei %d bytes ao cliente %d... (WriteFile)\n"), n, id);
+	} while (_tcscmp(cliData.comando, TEXT("exit")) != 0);
 	_tprintf(TEXT("[SERVIDOR] Desligar o pipe %d (DisconnectNamedPipe)\n"), id);
 	FlushFileBuffers(hPipesloc);
 	WaitForSingleObject(ptd_extra->ptd->hTrinco, INFINITE);
@@ -606,63 +723,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	}
 	CloseHandle(hPipesloc);
 	return 0;
-	/*ControlData* cdata = (ControlData*)lpParam;
-	clienteData cliente;
-	DWORD nBytes;
-	BOOL writeResult, resultado;
-	HANDLE hPipe = ptd->hPipe;
-	HANDLE hEvent;
-	OVERLAPPED ov = cdata->ov ;
 
-
-	_tprintf(TEXT("encontrei %p\n"), hPipe);
-	hEvent = CreateEvent(
-		NULL,			//lpEventAttributes
-		TRUE,			//bManualReset
-		FALSE,			//bInitialState
-		NULL	        //lpName
-	);
-	if (hEvent == NULL) {
-		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
-		return 1;
-	}
-	while ((_tcsicmp(TEXT("exit"), cliente.comando)) != 0){
-		
-		ZeroMemory(&ov, sizeof(ov));
-		ov.hEvent = hEvent;
-		resultado = ReadFile(
-			hPipe,
-			&cliente,
-			sizeof(clienteData),
-			&nBytes,
-			&ov
-		);
-		//_tprintf(TEXT("THREAD1\n"));
-		if (resultado == TRUE) { //leu de imediato
-			_tprintf(TEXT("Agendei a leitura THREAD1\n"));
-		}
-		else
-		{
-			if (GetLastError() == ERROR_IO_PENDING) {
-				_tprintf(TEXT("Agendei a leitura THREAD\n"));
-				_tprintf(TEXT("\n THREAD 4 "));
-				WaitForSingleObject(hEvent, INFINITE);
-				_tprintf(TEXT("\n THREAD 5 "));
-				GetOverlappedResult(hPipe, &ov, &nBytes, FALSE);
-				_tcscpy(cliente.RESPOSTA, cliente.comando);
-				writeResult = WriteFile(
-					hPipe,
-					&cliente,
-					sizeof(clienteData),
-					&nBytes,
-					NULL
-				);
-				FlushFileBuffers(hPipe);
-
-			}
-		}
-	}*/
-	return 0;
 }
 //-------
 
@@ -692,7 +753,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 
 
 	while (1) {
-		_tprintf(TEXT("[ESCRITOR] Criar copia %d do pipe '%s' ... (CreateNamedPipe)\n"), nCli, NAME_PIPE);
+		//_tprintf(TEXT("[ESCRITOR] Criar copia %d do pipe '%s' ... (CreateNamedPipe)\n"), nCli, NAME_PIPE);
 		hPipe = CreateNamedPipe(NAME_PIPE, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_WAIT |
 			PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PIPE_UNLIMITED_INSTANCES,
 			sizeof(buf), sizeof(buf), 1000, NULL);
@@ -707,9 +768,9 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 			_tprintf(TEXT("TODOS OS CLIENTES ESTAO CONECTADOS"));
 		}
 		*/
-		_tprintf(TEXT("[ESCRITOR] Esperar ligacao de um cliente %d... (ConnectNamedPipe)\n"), nCli);
+		//_tprintf(TEXT("[ESCRITOR] Esperar ligacao de um cliente %d... (ConnectNamedPipe)\n"), nCli);
 		if (!ConnectNamedPipe(hPipe, NULL)) {
-			_tprintf(TEXT("[ERRO] Liga��o ao cliente! (ConnectNamedPipe\n"));
+			_tprintf(TEXT("[ERRO] Ligação ao cliente! (ConnectNamedPipe\n"));
 			exit(-1);
 		}
 
@@ -717,9 +778,15 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 			WaitForSingleObject(tWrite.hTrinco, INFINITE);
 			tWrite.hPipe[nCli] = hPipe;
 			ReleaseMutex(tWrite.hTrinco);
+			//cdata[nCli]->ptd = &tWrite;
+			//cdata[nCli]->id = nCli;
 			td_extra[nCli].ptd = &tWrite;
 			td_extra[nCli].id = nCli;
-			hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&td_extra[nCli], 0, NULL);//LANÇAR THREAD P CADA CLI
+			td_extra[nCli].empresas = cdata->empresas;
+			td_extra[nCli].users = cdata->users;
+			//LANÇAR UMA THREAD PARA CADA CLIENTE
+			hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&td_extra[nCli], 0, NULL);
+			//hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&cdata[nCli], 0, NULL);
 			nCli++;
 		}
 		else {

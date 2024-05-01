@@ -65,20 +65,19 @@ int _tmain(int argc, TCHAR* argv[])
     DATA data;
 
 
-    _tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"),
-        NAME_PIPE);
+    //_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), NAME_PIPE);
     if (!WaitNamedPipe(NAME_PIPE, NMPWAIT_WAIT_FOREVER)) {
         _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), NAME_PIPE);
         exit(-1);
     }
-    _tprintf(TEXT("\n[CLIENTE] Liga��o ao pipe do escritor... (CreateFile)\n"));
+    //_tprintf(TEXT("\n[CLIENTE] Ligação ao pipe do escritor... (CreateFile)\n"));
     hPipe = CreateFile(NAME_PIPE, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
     if (hPipe == NULL) {
         _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"), NAME_PIPE);
         exit(-1);
     }
-    _tprintf(TEXT("[CLIENTE] Liguei-me...\n"));
+    //_tprintf(TEXT("[CLIENTE] Liguei-me...\n"));
 
     data.hPipe = hPipe;
     data.continua = TRUE;
@@ -90,15 +89,17 @@ int _tmain(int argc, TCHAR* argv[])
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
-        _tprintf(TEXT("\n[CLIENTE] Frase: "));
-        _fgetts(buf, 256, stdin);
-        buf[_tcslen(buf) - 1] = _T('\0');
+        _tprintf(TEXT("\nLogin: "));
+        _tscanf(TEXT("%s"), cliData.login);
+        _tprintf(TEXT("\nPassword: "));
+        _tscanf(TEXT("%s"), cliData.password);
+        //buf[_tcslen(buf) - 1] = _T('\0');
 
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
-
-        ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
-
+        
+        //ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
+        ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
         if (ret == TRUE) {
             _tprintf(TEXT("Escrevi de imediato\n"));
         }
@@ -115,7 +116,37 @@ int _tmain(int argc, TCHAR* argv[])
         }
 
         _tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
-    } while (_tcscmp(buf, TEXT("sair")) != 0);
+    } while (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0);
+    //TRATA DOS COMANDOS...
+    do {
+        //LER TECLADO...
+        //ENVIAR PARA SERVIDOR...
+        _tprintf(TEXT("\nComando: "));
+        //_tscanf(TEXT("%s"), &cliData.comando);
+        _fgetts(cliData.comando, 300, stdin);
+        cliData.comando[_tcslen(cliData.comando) - 1] = _T('\0');
+        ZeroMemory(&ov, sizeof(ov));
+        ov.hEvent = hEv;
+
+        //ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
+        ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
+        if (ret == TRUE) {
+            //_tprintf(TEXT("Escrevi de imediato\n"));
+        }
+        else {
+            if (GetLastError() == ERROR_IO_PENDING) {
+                _tprintf(TEXT("Agendei a escrita\n"));
+                WaitForSingleObject(hEv, INFINITE);
+                GetOverlappedResult(hPipe, &ov, &n, FALSE);
+            }
+            else {
+                _tprintf(TEXT("[ERRO] FALHOU O OVERLAPPED\n"));
+                break;
+            }
+        }
+
+        _tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
+    } while (_tcscmp(cliData.RESPOSTA, TEXT("exit")) != 0);
 
     return 0;
 }
@@ -148,7 +179,7 @@ DWORD WINAPI recebeMSG(LPVOID data) {
     TCHAR buf[256];
     DWORD n;
     BOOL ret;
-
+    clienteData cliData;
     OVERLAPPED ov;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
 
@@ -157,14 +188,15 @@ DWORD WINAPI recebeMSG(LPVOID data) {
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
 
-        ret = ReadFile(hPipe, buf, sizeof(buf), &n, &ov);
+        //ret = ReadFile(hPipe, buf, sizeof(buf), &n, &ov);
+        ret = ReadFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
 
         if (ret == TRUE) {
-            _tprintf(TEXT("Li de imediato\n"));
+           // _tprintf(TEXT("Li de imediato\n"));
         }
         else {
             if (GetLastError() == ERROR_IO_PENDING) {
-                _tprintf(TEXT("Agendei a leitura\n"));
+                //_tprintf(TEXT("Agendei a leitura\n"));
                 WaitForSingleObject(hEv, INFINITE);
                 GetOverlappedResult(hPipe, &ov, &n, FALSE);
             }
@@ -173,10 +205,10 @@ DWORD WINAPI recebeMSG(LPVOID data) {
                 break;
             }
         }
-        buf[n / sizeof(TCHAR)] = _T('\0');
-        _tprintf(TEXT("[LEITOR] Recebi %d bytes: '%s'... (ReadFile)\n"), n, buf);
+        //buf[n / sizeof(TCHAR)] = _T('\0');
+        _tprintf(TEXT("[LEITOR] Recebi %d bytes: '%s' '%s' '%s'... (ReadFile)\n"),n, cliData.login, cliData.password,cliData.RESPOSTA);
 
-    } while (_tcscmp(buf, TEXT("SAIR")) != 0);
+    } while (_tcscmp(cliData.RESPOSTA, TEXT("SAIR")) != 0);
 
     return 0;
 }
