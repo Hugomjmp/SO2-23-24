@@ -5,7 +5,7 @@ int _tmain(int argc, TCHAR* argv[])
 	//HANDLES...
 
 	HANDLE hPipe, hThreadArray[5] = {NULL,NULL,NULL,NULL,NULL},
-		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes, hSemBolsa;
+		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes, hSemBolsa, hMutexClient;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0;
@@ -187,7 +187,16 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
 		return 1;
 	}
+	hMutexClient = CreateMutex(
+		NULL,
+		FALSE,
+		MUTEX_NAME_C
+	);
 
+	if (hMutexClient== NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
 	//---------------------------------------------------------------
 
 
@@ -301,7 +310,8 @@ int _tmain(int argc, TCHAR* argv[])
 		//TRATA DO COMANNDO ACRESCENTAR UM EMPRESA via file txt
 		if (_tcsicmp(TEXT("adde"), comandoAdmin) == 0)
 		{
-			fp = fopen(EMPRESAS, "r"); //abertura do ficheiro Clientes.txt para leitura
+			//o fopen nao converte logo para utf8 tem de se colocar os parametros
+			fp = fopen(EMPRESAS, "rt+, ccs=UTF-8"); //abertura do ficheiro Clientes.txt para leitura
 			if (fp == NULL) //verifica se o ficheiro existe
 			{
 				_tprintf(TEXT("[ERRO] ao abrir o ficheiro! \n"));
@@ -557,74 +567,55 @@ DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
 	ControlData* cdata = (ControlData*)lpParam;
 	clienteData cliente;
 	DWORD nBytes;
-	HANDLE writeResult;
-	HANDLE hPipe = (HANDLE)lpParam;
+	BOOL writeResult, resultado;
+	HANDLE hPipe = cdata->hPipe[0];
+	HANDLE hEvent;
+	OVERLAPPED ov;
 
+	hEvent = CreateEvent(
+		NULL,			//lpEventAttributes
+		TRUE,			//bManualReset
+		FALSE,			//bInitialState
+		NULL	        //lpName
+	);
+	if (hEvent == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
 	while ((_tcsicmp(TEXT("exit"), cliente.comando)) != 0){
-		if (!ReadFile(
+		
+		ZeroMemory(&ov, sizeof(ov));
+		ov.hEvent = hEvent;
+		resultado = ReadFile(
 			hPipe,
 			&cliente,
 			sizeof(clienteData),
 			&nBytes,
-			NULL))
+			&ov
+		);
+		_tprintf(TEXT("THREAD1\n"));
+		if (resultado == TRUE) { //leu de imediato
+			_tprintf(TEXT("Agendei a leitura THREAD1\n"));
+		}
+		else
 		{
-			_tprintf(TEXT("\nErro ao ler do pipe do cliente: %d"), GetLastError());
-			break;
-		}
-		//ReadFile(hPipe, cd.comando, 200 * sizeof(TCHAR), &nbytes, NULL);
-		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
-		if (_tcsicmp(TEXT("listc"), cliente.comando) == 0)
-		{
-			
-			writeResult = WriteFile(
-				hPipe,
-				&cdata->empresas,
-				sizeof(cdata->empresas),
-				&nBytes,
-				NULL
-			);
-			FlushFileBuffers(hPipe);
-			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
-		}
-		//TRATA DO COMANDO COMPRAR AÇÕES
-		else if (_tcsicmp(TEXT("buy"), cliente.comando) == 0) {
-			writeResult = WriteFile(
-				hPipe,
-				&cliente,
-				sizeof(clienteData),
-				&nBytes,
-				NULL
-			);
-			FlushFileBuffers(hPipe);
-			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
-		}
-		//TRATA DO COMANDO VENDER AÇÕES
-		else if (_tcsicmp(TEXT("sell"), cliente.comando) == 0) {
-			writeResult = WriteFile(
-				hPipe,
-				&cliente,
-				sizeof(clienteData),
-				&nBytes,
-				NULL
-			);
-			FlushFileBuffers(hPipe);
-			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
-		}
-		//TRATA DO COMANDO BALANCE
-		else if (_tcsicmp(TEXT("balance"), cliente.comando) == 0) {
-			writeResult = WriteFile(
-				hPipe,
-				&cliente,
-				sizeof(clienteData),
-				&nBytes,
-				NULL
-			);
-			FlushFileBuffers(hPipe);
-			_tprintf(TEXT("\nRecebi do cliente o Comando: %s com tamanho %d"), cliente.comando, _tcslen(cliente.comando) - 1);
-		}
-		//TRATA DA FALHA DO COMANDO
-		else {
-			_tprintf(TEXT("\nComando do cliente: %s introduzido com tamanho %d, não existe!"), cliente.comando, _tcslen(cliente.comando) - 1);
+			if (GetLastError() == ERROR_IO_PENDING) {
+				_tprintf(TEXT("Agendei a leitura THREAD\n"));
+				_tprintf(TEXT("\n THREAD 4 "));
+				WaitForSingleObject(hEvent, INFINITE);
+				_tprintf(TEXT("\n THREAD 5 "));
+				GetOverlappedResult(hPipe, &ov, &nBytes, FALSE);
+				_tcscpy(cliente.RESPOSTA, cliente.comando);
+				writeResult = WriteFile(
+					hPipe,
+					&cliente,
+					sizeof(clienteData),
+					&nBytes,
+					&ov
+				);
+				FlushFileBuffers(hPipe);
+
+			}
 		}
 	}
 	return 0;
@@ -638,126 +629,132 @@ DWORD WINAPI trataComandosClientes(LPVOID lpParam) {
 //###############################################################
 DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 	ControlData* cdata = (ControlData*)ctrlData;
-	OVERLAPPED ov;
 	FILE* fp;
 	clienteData cliData;
-	BOOL resultado, readResult, writeResult;
-	DWORD nBytes;
-	TCHAR string[100];
-	HANDLE hSemClientes;
+	BOOL resultado, readResult, writeResult,res;
+	DWORD nBytes, cliente = 0, nPipe;
+	HANDLE hSemClientes, hMutexCliente, hPipe;
+	TCHAR string[200];
 	//HANDLE hPipe[6];
+	HANDLE hEvent;
 	HANDLE hThreadArray[5];
 	DWORD NCLIENTES = leRegedit();
 	
+	hMutexCliente = OpenMutex(MUTEX_ALL_ACCESS, FALSE, MUTEX_NAME_C);
 
-	//CRIAR O NAMEDPIPE BOLSA PARA A DETEÇÃO DOS CLIENTES...
-	cdata->hPipe[0] = CreateNamedPipe(
-		NAME_PIPE,					// Nome do pipe
-		PIPE_ACCESS_DUPLEX |		// acesso em modo de escrita e de leitura
-		FILE_FLAG_OVERLAPPED, 
-		PIPE_TYPE_MESSAGE |			// message type pipe 
-		PIPE_READMODE_MESSAGE |		// message-read mode 
-		PIPE_WAIT,					// blocking mode 
-		PIPE_UNLIMITED_INSTANCES,	// max. instances  
-		sizeof(clienteData),		// output buffer size 
-		sizeof(clienteData),		// input buffer size 
-		0,							// client time-out 
-		NULL);						// default security attribute 
-	if (cdata->hPipe[0] == INVALID_HANDLE_VALUE)
-	{
-		_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe[0], %d.\n"), GetLastError());
-		return -1;
+
+	//das aulas
+	OVERLAPPED ov;
+	HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	cdata->id = 0;
+
+	for (DWORD i = 0; i < NCLIENTES; i++) { //Inicializar o array dos pipes com NULL
+		cdata->hPipe[i] = NULL;
+		hThreadArray[i] = NULL;
 	}
-
-	//SEMAFOROS
-	hSemClientes = OpenSemaphore(
-		EVENT_MODIFY_STATE,
-		FALSE,
-		SEM_CLIENT_NAME
-	);
-	if (hSemClientes == NULL) {
-		_tprintf(TEXT("Erro ao abrir o semáforo. Código de erro: %d\n", GetLastError()));
-		return 1;
-	}
-
-	//_tprintf(TEXT("empresa %s.\n"), cdata->empresas[0].nomeEmpresa);
-	
 	while (1)
 	{
-		resultado = ConnectNamedPipe(cdata->hPipe[0], NULL); //espera que o cliente entre
+		_tprintf(TEXT("\n1 "));
+ 		//CRIAR O NAMEDPIPE A DETEÇÃO DOS CLIENTES...
+		hPipe = CreateNamedPipe(
+			NAME_PIPE,					// Nome do pipe
+			PIPE_ACCESS_DUPLEX |		// acesso em modo de escrita e de leitura
+			FILE_FLAG_OVERLAPPED,
+			PIPE_TYPE_MESSAGE |			// message type pipe 
+			PIPE_READMODE_MESSAGE |		// message-read mode 
+			PIPE_WAIT,					// blocking mode 
+			PIPE_UNLIMITED_INSTANCES,	// max. instances  
+			sizeof(clienteData),		// output buffer size 
+			sizeof(clienteData),		// input buffer size 
+			0,							// client time-out 
+			NULL);						// default security attribute 
+		if (hPipe == INVALID_HANDLE_VALUE)
+		{
+			_tprintf(TEXT("[ERRO] Falhou ao criar CreateNamedPipe[0], %d.\n"), GetLastError());
+			return -1;
+		}
+		_tprintf(TEXT("\n2 "));
+		resultado = ConnectNamedPipe(hPipe, NULL); //espera que o cliente entre
 		if (!resultado) {
 			_tprintf(TEXT("[ERRO] Falhou ao aguardar conexão do cliente, %d.\n"), GetLastError());
+			return -1;
 		}
-			resultado = ReadFile(		//recebe as credenciais
-				cdata->hPipe[0],		// handle to pipe 
-				&cliData,				// buffer to receive data 
-				sizeof(clienteData),	// size of buffer 
-				&nBytes,				// number of bytes read 
-				&ov);					// overlapped I/O 
-			_tprintf(TEXT("RECEBI: \n"));
-			if (nBytes != 0) {
+		_tprintf(TEXT("\n3 "));
+		//Verificação das credenciais...
+		ZeroMemory(&ov, sizeof(ov));
+		ov.hEvent = hEv;
+
+		//res = ReadFile(				//recebe as credenciais
+		//	hPipe,					// handle to pipe 
+		//	&cliData,				// buffer to receive data 
+		//	sizeof(clienteData),	// size of buffer 
+		//	&nBytes,				// number of bytes read 
+		//	&ov);					// overlapped I/O 
+		res = ReadFile(				//recebe as credenciais
+			hPipe,					// handle to pipe 
+			&cliData,				// buffer to receive data 
+			sizeof(clienteData),	// size of buffer 
+			&nBytes,				// number of bytes read 
+			&ov);					// overlapped I/O 
+		if (res == TRUE) { //leu de imediato
+			//_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
+			//_tprintf(TEXT("RECEBI password: %s\n"), cliData.password);
+			//_tprintf(TEXT("RECEBI string: %s\n"), string);
+
+			//cdata->users[i].estado = 1;
+			//cdata->hPipe[cliente] = hPipe;
+			//_tcscpy(cliData.RESPOSTA, cdata->users[0].username);
+			//writeResult = WriteFile(
+			//	hPipe,
+			//	&cliData,
+			//	sizeof(clienteData),
+			//	&nBytes,
+			//	&cdata->ov
+			//);
+			//FlushFileBuffers(hPipe);
+		}
+		else
+		{
+			if (GetLastError() == ERROR_IO_PENDING) {
+				_tprintf(TEXT("Agendei a leitura\n"));
+				_tprintf(TEXT("\n4 "));
+				WaitForSingleObject(hEv, INFINITE);
+				_tprintf(TEXT("\n5 "));
+				GetOverlappedResult(hPipe, &ov, &nBytes, FALSE);
+				_tprintf(TEXT("\n6 "));
 				_tprintf(TEXT("RECEBI login: %s\n"), cliData.login);
 				_tprintf(TEXT("RECEBI password: %s\n"), cliData.password);
 				for (DWORD i = 0; i < MAX_CLIENTES; i++)
 				{
-					//_tprintf(TEXT("empresa %s.\n"), cdata->empresas[i].nomeEmpresa);
-					//_tprintf(TEXT("user %s.\n"), cdata->users[i].username);
 					if (_tcsicmp(cdata->users[i].username, cliData.login) == 0 && _tcsicmp(cdata->users[i].password, cliData.password) == 0)
 					{
-						_tprintf(TEXT("VAGAS: %lu\n"), NCLIENTES);
-						if (NCLIENTES > 0)//VERIFICA SE TEM VAGAS...
-						{
+						if (cliente < NCLIENTES) {
 							cdata->users[i].estado = 1;
-							_tcscpy(cliData.RESPOSTA, cdata->users[i].username);
-
+							_tcscpy(cliData.RESPOSTA, TEXT("1"));
+							_tprintf(TEXT("encontrei %s %s\n"), cdata->users[i].username,cdata->users[i].password);
 							writeResult = WriteFile(
-								cdata->hPipe[0],
-								&cliData,
-								sizeof(clienteData),
-								&nBytes,
-								NULL
-							);
-							FlushFileBuffers(cdata->hPipe[0]);
-							ReleaseSemaphore(
-								hSemClientes,
-								1,
-								NULL
-							);
-							//CRIA A THREAD PARA O CLIENTE USAR COMANDOS
-							hThreadArray[0] = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-							hThreadArray[0] = CreateThread(
-								NULL,					// default security attributes
-								0,						// use default stack size
-								trataComandosClientes,		// thread function name
-								cdata->hPipe[0],					// argument to thread function
-								0,						// use default creation flags
-								NULL);
-							if (hThreadArray[0] == NULL) {
-								_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
-								return 1;
-							}
-
+											hPipe,
+											&cliData,
+											sizeof(clienteData),
+											&nBytes,
+											&ov
+										);
+							FlushFileBuffers(hPipe);
+							cdata->hPipe[i] = hPipe;
+							cdata->id = i;
+							hThreadArray[i] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&cdata, 0, NULL);
 						}
-
-					}
-					else
-					{
-						_tcscpy(cliData.RESPOSTA, TEXT("FAIL"));
-						writeResult = WriteFile(
-							cdata->hPipe[0],
-							&cliData,
-							sizeof(clienteData),
-							&nBytes,
-							NULL
-						);
-						FlushFileBuffers(cdata->hPipe[0]);
 					}
 				}
 			}
+		}
+
 			
+
 	}
 
-	CloseHandle(cdata->hPipe[0]);
+	CloseHandle(hPipe);
 
 	return 0;
 }

@@ -26,6 +26,7 @@
 //SINCRONIZAÇÃO
 #define EVENT_NAME TEXT("EVENT_BOLSA")
 #define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
+#define EVENT_NAME_C TEXT("EVENT_CLIENTE")
 
 //SEMAFOROS
 #define SEM_BOLSA TEXT("SEM_BOLSA")
@@ -35,7 +36,7 @@
 //MUTEX
 #define MUTEX_NAME TEXT("MUTEX_BOLSA")
 #define MUTEX_NAME_O TEXT("MUTEX_BOARD")
-
+#define MUTEX_NAME_C TEXT("MUTEX_CLIENTE")
 //NAMEDPIPE
 #define NAME_PIPE TEXT("\\\\.\\pipe\\BOLSA")
 
@@ -65,7 +66,10 @@ typedef struct {
 typedef struct {
 	empresaData* empresas;
 	userData* users;
+	OVERLAPPED ov;
 	HANDLE hPipe[5];
+	DWORD id;
+	//HANDLE hEvent[5];
 }ControlData;
 
 //THREADS
@@ -81,4 +85,5 @@ void CriaRegedit();
 DWORD leRegedit();
 void escreveRegedit();
 void mostra_tabela(empresaData* empresasBoard);
+void apresentacao();
 
