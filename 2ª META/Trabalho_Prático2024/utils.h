@@ -66,19 +66,30 @@ typedef struct {
 typedef struct {
 	empresaData* empresas;
 	userData* users;
-	OVERLAPPED ov;
-	HANDLE hPipe[5];
-	DWORD id;
-	//HANDLE hEvent[5];
 }ControlData;
 
+typedef struct {
+	HANDLE hPipe[5];
+	HANDLE hTrinco;
+}tDataInfo;
+
+typedef struct {
+	tDataInfo* ptd;
+	DWORD id;
+}tDataInfo_EXTRA;
+typedef struct {
+	HANDLE hPipe;
+	BOOL continua;
+	HANDLE hEv;
+}DATA;
 //THREADS
-DWORD WINAPI trataComandosClientes(LPVOID ctrlData);
+DWORD WINAPI trataComandosClientes(LPVOID data);
 DWORD WINAPI verificaClientes(LPVOID ctrlData);
 DWORD WINAPI variaPreços(LPVOID empresas);
 DWORD WINAPI Organiza_dados(LPVOID empresas);
 DWORD WINAPI SMtoLocal(LPVOID empresas);
 DWORD WINAPI cliente_read();
+DWORD WINAPI recebeMSG(LPVOID data);
 
 //Prototipos das funções
 void CriaRegedit();
