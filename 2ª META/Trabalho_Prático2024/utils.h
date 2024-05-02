@@ -62,9 +62,18 @@ typedef struct {
 	float saldo;
 	BOOL estado;
 }userData;
+
+typedef struct {
+	TCHAR nomeEmpresa[50];
+	TCHAR username[TAM];
+	DWORD nAções;
+	float pAções;
+}carteiraAcoes;
+
 typedef struct {
 	empresaData* empresas;
 	userData* users;
+	carteiraAcoes* cartAcoes;
 }ControlData;
 //ver se é necessário manter isto
 typedef struct {
@@ -78,6 +87,7 @@ typedef struct {
 	DWORD id;
 	empresaData* empresas;
 	userData* users;
+	carteiraAcoes* cartAcoes;
 }tDataInfo_EXTRA;
 
 

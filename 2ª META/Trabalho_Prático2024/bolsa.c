@@ -24,8 +24,9 @@ int _tmain(int argc, TCHAR* argv[])
 	userData users[6];
 	empresaData empresas[30];
 	empresaData* emP;
-	ControlData ctrlData = {.empresas = empresas, .users = users};
-	
+	carteiraAcoes cartAcoes[30];
+	ControlData ctrlData = {.empresas = empresas, .users = users, .cartAcoes = cartAcoes };
+
 
 	//ControlData* cdata;
 	
@@ -34,10 +35,21 @@ int _tmain(int argc, TCHAR* argv[])
 	_setmode(_fileno(stdout), _O_WTEXT);
 	_setmode(_fileno(stderr), _O_WTEXT);
 #endif
-
 	//###############################################################
 	//#																#
-	//#					INICIALIZAR MATRIZ USER						#
+	//#					INICIALIZAR ARRAY CARTEIRA					#
+	//#																#
+	//###############################################################
+	for (int i = 0; i < 30; i++) {
+		_tcscpy(cartAcoes[i].nomeEmpresa, TEXT("-1"));
+		_tcscpy(cartAcoes[i].username, TEXT("-1"));
+		cartAcoes[i].nAções = 0;
+		cartAcoes[i].pAções = 0;
+	}
+	//---------------------------------------------------------------
+	//###############################################################
+	//#																#
+	//#					INICIALIZAR ARRAY USER						#
 	//#																#
 	//###############################################################
 	for (int i = 0; i < 6; i++) {
@@ -567,11 +579,11 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	tDataInfo_EXTRA* ptd_extra = (tDataInfo_EXTRA*)data;
 	HANDLE hPipesloc;
 	TCHAR buf[256];
-	DWORD n, i = 0, id, ret;
+	DWORD n, i = 0, id, ret, registo = 0, resposta = 0, totalAcoes = 0;
 	clienteData cliData;
 	DWORD NCLIENTES = leRegedit();
 	TCHAR nomeEmpresa[50];
-	float nAções;
+	float nAções, totalPacoes = 0, valorAtual = 0, venda = 0, vendaAcao = 0;
 	WaitForSingleObject(ptd_extra->ptd->hTrinco, INFINITE);
 	id = ptd_extra->id;
 	hPipesloc = ptd_extra->ptd->hPipe[id];
@@ -647,42 +659,141 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 		//TRATA DO COMANDO COMPRAR AÇÕES 
 		//-------------------ACABAR-------------------------//
 		else if (_tcsncmp(TEXT("buy"), cliData.comando, _tcslen(TEXT("buy"))) == 0) {
+			registo = 0;
+			resposta = 0;
 			_tprintf(TEXT("\nCOMANDO: %s\n"), cliData.comando);
 			_stscanf(cliData.comando, TEXT("buy %s %f"), nomeEmpresa, &nAções);
 			_tprintf(TEXT("\nnomeEmpresa: %s\n"), nomeEmpresa);
-			_tprintf(TEXT("nAções: %.2f\n"), nAções);
+			_tprintf(TEXT("nAções: %lu\n"), nAções);
 			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
-				if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
+
+				if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0 && ptd_extra->empresas[i].nAções > 0) {
 					_tprintf(TEXT("EMPRESA: %s\n"), ptd_extra->empresas[i].nomeEmpresa);
-					ptd_extra->empresas[i].nAções += nAções;
+					for (DWORD a = 0; a < 6; a++)//localizar o utilizador para descontar no saldo
+					{
+						if (ptd_extra->users[a].saldo >= (ptd_extra->empresas[i].pAção * nAções)
+							 && (_tcsicmp(ptd_extra->users[a].username, cliData.login)) == 0) {
+							ptd_extra->users[a].saldo = ptd_extra->users[a].saldo - ptd_extra->empresas[i].pAção * nAções;
+							for (DWORD j = 0; j < 30; j++)
+							{
+								//o OU está mal aqui... mudar 
+								if (registo == 0 && (_tcsicmp(ptd_extra->cartAcoes[j].nomeEmpresa, TEXT("-1"))) == 0
+									|| (_tcsicmp(ptd_extra->users[a].username, cliData.login)) == 0) {
+									_tcscpy(ptd_extra->cartAcoes[j].nomeEmpresa, nomeEmpresa);
+									_tcscpy(ptd_extra->cartAcoes[j].username, cliData.login);
+									ptd_extra->cartAcoes[j].nAções = nAções;
+									ptd_extra->cartAcoes[j].pAções = ptd_extra->empresas[i].pAção;
+									ptd_extra->empresas[i].pAção *= ((0.01 * nAções) + 1); //aumenta 1% e tem em consideração o Nações compradas
+									registo = 1;
+									resposta = 1;
+								}
+							}
+						}
+					}
+
+
+
+					ptd_extra->empresas[i].nAções -= nAções;
+				}
+
+			}
+			_tprintf(TEXT("tabela\n"), nAções);
+			for (DWORD y = 0; y < 30; y++)
+			{
+						
+				_tprintf(TEXT("|%s\t"), ptd_extra->cartAcoes[y].nomeEmpresa);
+				_tprintf(TEXT("%s\t"), ptd_extra->cartAcoes[y].username);
+				_tprintf(TEXT("%lu\t"), ptd_extra->cartAcoes[y].nAções);
+				_tprintf(TEXT("%.4f|\n"), ptd_extra->cartAcoes[y].pAções);
+			}
+
+			if (resposta == 1)
+			{
+				_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
+				if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+					exit(-1);
 				}
 			}
-			
-			_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
-			if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
-				_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-				exit(-1);
+			if (resposta == 0)
+			{
+				_tcscpy(cliData.RESPOSTA, TEXT("\nSem saldo para realizar a compra!\n"));
+				if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+					exit(-1);
+				}
 			}
 		}
 		//TRATA DO COMANDO VENDER AÇÕES
 		//-------------------ACABAR-------------------------//
 		else if (_tcsncmp(TEXT("sell"), cliData.comando, _tcslen(TEXT("sell"))) == 0) {
+			registo = 0;
+			resposta = 0;
+			totalAcoes = 0;
 			_tprintf(TEXT("\nCOMANDO: %s\n"), cliData.comando);
 			_stscanf(cliData.comando, TEXT("sell %s %f"), nomeEmpresa, &nAções);
 			_tprintf(TEXT("\nnomeEmpresa: %s\n"), nomeEmpresa);
-			_tprintf(TEXT("nAções: %.2f\n"), nAções);
+			_tprintf(TEXT("nAções: %lu\n"), nAções); //quantidade a vender ex 100
 			for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
+
 				if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0) {
 					_tprintf(TEXT("EMPRESA: %s\n"), ptd_extra->empresas[i].nomeEmpresa);
-					ptd_extra->empresas[i].nAções -= nAções;
-					ptd_extra->empresas
+					for (DWORD a = 0; a < 6; a++)//localizar o utilizador para adicionar ao saldo
+					{
+						if ((_tcsicmp(ptd_extra->users[a].username, cliData.login)) == 0) {
+							for (DWORD j = 0; j < 30; j++)
+							{
+								if ((_tcsicmp(ptd_extra->cartAcoes[j].nomeEmpresa, cliData.login)) == 0) {
+									valorAtual = ptd_extra->empresas[i].pAção; //valor atual da ação
+									venda = nAções * valorAtual;
+									ptd_extra->users[a].saldo += venda;
+
+									_tcscpy(ptd_extra->cartAcoes[j].nomeEmpresa, nomeEmpresa);
+									_tcscpy(ptd_extra->cartAcoes[j].username, cliData.login);
+									ptd_extra->cartAcoes[j].nAções = nAções;
+									ptd_extra->cartAcoes[j].pAções = ptd_extra->empresas[i].pAção;
+									vendaAcao = ptd_extra->empresas[i].pAção * 0.01;
+									ptd_extra->empresas[i].pAção -= vendaAcao; //retira 1% e tem em consideração o Nações compradas
+									registo = 1;
+									resposta = 1;
+								}
+							}
+						}
+					}
+					ptd_extra->empresas[i].nAções += nAções;
 				}
+
+
+
+
 			}
 
-			_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
-			if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
-				_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-				exit(-1);
+		
+			_tprintf(TEXT("tabela\n"), nAções);
+			for (DWORD y = 0; y < 30; y++)
+			{
+
+				_tprintf(TEXT("|%s\t"), ptd_extra->cartAcoes[y].nomeEmpresa);
+				_tprintf(TEXT("%s\t"), ptd_extra->cartAcoes[y].username);
+				_tprintf(TEXT("%lu\t"), ptd_extra->cartAcoes[y].nAções);
+				_tprintf(TEXT("%.4f|\n"), ptd_extra->cartAcoes[y].pAções);
+			}
+
+			if (resposta == 1)
+			{
+				_tcscpy(cliData.RESPOSTA, TEXT("\nOK!\n"));
+				if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+					exit(-1);
+				}
+			}
+			if (resposta == 0)
+			{
+				_tcscpy(cliData.RESPOSTA, TEXT("\nSem saldo para realizar a compra!\n"));
+				if (!WriteFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL)) {
+					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+					exit(-1);
+				}
 			}
 		}
 		//TRATA DO COMANDO BALANCE
@@ -784,6 +895,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 			td_extra[nCli].id = nCli;
 			td_extra[nCli].empresas = cdata->empresas;
 			td_extra[nCli].users = cdata->users;
+			td_extra[nCli].cartAcoes = cdata->cartAcoes;
 			//LANÇAR UMA THREAD PARA CADA CLIENTE
 			hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&td_extra[nCli], 0, NULL);
 			//hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&cdata[nCli], 0, NULL);

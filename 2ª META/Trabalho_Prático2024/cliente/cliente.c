@@ -89,9 +89,9 @@ int _tmain(int argc, TCHAR* argv[])
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
-        _tprintf(TEXT("\nLogin: "));
+        _tprintf(TEXT("\n\t\t\tLogin: "));
         _tscanf(TEXT("%s"), cliData.login);
-        _tprintf(TEXT("\nPassword: "));
+        _tprintf(TEXT("\n\t\t\tPassword: "));
         _tscanf(TEXT("%s"), cliData.password);
         //buf[_tcslen(buf) - 1] = _T('\0');
 
@@ -121,7 +121,7 @@ int _tmain(int argc, TCHAR* argv[])
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
-        _tprintf(TEXT("\nComando: "));
+        _tprintf(TEXT("\n\t\t\tComando: "));
         //_tscanf(TEXT("%s"), &cliData.comando);
         _fgetts(cliData.comando, 300, stdin);
         cliData.comando[_tcslen(cliData.comando) - 1] = _T('\0');
@@ -218,9 +218,9 @@ DWORD WINAPI recebeMSG(LPVOID data) {
 
 
 void apresentacao() {
-    _tprintf(TEXT("#################################################################\n"));
-    _tprintf(TEXT("#\t\t\t\t\t\t\t\t#\n"));
-    _tprintf(TEXT("#\t\tBOLSA DE VALORES ONLINE\t\t\t\t#\n"));
-    _tprintf(TEXT("#\t\t\t\t\t\t\t\t#\n"));
-    _tprintf(TEXT("#################################################################\n"));
+    _tprintf(TEXT("\t\t\t#################################################################\n"));
+    _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+    _tprintf(TEXT("\t\t\t#\t\tBOLSA DE VALORES ONLINE\t\t\t\t#\n"));
+    _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
+    _tprintf(TEXT("\t\t\t#################################################################\n"));
 }
