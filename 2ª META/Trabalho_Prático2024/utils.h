@@ -27,6 +27,7 @@
 #define EVENT_NAME TEXT("EVENT_BOLSA")
 #define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
 #define EVENT_NAME_C TEXT("EVENT_CLIENTE")
+#define EVENT_NAME_V TEXT("EVENT_VERIFICA")
 
 //SEMAFOROS
 #define SEM_BOLSA TEXT("SEM_BOLSA")
@@ -42,19 +43,21 @@
 
 
 //ESTRUTURAS
+typedef struct {
+	TCHAR nomeEmpresa[50];
+	DWORD nAções;
+	float pAção;
+}empresaData;
+
 typedef struct   
 {
 	TCHAR login[TAM];
 	TCHAR password[TAM];
 	TCHAR comando[300];
 	TCHAR RESPOSTA[300];
+	empresaData* empresas;
 }clienteData;
 
-typedef struct {
-	TCHAR nomeEmpresa[50];
-	DWORD nAções;  
-	float pAção;
-}empresaData;
 
 typedef struct {
 	TCHAR username[TAM];
@@ -67,7 +70,7 @@ typedef struct {
 	TCHAR nomeEmpresa[50];
 	TCHAR username[TAM];
 	DWORD nAções;
-	float pAções;
+	float valor;
 }carteiraAcoes;
 
 typedef struct {
@@ -89,13 +92,11 @@ typedef struct {
 	userData* users;
 	carteiraAcoes* cartAcoes;
 }tDataInfo_EXTRA;
-
-
-
 typedef struct {
 	HANDLE hPipe;
 	BOOL continua;
 	HANDLE hEv;
+	clienteData* clidData;
 }DATA;
 //THREADS
 DWORD WINAPI trataComandosClientes(LPVOID data);
@@ -112,4 +113,4 @@ DWORD leRegedit();
 void escreveRegedit();
 void mostra_tabela(empresaData* empresasBoard);
 void apresentacao();
-
+void mostra_tabela();

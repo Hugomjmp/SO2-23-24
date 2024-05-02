@@ -16,6 +16,7 @@ int _tmain(int argc, TCHAR* argv[])
 
     //variaveis
     BOOL resultado, writeResult;
+    DWORD estado = 0;
     DWORD nBytes;
     DWORD clienteValido = 0;
     //HANDLES
@@ -29,7 +30,7 @@ int _tmain(int argc, TCHAR* argv[])
 
     //ESTRUTURAS
     clienteData cliData;
-
+    
     //Codigo para o unicode
 #ifdef UNICODE
     _setmode(_fileno(stdin), _O_WTEXT);
@@ -39,23 +40,6 @@ int _tmain(int argc, TCHAR* argv[])
 
     apresentacao();
 
-    //###############################################################
-    //#																#
-    //#							Threads								#
-    //#																#
-    //###############################################################
-    /*hThread = NULL; // é bom inicializar a zero para depois podermos testar se a thread foi criada com sucesso
-    hThread = CreateThread(
-        NULL,					// default security attributes
-        0,						// use default stack size
-        cliente_read,			// thread function name
-        NULL,				// argument to thread function
-        0,						// use default creation flags
-        NULL);
-    if (hThread == NULL) {
-        _tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
-        return 1;
-    }*/
     TCHAR buf[256];
     HANDLE hPipe;
     int i = 0;
@@ -63,6 +47,8 @@ int _tmain(int argc, TCHAR* argv[])
     DWORD n;
     HANDLE hThread;
     DATA data;
+
+    
 
 
     //_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), NAME_PIPE);
@@ -82,10 +68,9 @@ int _tmain(int argc, TCHAR* argv[])
     data.hPipe = hPipe;
     data.continua = TRUE;
     hThread = CreateThread(NULL, 0, recebeMSG, &data, 0, NULL);
-
+    
     OVERLAPPED ov;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
-
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
@@ -94,7 +79,7 @@ int _tmain(int argc, TCHAR* argv[])
         _tprintf(TEXT("\n\t\t\tPassword: "));
         _tscanf(TEXT("%s"), cliData.password);
         //buf[_tcslen(buf) - 1] = _T('\0');
-
+        
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
         
@@ -115,12 +100,15 @@ int _tmain(int argc, TCHAR* argv[])
             }
         }
 
-        _tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
-    } while (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0);
+
+        //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
+    } while (_tcsicmp(cliData.RESPOSTA, TEXT("1")) == 0);
     //TRATA DOS COMANDOS...
+    
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
+        
         _tprintf(TEXT("\n\t\t\tComando: "));
         //_tscanf(TEXT("%s"), &cliData.comando);
         _fgetts(cliData.comando, 300, stdin);
@@ -130,6 +118,7 @@ int _tmain(int argc, TCHAR* argv[])
 
         //ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
         ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
+        
         if (ret == TRUE) {
             //_tprintf(TEXT("Escrevi de imediato\n"));
         }
@@ -145,9 +134,9 @@ int _tmain(int argc, TCHAR* argv[])
             }
         }
 
-        _tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
+        //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
     } while (_tcscmp(cliData.RESPOSTA, TEXT("exit")) != 0);
-
+    
     return 0;
 }
 
@@ -157,23 +146,8 @@ int _tmain(int argc, TCHAR* argv[])
 //#				Thread vai receber os dados do Bolsa			#
 //#																#
 //###############################################################
-//TRATA DE RECEBER DADOS DO NAMEDPIPE
-DWORD WINAPI cliente_read(LPVOID lparam) {
-    //DWORD resultado, nBytes;
-    HANDLE hPipe = (HANDLE)lparam;
-    //clienteData cliData;
-
-    //resultado = ReadFile(
-    //    hPipe,        // handle to pipe 
-    //    &cliData,   // buffer to receive data 
-    //    sizeof(clienteData), // size of buffer 
-    //    &nBytes, // number of bytes read 
-    //    NULL);        // not overlapped I/O 
-    //_tprintf(TEXT("\nResposta: %s "), cliData.comando);*/
-}
-
 DWORD WINAPI recebeMSG(LPVOID data) {
-
+   
     DATA* ptd = (DATA*)data;
     HANDLE hPipe = ptd->hPipe;
     TCHAR buf[256];
@@ -181,16 +155,17 @@ DWORD WINAPI recebeMSG(LPVOID data) {
     BOOL ret;
     clienteData cliData;
     OVERLAPPED ov;
+    BOOL VERIFIÇÃO = FALSE;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
 
     do {
         //RECEBER RESPOSTA...
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
-
         //ret = ReadFile(hPipe, buf, sizeof(buf), &n, &ov);
+        
         ret = ReadFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
-
+        
         if (ret == TRUE) {
            // _tprintf(TEXT("Li de imediato\n"));
         }
@@ -205,8 +180,19 @@ DWORD WINAPI recebeMSG(LPVOID data) {
                 break;
             }
         }
+        if (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0) {
+
+        }
+        else if (_tcscmp(cliData.RESPOSTA, TEXT("-1")) == 0) {
+            _tprintf(TEXT("\n\t\t\t Credenciais erradas!"));
+        }
+        else if (_tcscmp(cliData.RESPOSTA, TEXT("2")) == 0){
+            _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
+            //mostra_tabela(&data);
+        }
         //buf[n / sizeof(TCHAR)] = _T('\0');
-        _tprintf(TEXT("[LEITOR] Recebi %d bytes: '%s' '%s' '%s'... (ReadFile)\n"),n, cliData.login, cliData.password,cliData.RESPOSTA);
+        wprintf(L"%s", cliData.RESPOSTA);
+       // _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
 
     } while (_tcscmp(cliData.RESPOSTA, TEXT("SAIR")) != 0);
 
@@ -214,8 +200,59 @@ DWORD WINAPI recebeMSG(LPVOID data) {
 }
 
 
+void mostra_tabela(LPVOID data) {
+    DATA* ptd = (DATA*)data;
+    DWORD contador = 0;
+    DWORD digitos = 0;
+    float numeros = 0.0;
 
+	_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
+        //_tprintf(TEXT(" |\t %s \t\t|"), ptd->clidData->empresas[i].nomeEmpresa);
+		/*if (_tcsicmp(TEXT("-1"), ptd->clidData->emp[i].nomeEmpresa) != 0)
+		{
+			contador++;
+		}*/
 
+	}/*
+	for (DWORD i = 0; i < contador; i++)
+	{
+		if (i < 9) { //corrige o espaçamento do ID
+			_tprintf(TEXT("\t\t| %d  |"), i + 1);
+		}
+		else {
+			_tprintf(TEXT("\t\t| %d |"), i + 1);
+		}
+		if (_tcslen(ptd->clidData->emp[i].nomeEmpresa) <= 5)
+		{
+            if (_tcscmp(ptd->clidData->emp[i].nomeEmpresa, TEXT("-1")) == 0) {
+				_tprintf(TEXT(" |\t   \t\t|"), ptd->clidData->emp[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
+			}
+			else
+				_tprintf(TEXT(" |\t %s \t\t|"), ptd->clidData->emp[i].nomeEmpresa);
+		}
+		else {
+			_tprintf(TEXT(" |\t %s \t|"), ptd->clidData->emp[i].nomeEmpresa);
+
+		}
+		_tprintf(TEXT(" |\t %lu \t\t|"), ptd->clidData->emp[i].nAções);
+		//contar os digitos para retificar espaçamento do Preço Ação
+		digitos = 0;
+		numeros = ptd->clidData->emp[i].pAção;
+		while (numeros >= 1) {
+			numeros /= 10;
+			digitos++;
+		}
+		if (digitos >= 2)
+			_tprintf(TEXT(" |\t %.2f€ \t|"), ptd->clidData->emp[i].pAção);
+		else
+			_tprintf(TEXT(" |\t %.2f€ \t\t|"), ptd->clidData->emp[i].pAção);
+
+        _tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
+    }
+    contador = 0;*/
+}
 
 void apresentacao() {
     _tprintf(TEXT("\t\t\t#################################################################\n"));
