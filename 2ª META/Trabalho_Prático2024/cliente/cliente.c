@@ -23,13 +23,14 @@ int _tmain(int argc, TCHAR* argv[])
 
     HANDLE hSemaphore;
 
-    HANDLE hEvent;
+   
 
     //Nome do namedpipe
     LPCTSTR pBolsa = TEXT("\\\\.\\pipe\\BOLSA");
 
     //ESTRUTURAS
     clienteData cliData;
+    clienteResposta cliRes;
     
     //Codigo para o unicode
 #ifdef UNICODE
@@ -44,12 +45,30 @@ int _tmain(int argc, TCHAR* argv[])
     HANDLE hPipe;
     int i = 0;
     BOOL ret;
+    BOOL retR;
     DWORD n;
     HANDLE hThread;
     DATA data;
 
-    
+    HANDLE hEvent = CreateEvent(
+        NULL,			//lpEventAttributes
+        TRUE,			//bManualReset
+        FALSE,			//bInitialState
+        EVENT_NAME_V	//lpName
+    );
 
+    /*
+    hSemaphore = CreateSemaphore(
+        NULL,
+        0,
+        1,
+        SEM_CLIENTE_LOGIN
+    );
+    if (hSemaphore == NULL)
+    {
+        printf("[ERRO] CreateSemaphore %d\n", GetLastError());
+        return 1;
+    }*/
 
     //_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), NAME_PIPE);
     if (!WaitNamedPipe(NAME_PIPE, NMPWAIT_WAIT_FOREVER)) {
@@ -71,6 +90,7 @@ int _tmain(int argc, TCHAR* argv[])
     
     OVERLAPPED ov;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
+
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
@@ -99,12 +119,42 @@ int _tmain(int argc, TCHAR* argv[])
                 break;
             }
         }
+        //recebe a resposta para validar as credenciais!!!!
+        /*
+        retR = ReadFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
 
+        if (retR == TRUE) {
+            // _tprintf(TEXT("Li de imediato\n"));
+        }
+        else {
+            if (!retR && GetLastError() == ERROR_IO_PENDING) {
+                //_tprintf(TEXT("Agendei a leitura\n"));
+                WaitForSingleObject(hEv, INFINITE);
+                GetOverlappedResult(hPipe, &ov, &n, FALSE);
+            }
+            else {
+                _tprintf(TEXT("[ERRO] FALHOU O OVERLAPPED\n"));
+                break;
+            }
+        }
+        if (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0) {
 
+        }
+        else if (_tcscmp(cliData.RESPOSTA, TEXT("-1")) == 0) {
+            _tprintf(TEXT("\n\t\t\t Credenciais erradas!"));
+        }
+        else if (_tcscmp(cliData.RESPOSTA, TEXT("2")) == 0) {
+            _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
+            //mostra_tabela(&data);
+        }
+      
+      */
         //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
-    } while (_tcsicmp(cliData.RESPOSTA, TEXT("1")) == 0);
+    } while (_tcsicmp(cliRes.RESPOSTA, TEXT("-1")) == 0);
+    //SetEvent(hEvent);
+    //Sleep(500);
+    //ResetEvent(hEvent);
     //TRATA DOS COMANDOS...
-    
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
@@ -135,7 +185,7 @@ int _tmain(int argc, TCHAR* argv[])
         }
 
         //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
-    } while (_tcscmp(cliData.RESPOSTA, TEXT("exit")) != 0);
+    } while (_tcscmp(cliRes.RESPOSTA, TEXT("exit")) != 0);
     
     return 0;
 }
@@ -154,17 +204,30 @@ DWORD WINAPI recebeMSG(LPVOID data) {
     DWORD n;
     BOOL ret;
     clienteData cliData;
+    clienteResposta cliRes;
+    empresaData empresas[30];
     OVERLAPPED ov;
     BOOL VERIFIÇÃO = FALSE;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
+    
+    HANDLE hEvent = OpenEvent(
+        SYNCHRONIZE,	//dwDesiredAccess,
+        FALSE,			//bInheritHandle,
+        EVENT_NAME_V		//lpName
+    );
+    if (hEvent == NULL) {
+        _tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+        return 1;
+    }
 
+    //WaitForSingleObject(hEvent , INFINITE);
     do {
         //RECEBER RESPOSTA...
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
         //ret = ReadFile(hPipe, buf, sizeof(buf), &n, &ov);
         
-        ret = ReadFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
+        ret = ReadFile(hPipe, &cliRes, sizeof(clienteResposta), &n, &ov);
         
         if (ret == TRUE) {
            // _tprintf(TEXT("Li de imediato\n"));
@@ -180,21 +243,74 @@ DWORD WINAPI recebeMSG(LPVOID data) {
                 break;
             }
         }
-        if (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0) {
+        if (_tcscmp(cliRes.RESPOSTA, TEXT("1")) == 0) {
 
         }
-        else if (_tcscmp(cliData.RESPOSTA, TEXT("-1")) == 0) {
+        else if (_tcscmp(cliRes.RESPOSTA, TEXT("-1")) == 0) {
             _tprintf(TEXT("\n\t\t\t Credenciais erradas!"));
         }
-        else if (_tcscmp(cliData.RESPOSTA, TEXT("2")) == 0){
-            _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
-            //mostra_tabela(&data);
-        }
-        //buf[n / sizeof(TCHAR)] = _T('\0');
-        wprintf(L"%s", cliData.RESPOSTA);
-       // _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
+        else if (_tcscmp(cliRes.RESPOSTA, TEXT("2")) == 0){
+            _tprintf(TEXT("\n\t\t\t %s"), cliRes.RESPOSTA);
 
-    } while (_tcscmp(cliData.RESPOSTA, TEXT("SAIR")) != 0);
+
+           
+            DWORD contador = 0;
+            DWORD digitos = 0;
+            float numeros = 0.0;
+
+            _tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+            _tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
+            for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
+               //_tprintf(TEXT(" |\t %s \t\t|"), cliRes.empW[0].nomeEmpresa);
+                if (_tcsicmp(TEXT("-1"), cliRes.empW[i].nomeEmpresa) != 0)
+                {
+                    contador++;
+                }
+
+            }
+            for (DWORD i = 0; i < contador; i++)
+            {
+                if (i < 9) { //corrige o espaçamento do ID
+                    _tprintf(TEXT("\t\t| %d  |"), i + 1);
+                }
+                else {
+                    _tprintf(TEXT("\t\t| %d |"), i + 1);
+                }
+                if (_tcslen(cliRes.empW[i].nomeEmpresa) <= 5)
+                {
+                    if (_tcscmp(cliRes.empW[i].nomeEmpresa, TEXT("-1")) == 0) {
+                        _tprintf(TEXT(" |\t   \t\t|"), cliRes.empW[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
+                    }
+                    else
+                        _tprintf(TEXT(" |\t %s \t\t|"), cliRes.empW[i].nomeEmpresa);
+                }
+                else {
+                    _tprintf(TEXT(" |\t %s \t|"), cliRes.empW[i].nomeEmpresa);
+
+                }
+                _tprintf(TEXT(" |\t %lu \t\t|"), cliRes.empW[i].nAções);
+                //contar os digitos para retificar espaçamento do Preço Ação
+                digitos = 0;
+                numeros = cliRes.empW[i].pAção;
+                while (numeros >= 1) {
+                    numeros /= 10;
+                    digitos++;
+                }
+                if (digitos >= 2)
+                    _tprintf(TEXT(" |\t %.2f€ \t|"), cliRes.empW[i].pAção);
+                else
+                    _tprintf(TEXT(" |\t %.2f€ \t\t|"), cliRes.empW[i].pAção);
+
+                _tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
+            }
+            contador = 0;
+            
+        }
+
+
+       _tprintf(TEXT("\n\t\t\t %s"), cliRes.RESPOSTA);
+       
+    } while (_tcscmp(cliRes.RESPOSTA, TEXT("SAIR")) != 0);
 
     return 0;
 }
@@ -202,56 +318,7 @@ DWORD WINAPI recebeMSG(LPVOID data) {
 
 void mostra_tabela(LPVOID data) {
     DATA* ptd = (DATA*)data;
-    DWORD contador = 0;
-    DWORD digitos = 0;
-    float numeros = 0.0;
-
-	_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
-	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
-	for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
-        //_tprintf(TEXT(" |\t %s \t\t|"), ptd->clidData->empresas[i].nomeEmpresa);
-		/*if (_tcsicmp(TEXT("-1"), ptd->clidData->emp[i].nomeEmpresa) != 0)
-		{
-			contador++;
-		}*/
-
-	}/*
-	for (DWORD i = 0; i < contador; i++)
-	{
-		if (i < 9) { //corrige o espaçamento do ID
-			_tprintf(TEXT("\t\t| %d  |"), i + 1);
-		}
-		else {
-			_tprintf(TEXT("\t\t| %d |"), i + 1);
-		}
-		if (_tcslen(ptd->clidData->emp[i].nomeEmpresa) <= 5)
-		{
-            if (_tcscmp(ptd->clidData->emp[i].nomeEmpresa, TEXT("-1")) == 0) {
-				_tprintf(TEXT(" |\t   \t\t|"), ptd->clidData->emp[i].nomeEmpresa); // coloca esppaços vazios onde está "-1"
-			}
-			else
-				_tprintf(TEXT(" |\t %s \t\t|"), ptd->clidData->emp[i].nomeEmpresa);
-		}
-		else {
-			_tprintf(TEXT(" |\t %s \t|"), ptd->clidData->emp[i].nomeEmpresa);
-
-		}
-		_tprintf(TEXT(" |\t %lu \t\t|"), ptd->clidData->emp[i].nAções);
-		//contar os digitos para retificar espaçamento do Preço Ação
-		digitos = 0;
-		numeros = ptd->clidData->emp[i].pAção;
-		while (numeros >= 1) {
-			numeros /= 10;
-			digitos++;
-		}
-		if (digitos >= 2)
-			_tprintf(TEXT(" |\t %.2f€ \t|"), ptd->clidData->emp[i].pAção);
-		else
-			_tprintf(TEXT(" |\t %.2f€ \t\t|"), ptd->clidData->emp[i].pAção);
-
-        _tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
-    }
-    contador = 0;*/
+    
 }
 
 void apresentacao() {

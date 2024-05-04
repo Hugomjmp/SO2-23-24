@@ -32,7 +32,7 @@
 //SEMAFOROS
 #define SEM_BOLSA TEXT("SEM_BOLSA")
 #define SEM_CLIENT_NAME TEXT("SEM_VAGA")
-
+#define	SEM_CLIENTE_LOGIN TEXT("SEM_LOGIN")
 
 //MUTEX
 #define MUTEX_NAME TEXT("MUTEX_BOLSA")
@@ -54,10 +54,13 @@ typedef struct
 	TCHAR login[TAM];
 	TCHAR password[TAM];
 	TCHAR comando[300];
-	TCHAR RESPOSTA[300];
-	empresaData* empresas;
+
 }clienteData;
 
+typedef struct {
+	TCHAR RESPOSTA[300];
+	empresaData empW[30];
+}clienteResposta;
 
 typedef struct {
 	TCHAR username[TAM];
@@ -73,11 +76,18 @@ typedef struct {
 	float valor;
 }carteiraAcoes;
 
+
+typedef struct {
+	empresaData empresas[30];
+	carteiraAcoes cartAcoes[30];
+}boardData;
+
 typedef struct {
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
 }ControlData;
+
 //ver se é necessário manter isto
 typedef struct {
 	HANDLE hPipe[5];
@@ -92,25 +102,28 @@ typedef struct {
 	userData* users;
 	carteiraAcoes* cartAcoes;
 }tDataInfo_EXTRA;
+
 typedef struct {
 	HANDLE hPipe;
 	BOOL continua;
 	HANDLE hEv;
 	clienteData* clidData;
+	clienteResposta* cliRes;
 }DATA;
+
 //THREADS
 DWORD WINAPI trataComandosClientes(LPVOID data);
 DWORD WINAPI verificaClientes(LPVOID ctrlData);
 DWORD WINAPI variaPreços(LPVOID empresas);
 DWORD WINAPI Organiza_dados(LPVOID empresas);
 DWORD WINAPI SMtoLocal(LPVOID empresas);
-DWORD WINAPI cliente_read();
 DWORD WINAPI recebeMSG(LPVOID data);
 
 //Prototipos das funções
 void CriaRegedit();
 DWORD leRegedit();
 void escreveRegedit();
-void mostra_tabela(empresaData* empresasBoard);
+void mostra_tabela(empresaData* empresasBoard, carteiraAcoes *cartA);
+void mostraMenu();
 void apresentacao();
-void mostra_tabela();
+void mostra_tabela(empresasBoard, boardDt);

@@ -24,13 +24,13 @@ int _tmain(int argc, TCHAR* argv[])
 		NULL,					// default security attributes
 		0,						// use default stack size
 		Organiza_dados,			// thread function name
-		empresasBoard,				// argument to thread function
+		&empresasBoard,			// argument to thread function
 		0,						// use default creation flags
 		NULL);
 	//---------------------------------------------------------------
 		while ((_tcsicmp(TEXT("close"), comandoBoard)) != 0)
 	{
-			_tprintf(TEXT("\n\t\t close - Fechar o programa\n"));
+			_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));
 			fflush(stdin);
 			//_tprintf(TEXT("\n Comando: "));
 			_tscanf(TEXT("%s"), comandoBoard);
@@ -52,8 +52,17 @@ int _tmain(int argc, TCHAR* argv[])
 DWORD WINAPI Organiza_dados(LPVOID empresas) {
 	HANDLE hEvent, hEventWrite, hMutex, hMutexWrite, hMapFile;
 	empresaData* empresasBoard = (empresaData*)empresas;
-	empresaData* emP;
-	
+	//empresaData* emP;
+	carteiraAcoes cartA[30];
+	boardData* boardDt;
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tcscpy(cartA[i].nomeEmpresa, TEXT("-1"));
+		_tcscpy(cartA[i].username, TEXT("-1"));
+		cartA[i].nAções = 0;
+		cartA[i].valor = 0.0;
+	}
+
 	//###############################################################
 	//#																#
 	//#						Eventos			 						#
@@ -116,26 +125,47 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
 		return 1;
 	}
-	emP = (empresaData*)MapViewOfFile(
+	/*emP = (empresaData*)*/boardDt = (boardData*)MapViewOfFile(
 		hMapFile,
 		FILE_MAP_ALL_ACCESS,
 		0,
 		0,
-		sizeof(empresaData)
+		sizeof(boardData)
 	);
 
-	if (emP == NULL) {
+	if (boardDt/*emP*/ == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
 		return 1;
 	}
+	/*for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
+		_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
+		_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
+		_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
+		//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
+		//emP[i].nAções = 0;
+		//emP[i].pAção = 0.0;
+	}*/
 	while(1){
 		WaitForSingleObject(hEvent, INFINITE);
 		WaitForSingleObject(hMutex, INFINITE);
 		for (DWORD i = 0; i < MAX_EMPRESAS; i++) //copia o que tem na shared memory para um array local
 		{
-			empresasBoard[i] = emP[i];
+			//empresasBoard[i] = emP[i];
+			empresasBoard[i] = boardDt->empresas[i];
+			cartA[i] = boardDt->cartAcoes[i];
 		}
-
+		/*for (DWORD i = 0; i < 2; i++)
+		{
+			_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
+			_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
+			_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
+			_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
+			//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
+			//emP[i].nAções = 0;
+			//emP[i].pAção = 0.0;
+		}*/
 		//REORGANIZAÇÃO.... está a duplicar... problema aqui
 		
 		//bolha
@@ -177,18 +207,18 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 
 
 		ReleaseMutex(hMutex);
-		mostra_tabela(empresasBoard);
-		WaitForSingleObject(hMutexWrite, INFINITE);
-		CopyMemory(emP, empresasBoard, sizeof(empresaData) * MAX_EMPRESAS);
-		ReleaseMutex(hMutexWrite);
-		SetEvent(hEventWrite);
-		Sleep(500);
-		ResetEvent(hEventWrite);
+		mostra_tabela(empresasBoard, boardDt);
+		//WaitForSingleObject(hMutexWrite, INFINITE);
+		//CopyMemory(/*emP*/boardDt, empresasBoard, sizeof(boardData)/*sizeof(empresaData) * MAX_EMPRESAS*/);
+		//ReleaseMutex(hMutexWrite);
+		//SetEvent(hEventWrite);
+		//Sleep(500);
+		//ResetEvent(hEventWrite);
 		Sleep(1000);
 		
 
 	}
-	UnmapViewOfFile(emP);
+	UnmapViewOfFile(boardDt/*emP*/);
 	CloseHandle(hMapFile);
 }
 
@@ -197,10 +227,16 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 
 
 
-void mostra_tabela(empresaData* empresasBoard){
+void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	DWORD Nempresas = 10;
 	DWORD contador = 0, numeros;
 	DWORD digitos = 0;
+	//empresaData empresasCompara[MAX_EMPRESAS];
+	//boardData* boardDT = (boardData*)boardDt;
+
+	
+	
+
 	_tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
 	for (DWORD i = 0; i < Nempresas; i++)
@@ -239,5 +275,15 @@ void mostra_tabela(empresaData* empresasBoard){
 		_tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
 		
 	}
-	_tprintf(TEXT("\n\t\t close - Fechar o programa\n"));
+
+
+	//MOSTRAR A ULTIMA TRANSAÇÃO//
+	_tprintf(TEXT("\n\t\t--------------------------------ULTIMA TRANSAÇÃO---------------------------------\n"));
+	_tprintf(TEXT("\n\t\t\t|\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
+	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
+	_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| |\t %.2f €\t\t|\n"), boardDt->cartAcoes[0].username,
+		boardDt->cartAcoes[0].nAções, boardDt->cartAcoes[0].valor);
+
+
+	_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));
 }

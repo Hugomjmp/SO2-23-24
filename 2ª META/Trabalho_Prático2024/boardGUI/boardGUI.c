@@ -1,40 +1,12 @@
 ﻿#include <windows.h>
 #include <tchar.h>
 #include <windowsx.h>
-/* ===================================================== */
-/* Programa base (esqueleto) para aplica��es Windows     */
-/* ===================================================== */
-// Cria uma janela de nome "Janela Principal" e pinta fundo de branco
-// Modelo para programas Windows:
-//  Composto por 2 fun��es: 
-//	WinMain()     = Ponto de entrada dos programas windows
-//			1) Define, cria e mostra a janela
-//			2) Loop de recep��o de mensagens provenientes do Windows
-//     TrataEventos()= Processamentos da janela (pode ter outro nome)
-//			1) � chamada pelo Windows (callback) 
-//			2) Executa c�digo em fun��o da mensagem recebida
+#include "..\utils.h"
+
 
 LRESULT CALLBACK TrataEventos(HWND, UINT, WPARAM, LPARAM);
 
-// Nome da classe da janela (para programas de uma s� janela, normalmente este nome � 
-// igual ao do pr�prio programa) "szprogName" � usado mais abaixo na defini��o das 
-// propriedades do objecto janela
 TCHAR szProgName[] = TEXT("Base"); // vai ser o nome do nosso programa, que vai aparecer no cantinho da janela
-
-// ============================================================================
-// FUN��O DE IN�CIO DO PROGRAMA: _tWinMain()
-// ============================================================================
-// Em Windows, o programa come�a sempre a sua execu��o na fun��o WinMain()que desempenha
-// o papel da fun��o main() do C em modo consola WINAPI indica o "tipo da fun��o" (WINAPI
-// para todas as declaradas nos headers do Windows e CALLBACK para as fun��es de
-// processamento da janela)
-// Par�metros:
-//   hInst: Gerado pelo Windows, � o handle (n�mero) da inst�ncia deste programa 
-//   hPrevInst: Gerado pelo Windows, � sempre NULL para o NT (era usado no Windows 3.1)
-//   lpCmdLine: Gerado pelo Windows, � um ponteiro para uma string terminada por 0
-//              destinada a conter par�metros para o programa 
-//   nCmdShow:  Par�metro que especifica o modo de exibi��o da janela (usado em  
-//        	   ShowWindow()
 
 int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int nCmdShow) {
 	HWND hWnd;		// hWnd � o handler da janela, gerado mais abaixo por CreateWindow()
@@ -42,10 +14,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	WNDCLASSEX wcApp;	// WNDCLASSEX � uma estrutura cujos membros servem para 
 	// definir as caracter�sticas da classe da janela
 
-// ============================================================================
-// 1. Defini��o das caracter�sticas da janela "wcApp" 
-//    (Valores dos elementos da estrutura "wcApp" do tipo WNDCLASSEX)
-// ============================================================================
+
 	wcApp.cbSize = sizeof(WNDCLASSEX);      // Tamanho da estrutura WNDCLASSEX
 	wcApp.hInstance = hInst;		         // Inst�ncia da janela actualmente exibida 
 	// ("hInst" � par�metro de WinMain e vem 
@@ -71,18 +40,11 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	wcApp.cbClsExtra = 0;				// Livre, para uso particular
 	wcApp.cbWndExtra = 0;				// Livre, para uso particular
 	wcApp.hbrBackground = CreateSolidBrush(RGB(22, 26, 37));
-	// "hbrBackground" = handler para "brush" de pintura do fundo da janela. Devolvido por
-	// "GetStockObject".Neste caso o fundo ser� branco
-
-	// ============================================================================
-	// 2. Registar a classe "wcApp" no Windows
-	// ============================================================================
+	
 	if (!RegisterClassEx(&wcApp))
 		return(0);
 
-	// ============================================================================
-	// 3. Criar a janela
-	// ============================================================================
+	
 	hWnd = CreateWindow(
 		szProgName,			// Nome da janela (programa) definido acima
 		TEXT("BoardGui"),// Texto que figura na barra do t�tulo
@@ -99,37 +61,12 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		// passado num dos par�metros de WinMain()
 		0);
 
-	// N�o h� par�metros adicionais para a janela
-	// ============================================================================
-	// 4. Mostrar a janela
-	// ============================================================================
+	
 	ShowWindow(hWnd, nCmdShow);	// "hWnd"= handler da janela, devolvido por 
 	// "CreateWindow"; "nCmdShow"= modo de exibi��o (p.e. 
 	// normal/modal); � passado como par�metro de WinMain()
 	UpdateWindow(hWnd);		// Refrescar a janela (Windows envia � janela uma 
 	// mensagem para pintar, mostrar dados, (refrescar)� 
-// ============================================================================
-// 5. Loop de Mensagens
-// ============================================================================
-// O Windows envia mensagens �s janelas (programas). Estas mensagens ficam numa fila de
-// espera at� que GetMessage(...) possa ler "a mensagem seguinte"	
-// Par�metros de "getMessage":
-// 1)"&lpMsg"=Endere�o de uma estrutura do tipo MSG ("MSG lpMsg" ja foi declarada no  
-//   in�cio de WinMain()):
-//			HWND hwnd		handler da janela a que se destina a mensagem
-//			UINT message		Identificador da mensagem
-//			WPARAM wParam		Par�metro, p.e. c�digo da tecla premida
-//			LPARAM lParam		Par�metro, p.e. se ALT tamb�m estava premida
-//			DWORD time		Hora a que a mensagem foi enviada pelo Windows
-//			POINT pt		Localiza��o do mouse (x, y) 
-// 2)handle da window para a qual se pretendem receber mensagens (=NULL se se pretendem
-//   receber as mensagens para todas as
-// janelas pertencentes � thread actual)
-// 3)C�digo limite inferior das mensagens que se pretendem receber
-// 4)C�digo limite superior das mensagens que se pretendem receber
-
-// NOTA: GetMessage() devolve 0 quando for recebida a mensagem de fecho da janela,
-// 	  terminando ent�o o loop de recep��o de mensagens, e o programa 
 
 	while (GetMessage(&lpMsg, NULL, 0, 0) > 0) {
 		TranslateMessage(&lpMsg);	// Pr�-processamento da mensagem (p.e. obter c�digo 
@@ -139,52 +76,157 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		// tratamento da janela, CALLBACK TrataEventos (abaixo)
 	}
 
-	// ============================================================================
-	// 6. Fim do programa
-	// ============================================================================
+
 	return (int)lpMsg.wParam;	// Retorna sempre o par�metro wParam da estrutura lpMsg
 }
-
-// ============================================================================
-// FUN��O DE PROCESSAMENTO DA JANELA
-// Esta fun��o pode ter um nome qualquer: Apenas � neces�rio que na inicializa��o da
-// estrutura "wcApp", feita no in�cio de // WinMain(), se identifique essa fun��o. Neste
-// caso "wcApp.lpfnWndProc = WndProc"
-//
-// WndProc recebe as mensagens enviadas pelo Windows (depois de lidas e pr�-processadas
-// no loop "while" da fun��o WinMain()
-// Par�metros:
-//		hWnd	O handler da janela, obtido no CreateWindow()
-//		messg	Ponteiro para a estrutura mensagem (ver estrutura em 5. Loop...
-//		wParam	O par�metro wParam da estrutura messg (a mensagem)
-//		lParam	O par�metro lParam desta mesma estrutura
-//
-// NOTA:Estes par�metros est�o aqui acess�veis o que simplifica o acesso aos seus valores
-//
-// A fun��o EndProc � sempre do tipo "switch..." com "cases" que descriminam a mensagem
-// recebida e a tratar.
-// Estas mensagens s�o identificadas por constantes (p.e. 
-// WM_DESTROY, WM_CHAR, WM_KEYDOWN, WM_PAINT...) definidas em windows.h
-// ============================================================================
-
-LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
 	HDC hdc;
 	RECT rect;
 	int xPos, yPos;
-	static TCHAR c = '?';
+	static TCHAR curChar = '?';
+	float angulo = 45.0;
+	float anguloemradianos = angulo * (3.14 / 180.0);
+	HANDLE hEvent, hMutex, hMapFile;
+	boardData* boardDt;
+	DWORD Nempresas = 0;
+	empresaData empresasBoard[MAX_EMPRESAS];
+
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tcscpy(empresasBoard[i].nomeEmpresa, TEXT("-1"));
+		empresasBoard[i].nAções = 0;
+		empresasBoard[i].pAção = 0.0;
+	}
+	//###############################################################
+	//#																#
+	//#						Eventos			 						#
+	//#																#
+	//###############################################################
+	hEvent = OpenEvent(
+		SYNCHRONIZE,	//dwDesiredAccess,
+		FALSE,			//bInheritHandle,
+		EVENT_NAME		//lpName
+	);
+	if (hEvent == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	//###############################################################
+//#																#
+//#							MUTEX								#
+//#																#
+//###############################################################
+	hMutex = OpenMutex(
+		MUTEX_ALL_ACCESS,
+		FALSE,
+		MUTEX_NAME);
+
+	if (hMutex == NULL) {
+		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
+		return 1;
+	}
+	//###############################################################
+	//#																#
+	//#						Shared Memory	 						#
+	//#																#
+	//###############################################################
+	hMapFile = OpenFileMapping(
+		FILE_MAP_ALL_ACCESS,	// acesso pretendido 
+		FALSE,
+		SHM_NAME			// nome dado ao recurso (ficheiro mapeado)
+	);
+	if (hMapFile == NULL) {
+		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
+		return 1;
+	}
+	/*emP = (empresaData*)*/boardDt = (boardData*)MapViewOfFile(
+		hMapFile,
+		FILE_MAP_ALL_ACCESS,
+		0,
+		0,
+		sizeof(boardData)
+	);
+
+	if (boardDt/*emP*/ == NULL) {
+		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
+		return 1;
+	}
+
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tcscpy(empresasBoard[i].nomeEmpresa, boardDt->empresas[i].nomeEmpresa);
+		empresasBoard[i].nAções = boardDt->empresas[i].nAções;
+		empresasBoard[i].pAção = boardDt->empresas[i].pAção;
+	}
 
 	switch (messg) {
-	case WM_LBUTTONDOWN:
-		xPos = GET_X_LPARAM(lParam);
-		yPos = GET_Y_LPARAM(lParam);
-		hdc = GetDC(hWnd);
-		GetClientRect(hWnd, &rect);
+	case WM_PAINT:
+		
+
+		HDC hdc = BeginPaint(hWnd, &ps);
+		
+		// Definir as dimensões e valores das barras
+		RECT bars[30];
+		//int values[5] = { 20, 50, 80, 30, 60 }; // Valores das barras
+		int barWidth = 40; // Largura das barras
+		int barSpacing = 20; // Espaçamento entre as barras
+		int startX = 50; // Posição inicial das barras
+		int startY = 400; // Posição vertical das barras
+		int maxHeight = 300; // Altura máxima das barras
+		
+		rect.left = 30;
+		rect.top = 415;
+
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
-		rect.left = xPos;
-		rect.top = yPos;
-		DrawText(hdc, &c, 1, &rect, DT_SINGLELINE | DT_NOCLIP);
-		ReleaseDC(hWnd, hdc);
+
+		for (int i = 0; i < 30; i++)
+		{
+			if (_tcscmp(empresasBoard[i].nomeEmpresa, TEXT("-1")) != 0)
+				Nempresas++;
+
+		}
+	
+
+
+
+
+
+		// Desenhar as barras
+		for (int i = 0; i < Nempresas; i++) {
+			bars[i].left = startX + (barWidth + barSpacing) * i;
+			bars[i].top = startY - (maxHeight * empresasBoard[i].pAção / 500);
+			bars[i].right = bars[i].left + barWidth;
+			bars[i].bottom = startY;
+
+			FillRect(hdc, &bars[i], (HBRUSH)CreateSolidBrush(RGB(38, 166, 154)));
+
+			if (_tcscmp(empresasBoard[i].nomeEmpresa, TEXT("-1")) != 0)
+			{
+				RECT textRect = bars[i];
+				textRect.bottom = textRect.top;
+				textRect.top -= 20;
+				SetTextColor(hdc, RGB(rand() % 255, rand() % 255, rand() % 255));
+
+				DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &textRect, DT_SINGLELINE | DT_NOCLIP | DT_CENTER);
+				//DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+				//DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+				//rect.top = startY + empresasBoard[i].pAção;
+				//rect.left += 20;
+			}
+		}
+
+
+
+
+
+
+
+
+		EndPaint(hWnd, &ps);
+		break;
+	case WM_LBUTTONDOWN:
+
 		break;
 	case WM_CLOSE:
 		if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
