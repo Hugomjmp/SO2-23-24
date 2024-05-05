@@ -50,25 +50,12 @@ int _tmain(int argc, TCHAR* argv[])
     HANDLE hThread;
     DATA data;
 
-    HANDLE hEvent = CreateEvent(
-        NULL,			//lpEventAttributes
-        TRUE,			//bManualReset
-        FALSE,			//bInitialState
-        EVENT_NAME_V	//lpName
-    );
+    
+    HANDLE hSemClientes = OpenSemaphore(
+        SEMAPHORE_ALL_ACCESS,
+        FALSE,
+        SEM_CLIENT_NAME);
 
-    /*
-    hSemaphore = CreateSemaphore(
-        NULL,
-        0,
-        1,
-        SEM_CLIENTE_LOGIN
-    );
-    if (hSemaphore == NULL)
-    {
-        printf("[ERRO] CreateSemaphore %d\n", GetLastError());
-        return 1;
-    }*/
 
     //_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), NAME_PIPE);
     if (!WaitNamedPipe(NAME_PIPE, NMPWAIT_WAIT_FOREVER)) {
@@ -86,31 +73,34 @@ int _tmain(int argc, TCHAR* argv[])
 
     data.hPipe = hPipe;
     data.continua = TRUE;
-    hThread = CreateThread(NULL, 0, recebeMSG, &data, 0, NULL);
     
     OVERLAPPED ov;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-    do {
+    HANDLE hEvent = OpenEvent(
+        SYNCHRONIZE,	//dwDesiredAccess,
+        FALSE,			//bInheritHandle,
+        EVENT_NAME_V		//lpName
+    );
+    do { 
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
         _tprintf(TEXT("\n\t\t\tLogin: "));
-        _tscanf(TEXT("%s"), cliData.login);
+        _fgetts(cliData.login, sizeof(cliData.login), stdin);
+        cliData.login[_tcslen(cliData.login) - 1] = _T('\0');
         _tprintf(TEXT("\n\t\t\tPassword: "));
-        _tscanf(TEXT("%s"), cliData.password);
-        //buf[_tcslen(buf) - 1] = _T('\0');
+        _fgetts(cliData.password, sizeof(cliData.password), stdin);
+        cliData.password[_tcslen(cliData.password) - 1] = _T('\0');
         
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
-        
-        //ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
+
         ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
         if (ret == TRUE) {
-            _tprintf(TEXT("Escrevi de imediato\n"));
+            //_tprintf(TEXT("Escrevi de imediato\n"));
         }
         else {
             if (GetLastError() == ERROR_IO_PENDING) {
-                _tprintf(TEXT("Agendei a escrita\n"));
+                //_tprintf(TEXT("Agendei a escrita\n"));
                 WaitForSingleObject(hEv, INFINITE);
                 GetOverlappedResult(hPipe, &ov, &n, FALSE);
             }
@@ -119,15 +109,14 @@ int _tmain(int argc, TCHAR* argv[])
                 break;
             }
         }
-        //recebe a resposta para validar as credenciais!!!!
-        /*
-        retR = ReadFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
 
+        retR = ReadFile(hPipe, &cliRes, sizeof(clienteResposta), &n, &ov);
+        
         if (retR == TRUE) {
             // _tprintf(TEXT("Li de imediato\n"));
         }
         else {
-            if (!retR && GetLastError() == ERROR_IO_PENDING) {
+            if (GetLastError() == ERROR_IO_PENDING) {
                 //_tprintf(TEXT("Agendei a leitura\n"));
                 WaitForSingleObject(hEv, INFINITE);
                 GetOverlappedResult(hPipe, &ov, &n, FALSE);
@@ -137,44 +126,44 @@ int _tmain(int argc, TCHAR* argv[])
                 break;
             }
         }
-        if (_tcscmp(cliData.RESPOSTA, TEXT("1")) == 0) {
+    if (_tcscmp(cliRes.RESPOSTA, TEXT("-1")) == 0) {
+        _tprintf(TEXT("\n\t\t\tCredenciais erradas!\n"));
+    }
+    else if (_tcscmp(cliRes.RESPOSTA, TEXT("3")) == 0) {
 
-        }
-        else if (_tcscmp(cliData.RESPOSTA, TEXT("-1")) == 0) {
-            _tprintf(TEXT("\n\t\t\t Credenciais erradas!"));
-        }
-        else if (_tcscmp(cliData.RESPOSTA, TEXT("2")) == 0) {
-            _tprintf(TEXT("\n\t\t\t %s"), cliData.RESPOSTA);
-            //mostra_tabela(&data);
-        }
-      
-      */
-        //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
-    } while (_tcsicmp(cliRes.RESPOSTA, TEXT("-1")) == 0);
-    //SetEvent(hEvent);
-    //Sleep(500);
-    //ResetEvent(hEvent);
+        avisos(1);
+    }
+
+        Sleep(100);
+
+    } while (_tcsicmp(cliRes.RESPOSTA, TEXT("1")) != 0);
+    WaitForSingleObject(hSemClientes, INFINITE);
+    hThread = CreateThread(NULL, 0, recebeMSG, &data, 0, NULL);
     //TRATA DOS COMANDOS...
     do {
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
-        
-        _tprintf(TEXT("\n\t\t\tComando: "));
-        //_tscanf(TEXT("%s"), &cliData.comando);
-        _fgetts(cliData.comando, 300, stdin);
-        cliData.comando[_tcslen(cliData.comando) - 1] = _T('\0');
+        fflush(stdin);
+        Sleep(100);
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
-
-        //ret = WriteFile(hPipe, buf, (DWORD)_tcslen(buf) * sizeof(TCHAR), &n, &ov);
-        ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
         
+        _tprintf(TEXT("\n\t\t\tComando: "));
+
+        _fgetts(cliData.comando, sizeof(cliData.comando), stdin);
+        cliData.comando[_tcslen(cliData.comando) - 1] = _T('\0');
+        
+
+
+
+        ret = WriteFile(hPipe, &cliData, sizeof(clienteData), &n, &ov);
+
         if (ret == TRUE) {
             //_tprintf(TEXT("Escrevi de imediato\n"));
         }
         else {
             if (GetLastError() == ERROR_IO_PENDING) {
-                _tprintf(TEXT("Agendei a escrita\n"));
+                //_tprintf(TEXT("Agendei a escrita\n"));
                 WaitForSingleObject(hEv, INFINITE);
                 GetOverlappedResult(hPipe, &ov, &n, FALSE);
             }
@@ -184,9 +173,7 @@ int _tmain(int argc, TCHAR* argv[])
             }
         }
 
-        //_tprintf(TEXT("\n[CLIENTE] Enviei %d bytes ao leitor %d... (WriteFile)\n"), n, i);
     } while (_tcscmp(cliRes.RESPOSTA, TEXT("exit")) != 0);
-    
     return 0;
 }
 
@@ -209,19 +196,13 @@ DWORD WINAPI recebeMSG(LPVOID data) {
     OVERLAPPED ov;
     BOOL VERIFIÇÃO = FALSE;
     HANDLE hEv = CreateEvent(NULL, TRUE, FALSE, NULL);
-    
-    HANDLE hEvent = OpenEvent(
-        SYNCHRONIZE,	//dwDesiredAccess,
-        FALSE,			//bInheritHandle,
-        EVENT_NAME_V		//lpName
-    );
-    if (hEvent == NULL) {
-        _tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
-        return 1;
-    }
+    HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_V);
 
-    //WaitForSingleObject(hEvent , INFINITE);
+
+
     do {
+       
+        mostraMenuCliente();
         //RECEBER RESPOSTA...
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
@@ -244,16 +225,10 @@ DWORD WINAPI recebeMSG(LPVOID data) {
             }
         }
         if (_tcscmp(cliRes.RESPOSTA, TEXT("1")) == 0) {
-
-        }
-        else if (_tcscmp(cliRes.RESPOSTA, TEXT("-1")) == 0) {
-            _tprintf(TEXT("\n\t\t\t Credenciais erradas!"));
-        }
-        else if (_tcscmp(cliRes.RESPOSTA, TEXT("2")) == 0){
-            _tprintf(TEXT("\n\t\t\t %s"), cliRes.RESPOSTA);
-
-
-           
+            _tprintf(TEXT("Login efetuado com sucesso!\n"));
+        } 
+        //mostra o resultado do listc
+        else if (_tcscmp(cliRes.RESPOSTA, TEXT("2")) == 0){ 
             DWORD contador = 0;
             DWORD digitos = 0;
             float numeros = 0.0;
@@ -261,12 +236,8 @@ DWORD WINAPI recebeMSG(LPVOID data) {
             _tprintf(TEXT("\n\t\t| ID | |\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
             _tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
             for (DWORD i = 0; i < MAX_EMPRESAS; i++) { //conta quantas empresas estão na tabela
-               //_tprintf(TEXT(" |\t %s \t\t|"), cliRes.empW[0].nomeEmpresa);
                 if (_tcsicmp(TEXT("-1"), cliRes.empW[i].nomeEmpresa) != 0)
-                {
                     contador++;
-                }
-
             }
             for (DWORD i = 0; i < contador; i++)
             {
@@ -304,27 +275,50 @@ DWORD WINAPI recebeMSG(LPVOID data) {
                 _tprintf(TEXT("\n\t\t---------------------------------------------------------------------------------\n"));
             }
             contador = 0;
-            
+        }
+        else 
+        {   
+            _tprintf(TEXT("\n\t\t\t%s"), cliRes.RESPOSTA);
         }
 
-
-       _tprintf(TEXT("\n\t\t\t %s"), cliRes.RESPOSTA);
-       
+       //SetEvent(hEvent);
+       //Sleep(500);
+       //ResetEvent(hEvent);
     } while (_tcscmp(cliRes.RESPOSTA, TEXT("SAIR")) != 0);
 
     return 0;
 }
 
 
-void mostra_tabela(LPVOID data) {
-    DATA* ptd = (DATA*)data;
-    
-}
+
 
 void apresentacao() {
     _tprintf(TEXT("\t\t\t#################################################################\n"));
     _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
-    _tprintf(TEXT("\t\t\t#\t\tBOLSA DE VALORES ONLINE\t\t\t\t#\n"));
+    _tprintf(TEXT("\t\t\t#\t\t\tBOLSA DE VALORES ONLINE\t\t\t#\n"));
     _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
     _tprintf(TEXT("\t\t\t#################################################################\n"));
+}
+
+void mostraMenuCliente() {
+    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
+    _tprintf(TEXT("\n\t\t\t|\t\t\t\tMENU\t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
+    _tprintf(TEXT("\n\t\t\t| listc   - Listar todas as empresas \t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t| buy     - Comprar ações\t\t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t| sell    - Vender ações\t\t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t| balance - Consultar saldo \t\t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t| exit    - Sair da plataforma\t\t\t\t\t|"));
+    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+\n"));
+}
+
+void avisos(int x) {
+    if (x==1)
+    {
+        _tprintf(TEXT("\n\t\t\t\033[1;31m     / \\    "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m    /\033[0m |\033[1;31m \\   "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m   /\033[0m  .\033[1;31m  \\  \033[0mJá tem uma sessão ativa com esse login!"));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m  /_______\\ \033[0m\n"));
+    }
+
 }

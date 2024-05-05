@@ -1,6 +1,7 @@
 ﻿#include <windows.h>
 #include <tchar.h>
 #include <windowsx.h>
+#include "Resource.h"
 #include "..\utils.h"
 
 
@@ -13,7 +14,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	MSG lpMsg;		// MSG � uma estrutura definida no Windows para as mensagens
 	WNDCLASSEX wcApp;	// WNDCLASSEX � uma estrutura cujos membros servem para 
 	// definir as caracter�sticas da classe da janela
-
+	
 
 	wcApp.cbSize = sizeof(WNDCLASSEX);      // Tamanho da estrutura WNDCLASSEX
 	wcApp.hInstance = hInst;		         // Inst�ncia da janela actualmente exibida 
@@ -31,11 +32,11 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	// "IDI_AP..." icone "aplicação"
 	wcApp.hIconSm = LoadIcon(NULL, IDI_INFORMATION); // "hIconSm" = handler do icon pequeno
 	// "NULL" = Icon definido no Windows
-	// "IDI_INF..." �con de informacao
+	// "IDI_INF..." Icon de informacao
 	wcApp.hCursor = LoadCursor(NULL, IDC_ARROW);	// "hCursor" = handler do cursor (rato) 
 	// "NULL" = Forma definida no Windows
 	// "IDC_ARROW" Aspecto "seta" 
-	wcApp.lpszMenuName = NULL;			// Classe do menu que a janela pode ter
+	wcApp.lpszMenuName = MAKEINTRESOURCE(IDC_BOARDGUI);			// Classe do menu que a janela pode ter
 	// (NULL = não tem menu)
 	wcApp.cbClsExtra = 0;				// Livre, para uso particular
 	wcApp.cbWndExtra = 0;				// Livre, para uso particular
@@ -49,10 +50,10 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		szProgName,			// Nome da janela (programa) definido acima
 		TEXT("BoardGui"),// Texto que figura na barra do t�tulo
 		WS_OVERLAPPEDWINDOW,	// Estilo da janela (WS_OVERLAPPED= normal)
-		CW_USEDEFAULT,		// Posi��o x pixels (default=� direita da �ltima)
-		CW_USEDEFAULT,		// Posi��o y pixels (default=abaixo da �ltima)
-		680,		// Largura da janela (em pixels)
-		480,		// Altura da janela (em pixels)
+		CW_USEDEFAULT,		// Posi��o x pixels (default=� direita da ultima)
+		CW_USEDEFAULT,		// Posi��o y pixels (default=abaixo da ultima)
+		800,		// Largura da janela (em pixels)
+		600,		// Altura da janela (em pixels)
 		(HWND)HWND_DESKTOP,	// handle da janela pai (se se criar uma a partir de
 		// outra) ou HWND_DESKTOP se a janela for a primeira, 
 		// criada a partir do "desktop"
@@ -228,7 +229,26 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 	case WM_LBUTTONDOWN:
 
 		break;
+	
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDM_EXIT:
+			if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
+				TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES)
+			{
+				DestroyWindow(hWnd);
+			}
+			break;
+		case IDM_ABOUT:
+			MessageBox(hWnd, TEXT("Olá?"),
+				TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES;
+		default:
+			break;
+		}
+
 	case WM_CLOSE:
+
 		if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
 			TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES)
 		{

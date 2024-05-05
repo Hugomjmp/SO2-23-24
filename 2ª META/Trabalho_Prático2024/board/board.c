@@ -154,18 +154,18 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 		{
 			//empresasBoard[i] = emP[i];
 			empresasBoard[i] = boardDt->empresas[i];
-			cartA[i] = boardDt->cartAcoes[i];
+			
 		}
-		/*for (DWORD i = 0; i < 2; i++)
-		{
-			_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
-			_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
-			_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
-			_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
-			//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
-			//emP[i].nAções = 0;
-			//emP[i].pAção = 0.0;
-		}*/
+		//for (DWORD i = 0; i < 30; i++)
+		//{
+		//	_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
+		//	_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
+		//	_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
+		//	_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
+		//	//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
+		//	//emP[i].nAções = 0;
+		//	//emP[i].pAção = 0.0;
+		//}
 		//REORGANIZAÇÃO.... está a duplicar... problema aqui
 		
 		//bolha
@@ -208,17 +208,17 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 
 		ReleaseMutex(hMutex);
 		mostra_tabela(empresasBoard, boardDt);
-		//WaitForSingleObject(hMutexWrite, INFINITE);
-		//CopyMemory(/*emP*/boardDt, empresasBoard, sizeof(boardData)/*sizeof(empresaData) * MAX_EMPRESAS*/);
-		//ReleaseMutex(hMutexWrite);
-		//SetEvent(hEventWrite);
+		WaitForSingleObject(hMutexWrite, INFINITE);
+		CopyMemory(boardDt->empresas, empresasBoard, sizeof(empresaData) * MAX_EMPRESAS);
+		ReleaseMutex(hMutexWrite);
+		SetEvent(hEventWrite);
 		//Sleep(500);
-		//ResetEvent(hEventWrite);
+		ResetEvent(hEventWrite);
 		Sleep(1000);
 		
 
 	}
-	UnmapViewOfFile(boardDt/*emP*/);
+	UnmapViewOfFile(boardDt);
 	CloseHandle(hMapFile);
 }
 
@@ -231,6 +231,7 @@ void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	DWORD Nempresas = 10;
 	DWORD contador = 0, numeros;
 	DWORD digitos = 0;
+
 	//empresaData empresasCompara[MAX_EMPRESAS];
 	//boardData* boardDT = (boardData*)boardDt;
 
@@ -281,9 +282,16 @@ void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	_tprintf(TEXT("\n\t\t--------------------------------ULTIMA TRANSAÇÃO---------------------------------\n"));
 	_tprintf(TEXT("\n\t\t\t|\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
-	_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| |\t %.2f €\t\t|\n"), boardDt->cartAcoes[0].username,
-		boardDt->cartAcoes[0].nAções, boardDt->cartAcoes[0].valor);
-
+	
+	/*for (int i = 0; i < 30; i++)
+	{
+		//if (_tcsicmp(boardDt->cartAcoes[i].nomeEmpresa,TEXT("-1")) != 0) {
+			_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| |\t %.2f €\t\t|\n"), boardDt->cartAcoes[i].nomeEmpresa,
+				boardDt->cartAcoes[i].nAções, boardDt->cartAcoes[i].valor);
+			//break;
+		//}
+		
+	}*/
 
 	_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));
 }

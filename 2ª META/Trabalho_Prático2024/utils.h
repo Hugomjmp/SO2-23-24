@@ -33,6 +33,7 @@
 #define SEM_BOLSA TEXT("SEM_BOLSA")
 #define SEM_CLIENT_NAME TEXT("SEM_VAGA")
 #define	SEM_CLIENTE_LOGIN TEXT("SEM_LOGIN")
+#define SEM_BUYSELL TEXT("SEM_BUYSELL")
 
 //MUTEX
 #define MUTEX_NAME TEXT("MUTEX_BOLSA")
@@ -90,7 +91,7 @@ typedef struct {
 
 //ver se é necessário manter isto
 typedef struct {
-	HANDLE hPipe[5];
+	HANDLE hPipe[10];
 	HANDLE hTrinco;
 }tDataInfo;
 //----------
@@ -123,7 +124,9 @@ DWORD WINAPI recebeMSG(LPVOID data);
 void CriaRegedit();
 DWORD leRegedit();
 void escreveRegedit();
-void mostra_tabela(empresaData* empresasBoard, carteiraAcoes *cartA);
 void mostraMenu();
 void apresentacao();
 void mostra_tabela(empresasBoard, boardDt);
+void mostraTitulo();
+void mostraMenuCliente();
+void avisos(int x);

@@ -1,7 +1,7 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by boardGUI.rc
-
+//os numeros são os ID's
 #define IDS_APP_TITLE			103
 
 #define IDR_MAINFRAME			128
@@ -15,6 +15,8 @@
 #define IDC_MYICON				2
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
+#define IDC_BOARDGUI			1001
+#define IDD_ABOUTBOX			1002
 #endif
 // Next default values for new objects
 //
