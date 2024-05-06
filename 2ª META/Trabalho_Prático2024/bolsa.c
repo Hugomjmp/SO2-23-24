@@ -27,7 +27,9 @@ int _tmain(int argc, TCHAR* argv[])
 	carteiraAcoes cartAcoes[30];
 	boardData board = { .empresas = empresas, .cartAcoes = cartAcoes };
 	boardData* boardDt;
-	ControlData ctrlData = {.empresas = empresas, .users = users, .cartAcoes = cartAcoes , .pause = &pause};
+	ControlPause ctrPause[1];
+	ctrPause[0].pause = FALSE;
+	ControlData ctrlData = {.empresas = empresas, .users = users, .cartAcoes = cartAcoes , .ctrPause = ctrPause};
 	
 
 	
@@ -510,12 +512,14 @@ int _tmain(int argc, TCHAR* argv[])
 			_tscanf(TEXT("%lu"), &nSegundos);
 			//ctrlData.pause = TRUE;
 			pause = TRUE;
-			_tprintf(TEXT("ctrlData.pause: '%d'\n"), *ctrlData.pause);
+			ctrPause[0].pause = TRUE;
+			_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
 			Sleep(nSegundos * 1000); //em segundos
 
 			//ctrlData.pause = FALSE;
 			pause = FALSE;
-			_tprintf(TEXT("ctrlData.pause: '%d'\n"), *ctrlData.pause);
+			ctrPause[0].pause = FALSE;
+			_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
 			_tprintf(TEXT("\nRecebi Comando: %s %lu com tamanho %zu"), comandoAdmin, nSegundos, _tcslen(comandoAdmin));
 
 		}
@@ -661,17 +665,20 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	carteiraAcoes ctA[30];
 	clienteResposta cliRes;
 	carteiraAcoes* cA;
+	UltimaTransacao ultmTransacao;
 	//novo
 	HANDLE hMapFile;
 	boardData* boardDt;
 	BOOL pause;
-
+	_tcscpy(ultmTransacao.EmpresaNome, TEXT("-1"));
+	ultmTransacao.nAcoes = 0;
+	ultmTransacao.pAcao = 0;
 	DWORD index = 0;
 	float  totalPacoes = 0, valorAtual = 0, valorTotal = 0, venda = 0, vendaAcao = 0, lucro = 0;
 	WaitForSingleObject(ptd_extra->ptd->hTrinco, INFINITE);
 	id = ptd_extra->id;
 	hPipesloc = ptd_extra->ptd->hPipe[id];
-	pause = ptd_extra->pause;
+
 	ReleaseMutex(ptd_extra->ptd->hTrinco);
 	for (int i = 0; i < 30; i++) {
 		_tcscpy(ctA[i].nomeEmpresa, TEXT("-1"));
@@ -679,7 +686,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 		ctA[i].nAções = 0;
 		ctA[i].valor = 0;
 	}
-	_tprintf(TEXT("pause = ptd_extra->pause: '%d'\n"), pause);
+
 	//###############################################################
 	//#																#
 	//#						Shared Memory	 						#
@@ -819,6 +826,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 			_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
 			exit(-1);
 		}*/
+		pause = ptd_extra->ctrPause[0].pause;
 		//TRATA DO COMANDO LISTAR TODAS AS EMPRESAS
 		
 		if (_tcsicmp(TEXT("listc"), cliData.comando) == 0) {
@@ -883,9 +891,13 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 										//_tprintf(TEXT("PREÇO ACOES!!: %f\n"), ptd_extra->empresas[i].pAção);
 										registo = 1;
 										resposta = 1;
+										_tcscpy(ultmTransacao.EmpresaNome, ptd_extra->empresas[i].nomeEmpresa);
+										ultmTransacao.nAcoes = nAções;
+										ultmTransacao.pAcao = ptd_extra->cartAcoes[j].valor;
 										ptd_extra->empresas[i].nAções -= nAções; // falta mutex aqui nesta instrução
 										CopyMemory(boardDt->cartAcoes, ptd_extra->cartAcoes, sizeof(carteiraAcoes)*MAX_EMPRESAS);
 										CopyMemory(boardDt->empresas, ptd_extra->empresas, sizeof(empresaData)* MAX_EMPRESAS);
+										CopyMemory(boardDt->ultmTransacao, &ultmTransacao, sizeof(UltimaTransacao)* MAX_EMPRESAS);
 										//for (DWORD i = 0; i < 30; i++)
 										//{
 										//	_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
@@ -916,9 +928,13 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 										//_tprintf(TEXT("PREÇO ACOES!!: %f\n"), ptd_extra->empresas[i].pAção);
 										registo = 1;
 										resposta = 1;
+										_tcscpy(ultmTransacao.EmpresaNome, ptd_extra->empresas[i].nomeEmpresa);
+										ultmTransacao.nAcoes = nAções;
+										ultmTransacao.pAcao = ptd_extra->cartAcoes[j].valor;
 										ptd_extra->empresas[i].nAções -= nAções; // falta mutex aqui nesta instrução
 										CopyMemory(boardDt->cartAcoes, ptd_extra->cartAcoes, sizeof(carteiraAcoes) * MAX_EMPRESAS);
 										CopyMemory(boardDt->empresas, ptd_extra->empresas, sizeof(empresaData) * MAX_EMPRESAS);
+										CopyMemory(boardDt->ultmTransacao, &ultmTransacao, sizeof(UltimaTransacao)* MAX_EMPRESAS);
 										//relase ao mutex
 										ReleaseMutex(hMutex);
 										//evento
@@ -1205,7 +1221,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 			td_extra[nCli].empresas = cdata->empresas;
 			td_extra[nCli].users = cdata->users;
 			td_extra[nCli].cartAcoes = cdata->cartAcoes;
-			td_extra[nCli].pause = *cdata->pause;
+			td_extra[nCli].ctrPause = cdata->ctrPause;
 			//LANÇAR UMA THREAD PARA CADA CLIENTE
 			hThreadCli[nCli] = CreateThread(NULL, 0, trataComandosClientes, (LPVOID)&td_extra[nCli], 0, NULL);
 			

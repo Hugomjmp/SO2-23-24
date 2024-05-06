@@ -56,7 +56,6 @@ typedef struct
 	TCHAR login[TAM];
 	TCHAR password[TAM];
 	TCHAR comando[300];
-	
 }clienteData;
 
 typedef struct {
@@ -77,34 +76,38 @@ typedef struct {
 	DWORD nAções;
 	float valor;
 }carteiraAcoes;
-
-
+typedef	struct {
+	TCHAR EmpresaNome[50];
+	DWORD nAcoes;
+	float pAcao;
+}UltimaTransacao;
+typedef struct {
+	BOOL pause;
+}ControlPause;
 typedef struct {
 	empresaData empresas[30];
 	carteiraAcoes cartAcoes[30];
+	UltimaTransacao ultmTransacao[1];
 }boardData;
 
 typedef struct {
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
-	BOOL* pause;
+	ControlPause* ctrPause;
 }ControlData;
 
-//ver se é necessário manter isto
 typedef struct {
 	HANDLE hPipe[10];
 	HANDLE hTrinco;
 }tDataInfo;
-//----------
-
 typedef struct {
 	tDataInfo* ptd;
 	DWORD id;
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
-	BOOL* pause;
+	ControlPause* ctrPause;
 }tDataInfo_EXTRA;
 
 typedef struct {

@@ -283,15 +283,14 @@ void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	_tprintf(TEXT("\n\t\t\t|\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
 	
-	/*for (int i = 0; i < 30; i++)
-	{
-		//if (_tcsicmp(boardDt->cartAcoes[i].nomeEmpresa,TEXT("-1")) != 0) {
-			_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| |\t %.2f €\t\t|\n"), boardDt->cartAcoes[i].nomeEmpresa,
-				boardDt->cartAcoes[i].nAções, boardDt->cartAcoes[i].valor);
-			//break;
-		//}
+
+		if (_tcsicmp(boardDt->ultmTransacao->EmpresaNome,TEXT("-1")) != 0) {
+			_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| "), boardDt->ultmTransacao->EmpresaNome,
+				boardDt->ultmTransacao->nAcoes);
+			_tprintf(TEXT("|\t %.2f €\t|\n"), boardDt->ultmTransacao->pAcao);
+		}
 		
-	}*/
+	
 
 	_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));
 }

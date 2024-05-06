@@ -1,19 +1,18 @@
 ﻿  cliente.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(51,10): error C2065: 'DATA': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(51,10): error C2146: syntax error: missing ';' before identifier 'data'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(51,14): error C2065: 'data': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(74,9): error C2065: 'data': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(74,10): error C2224: left of '.hPipe' must have struct/union type
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(75,9): error C2065: 'data': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(75,10): error C2224: left of '.continua' must have struct/union type
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(141,53): error C2065: 'data': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(188,9): error C2065: 'DATA': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(188,15): error C2065: 'ptd': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(188,22): error C2065: 'DATA': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(188,23): error C2059: syntax error: ')'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(189,23): error C2065: 'ptd': undeclared identifier
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(189,25): error C2223: left of '->hPipe' must point to struct/union
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(20,11): warning C4101: 'nBytes': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(15,11): warning C4101: 'string': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(18,21): warning C4101: 'writeResult': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(44,11): warning C4101: 'buf': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(24,12): warning C4101: 'hSemaphore': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(18,10): warning C4101: 'resultado': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,38): warning C4101: 'comando': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,23): warning C4101: 'password': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,11): warning C4101: 'login': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(253,70): warning C4474: 'wprintf' : too many arguments passed for format string
   C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(253,70):
   placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(190,11): warning C4101: 'buf': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(193,17): warning C4101: 'cliData': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(195,17): warning C4101: 'empresas': unreferenced local variable
+  cliente.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\cliente.exe
