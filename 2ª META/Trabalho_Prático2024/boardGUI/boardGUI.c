@@ -164,7 +164,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 	case WM_PAINT:
 		
 
-		HDC hdc = BeginPaint(hWnd, &ps);
+		hdc = BeginPaint(hWnd, &ps);
 		
 		// Definir as dimensões e valores das barras
 		RECT bars[30];
@@ -210,10 +210,6 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 				SetTextColor(hdc, RGB(rand() % 255, rand() % 255, rand() % 255));
 
 				DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &textRect, DT_SINGLELINE | DT_NOCLIP | DT_CENTER);
-				//DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-				//DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
-				//rect.top = startY + empresasBoard[i].pAção;
-				//rect.left += 20;
 			}
 		}
 
@@ -243,6 +239,10 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		case IDM_ABOUT:
 			MessageBox(hWnd, TEXT("Olá?"),
 				TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES;
+			break;
+
+		case IDM_SETTINGS:
+			break;
 		default:
 			break;
 		}

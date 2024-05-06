@@ -48,6 +48,7 @@ typedef struct {
 	TCHAR nomeEmpresa[50];
 	DWORD nAções;
 	float pAção;
+	
 }empresaData;
 
 typedef struct   
@@ -55,7 +56,7 @@ typedef struct
 	TCHAR login[TAM];
 	TCHAR password[TAM];
 	TCHAR comando[300];
-
+	
 }clienteData;
 
 typedef struct {
@@ -87,6 +88,7 @@ typedef struct {
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
+	BOOL* pause;
 }ControlData;
 
 //ver se é necessário manter isto
@@ -102,6 +104,7 @@ typedef struct {
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
+	BOOL* pause;
 }tDataInfo_EXTRA;
 
 typedef struct {
