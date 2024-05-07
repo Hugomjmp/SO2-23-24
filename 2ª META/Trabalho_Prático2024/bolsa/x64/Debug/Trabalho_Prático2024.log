@@ -1,36 +1,50 @@
 ﻿  bolsa.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(240,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(240,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(240,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(111,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(111,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(111,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(240,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(111,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(252,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(252,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(252,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(121,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(121,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(121,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(252,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(121,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(264,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(264,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(264,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(242,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(242,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(242,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(264,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(242,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(377,50): warning C4474: 'wprintf' : too many arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(377,50):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(254,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(254,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(254,12):
+  placeholders and their parameters expect 1 variadic arguments, but 0 were provided
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(254,12):
+  the missing variadic argument 1 is required by format string '%d'
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(266,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(266,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(266,12):
+  placeholders and their parameters expect 1 variadic arguments, but 0 were provided
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(266,12):
+  the missing variadic argument 1 is required by format string '%d'
+  
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(379,50): warning C4474: 'wprintf' : too many arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(379,50):
   placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(388,27): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(435,23): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(483,60): warning C4474: 'wprintf' : too many arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(483,60):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(390,27): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(437,23): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(478,60): warning C4474: 'wprintf' : too many arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(478,60):
   placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(494,28): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(489,28): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(28,12): warning C4047: 'initializing': 'TCHAR' differs in levels of indirection from 'empresaData *'
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(28,12): warning C4047: 'initializing': 'TCHAR' differs in levels of indirection from 'carteiraAcoes *'
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(12,44): warning C4101: 'nBytes': unreferenced local variable
@@ -55,36 +69,35 @@ C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª M
   C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(737,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(856,13): warning C4477: 'wprintf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(856,13):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(834,13): warning C4477: 'wprintf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(834,13):
   consider using '%zd' in the format string
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(890,45): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(927,45): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1031,29): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1047,44): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1088,30): warning C4129: ' ': unrecognized character escape sequence
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1130,13): warning C4477: 'wprintf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'size_t'
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1130,13):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(868,45): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(905,45): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1023,31): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1037,46): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1135,13): warning C4477: 'wprintf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'size_t'
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1135,13):
   consider using '%zd' in the format string
   
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(664,14): warning C4101: 'lastTransation': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(667,17): warning C4101: 'cA': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1174,8): warning C4101: 'n': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1274,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1274,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1274,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1179,8): warning C4101: 'n': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1272,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1272,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1272,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1274,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1272,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1324,81): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1344,81): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1401,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1401,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1401,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1322,81): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1342,81): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1399,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1399,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1399,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1401,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\bolsa.c(1399,12):
   the missing variadic argument 1 is required by format string '%d'
   
   Trabalho_Prático2024.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\bolsa.exe

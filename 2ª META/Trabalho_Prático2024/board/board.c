@@ -34,13 +34,13 @@ int _tmain(int argc, TCHAR* argv[])
 			fflush(stdin);
 			//_tprintf(TEXT("\n Comando: "));
 			_tscanf(TEXT("%s"), comandoBoard);
-			if ((_tcsicmp(TEXT("close"), comandoBoard)) != 0)
+			if ((_tcsicmp(TEXT("close"), comandoBoard)) == 0)
 			{
 				break;
 			}
 			else
 			{
-				_tprintf(TEXT("\nComando: %s introduzido com tamanho %zu, não existe!"), comandoBoard, _tcslen(comandoBoard));
+				_tprintf(TEXT("\nComando: '%s' introduzido, não existe!"), comandoBoard);
 }
 		//-------------------
 		
@@ -229,8 +229,8 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 
 void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	DWORD Nempresas = 10;
-	DWORD contador = 0, numeros;
-	DWORD digitos = 0;
+	DWORD contador = 0, numeros, numerosT;
+	DWORD digitos = 0, digitosT = 0;
 
 	//empresaData empresasCompara[MAX_EMPRESAS];
 	//boardData* boardDT = (boardData*)boardDt;
@@ -283,13 +283,44 @@ void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 	_tprintf(TEXT("\n\t\t\t|\t NOME\t\t| |\t Num_Ações\t| |\t Preço-Ação\t|\n"));
 	_tprintf(TEXT("\t\t---------------------------------------------------------------------------------\n"));
 	
+	if (_tcslen(boardDt->ultmTransacao->EmpresaNome) <= 5) {
+		if (_tcsicmp(boardDt->ultmTransacao->EmpresaNome, TEXT("-1")) == 0) {
+			_tprintf(TEXT(" |\t   \t\t|"));
+			//_tprintf(TEXT("\t\t\t|\t %s\t\t|"), boardDt->ultmTransacao->EmpresaNome);
+		}else {
+			_tprintf(TEXT("\t\t\t|\t %s\t\t|"), boardDt->ultmTransacao->EmpresaNome);
+		}
+	}
+	else {
+		_tprintf(TEXT("\t\t\t|\t %s\t|"), boardDt->ultmTransacao->EmpresaNome);
 
+	}
+	_tprintf(TEXT(" | \t % lu\t\t|"), boardDt->ultmTransacao->nAcoes);
+
+
+
+	//contar os digitos para retificar espaçamento do Preço Ação
+	digitosT = 0;
+	numerosT = boardDt->ultmTransacao->pAcao;
+	while (numerosT >= 1) {
+		numerosT /= 10;
+		digitosT++;
+	}
+	if (digitosT >= 2)
+		_tprintf(TEXT(" |\t %.2f€ \t|"), boardDt->ultmTransacao->pAcao);
+	else
+		_tprintf(TEXT(" |\t %.2f€ \t\t|"), boardDt->ultmTransacao->pAcao);
+
+
+
+
+	/*
 		if (_tcsicmp(boardDt->ultmTransacao->EmpresaNome,TEXT("-1")) != 0) {
 			_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| "), boardDt->ultmTransacao->EmpresaNome,
 				boardDt->ultmTransacao->nAcoes);
 			_tprintf(TEXT("|\t %.2f €\t|\n"), boardDt->ultmTransacao->pAcao);
 		}
-		
+		*/
 	
 
 	_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));

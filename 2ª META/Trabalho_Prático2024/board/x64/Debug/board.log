@@ -18,4 +18,5 @@ C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª M
   placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(267,29): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\board\board.c(304,35): warning C4244: '=': conversion from 'float' to 'DWORD', possible loss of data
   board.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\board.exe

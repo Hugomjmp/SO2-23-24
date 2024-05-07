@@ -5,7 +5,9 @@
 #include "..\utils.h"
 
 
-LRESULT CALLBACK TrataEventos(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK TrataEventos(HWND, UINT, WPARAM, LPARAM, PAINTSTRUCT);
+BOOL CALLBACK DialogBoxAbout(HWND, UINT, WPARAM, LPARAM, PAINTSTRUCT);
+DWORD WINAPI PaintThread(LPVOID dados);
 
 TCHAR szProgName[] = TEXT("Base"); // vai ser o nome do nosso programa, que vai aparecer no cantinho da janela
 
@@ -22,6 +24,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		  // inicializada da�)
 	wcApp.lpszClassName = szProgName;       // Nome da janela (neste caso = nome do programa)
 	wcApp.lpfnWndProc = TrataEventos;       // Endere�o da fun��o de processamento da janela
+	
 	// ("TrataEventos" foi declarada no in�cio e
 	// encontra-se mais abaixo)
 	wcApp.style = CS_HREDRAW | CS_VREDRAW;  // Estilo da janela: Fazer o redraw se for
@@ -69,6 +72,8 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	UpdateWindow(hWnd);		// Refrescar a janela (Windows envia � janela uma 
 	// mensagem para pintar, mostrar dados, (refrescar)� 
 
+
+
 	while (GetMessage(&lpMsg, NULL, 0, 0) > 0) {
 		TranslateMessage(&lpMsg);	// Pr�-processamento da mensagem (p.e. obter c�digo 
 		// ASCII da tecla premida)
@@ -80,24 +85,14 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 
 	return (int)lpMsg.wParam;	// Retorna sempre o par�metro wParam da estrutura lpMsg
 }
-LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
-	HDC hdc;
-	RECT rect;
-	int xPos, yPos;
-	static TCHAR curChar = '?';
-	float angulo = 45.0;
-	float anguloemradianos = angulo * (3.14 / 180.0);
-	HANDLE hEvent, hMutex, hMapFile;
-	boardData* boardDt;
-	DWORD Nempresas = 0;
-	empresaData empresasBoard[MAX_EMPRESAS];
 
-	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
-	{
-		_tcscpy(empresasBoard[i].nomeEmpresa, TEXT("-1"));
-		empresasBoard[i].nAções = 0;
-		empresasBoard[i].pAção = 0.0;
-	}
+
+
+DWORD WINAPI PaintThread(LPVOID dados) {
+	BoardGUIDados* bGUIdt = (BoardGUIDados*)dados;
+	HANDLE hEvent, hMutex;
+	DWORD aqui = 0;
+
 	//###############################################################
 	//#																#
 	//#						Eventos			 						#
@@ -126,6 +121,49 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		_tprintf(TEXT("ERROR: Mutex (%d)\n"), GetLastError());
 		return 1;
 	}
+	while (bGUIdt->continua == 1)
+	{
+		TCHAR buffer[256];
+		wsprintf(buffer, TEXT("\nCheguei aqui '%d'"), bGUIdt->continua);
+		OutputDebugString(buffer);
+
+		WaitForSingleObject(hEvent, INFINITE);
+
+		WaitForSingleObject(hMutex, INFINITE);
+
+		ReleaseMutex(hMutex);
+		InvalidateRect(bGUIdt->hWnd, NULL, TRUE);
+		Sleep(1000);
+	}
+
+	return 1;
+}
+
+LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
+	HDC hdc;
+
+	RECT rect;
+	int xPos, yPos;
+	static BoardGUIDados dados;
+	//static TCHAR curChar = '?';
+	dados.hWnd = hWnd;
+	dados.continua = 1;
+	float angulo = 45.0;
+	float anguloemradianos = angulo * (3.14 / 180.0);
+	HANDLE hMapFile;
+	int resultado = 0;
+	boardData* boardDt;
+	DWORD Nempresas = 0;
+	empresaData empresasBoard[MAX_EMPRESAS];
+	HANDLE hThread = NULL;
+
+	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
+	{
+		_tcscpy(empresasBoard[i].nomeEmpresa, TEXT("-1"));
+		empresasBoard[i].nAções = 0;
+		empresasBoard[i].pAção = 0.0;
+	}
+
 	//###############################################################
 	//#																#
 	//#						Shared Memory	 						#
@@ -140,18 +178,8 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
 		return 1;
 	}
-	/*emP = (empresaData*)*/boardDt = (boardData*)MapViewOfFile(
-		hMapFile,
-		FILE_MAP_ALL_ACCESS,
-		0,
-		0,
-		sizeof(boardData)
-	);
+	boardDt = (boardData*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(boardData));
 
-	if (boardDt/*emP*/ == NULL) {
-		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
-		return 1;
-	}
 
 	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
 	{
@@ -161,9 +189,11 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 	}
 
 	switch (messg) {
-	case WM_PAINT:
+	case WM_CREATE:
+		hThread = CreateThread(NULL, 0, PaintThread, &dados, 0, NULL);
 		
-
+		break;
+	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		
 		// Definir as dimensões e valores das barras
@@ -178,7 +208,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		rect.left = 30;
 		rect.top = 415;
 
-		SetTextColor(hdc, RGB(255, 255, 255));
+
 		SetBkMode(hdc, TRANSPARENT);
 
 		for (int i = 0; i < 30; i++)
@@ -187,12 +217,6 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 				Nempresas++;
 
 		}
-	
-
-
-
-
-
 		// Desenhar as barras
 		for (int i = 0; i < Nempresas; i++) {
 			bars[i].left = startX + (barWidth + barSpacing) * i;
@@ -213,12 +237,34 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 			}
 		}
 
+		SetTextColor(hdc, RGB(38, 166, 154));
+		//SetTextColor(hdc, RGB(rand() % 255, rand() % 255, rand() % 255));
+		TCHAR string[200];
+		TCHAR string2[200];
+		if (_tcscmp(boardDt->ultmTransacao->EmpresaNome, TEXT("")) != 0) {
+			DrawText(hdc, TEXT("Ultima Transação: "), -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+			rect.left = 150;
+			DrawText(hdc, TEXT("Empresa: "), -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+			rect.left += (5*15)-1;
+			DrawText(hdc, boardDt->ultmTransacao->EmpresaNome, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 
+			rect.top = 430;
+			rect.left = 150;
+			_tcscpy(string, TEXT(""));
+			DrawText(hdc, TEXT("Valor: "), -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+			rect.left += (5 * 15) - 1;
+			swprintf(string, sizeof(string) / sizeof(TCHAR), TEXT("%lu"), boardDt->ultmTransacao->nAcoes);
+			DrawText(hdc, string, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 
+			rect.top = 445;
+			rect.left = 150;
+			_tcscpy(string2, TEXT(""));
+			DrawText(hdc, TEXT("Custo: "), -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+			rect.left += (5 * 15) - 1;
+			swprintf(string2, sizeof(string2) / sizeof(TCHAR), TEXT("%.2f€"), boardDt->ultmTransacao->pAcao);
+			DrawText(hdc, string2, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 
-
-
-
+		}
 
 		EndPaint(hWnd, &ps);
 		break;
@@ -237,9 +283,9 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 			}
 			break;
 		case IDM_ABOUT:
-			MessageBox(hWnd, TEXT("Olá?"),
-				TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES;
-			break;
+			DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, DialogBoxAbout);
+
+			
 
 		case IDM_SETTINGS:
 			break;
@@ -254,6 +300,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		{
 			DestroyWindow(hWnd);
 		}
+		dados.continua = 0;
 		break;
 	case WM_DESTROY:	// Destruir a janela e terminar o programa 
 		// "PostQuitMessage(Exit Status)"		
@@ -265,5 +312,35 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		return(DefWindowProc(hWnd, messg, wParam, lParam));
 		break;  // break tecnicamente desnecess�rio por causa do return
 	}
+
+	CloseHandle(hThread);
+	UnmapViewOfFile(hMapFile);
 	return 0;
+}
+
+
+BOOL CALLBACK DialogBoxAbout(HWND hWndialog, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
+
+
+
+
+
+	switch (messg) {
+	case WM_INITDIALOG:
+		return TRUE;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+			case IDOK:
+				EndDialog(hWndialog, IDOK);
+				return TRUE;
+			//case IDCANCEL: 
+			//	EndDialog(hWnd, IDCANCEL);
+			//	return TRUE;
+		}
+	case WM_CLOSE:
+		EndDialog(hWndialog, IDOK); // janela criada com DialogBox()
+		DestroyWindow(hWndialog); // janela criado com CreateDialog()
+		return TRUE;
+	}
+	return FALSE;
 }

@@ -89,18 +89,20 @@ typedef struct {
 	carteiraAcoes cartAcoes[30];
 	UltimaTransacao ultmTransacao[1];
 }boardData;
+typedef struct {
+	HANDLE hPipe[10];
+	HANDLE hTrinco;
+}tDataInfo;
 
 typedef struct {
 	empresaData* empresas;
 	userData* users;
 	carteiraAcoes* cartAcoes;
 	ControlPause* ctrPause;
+	tDataInfo* ptd;
 }ControlData;
 
-typedef struct {
-	HANDLE hPipe[10];
-	HANDLE hTrinco;
-}tDataInfo;
+
 typedef struct {
 	tDataInfo* ptd;
 	DWORD id;
@@ -117,7 +119,10 @@ typedef struct {
 	clienteData* clidData;
 	clienteResposta* cliRes;
 }DATA;
-
+typedef struct {
+	HWND hWnd;
+	BOOL continua;
+}BoardGUIDados;
 //THREADS
 DWORD WINAPI trataComandosClientes(LPVOID data);
 DWORD WINAPI verificaClientes(LPVOID ctrlData);
