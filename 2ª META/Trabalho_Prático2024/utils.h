@@ -122,6 +122,9 @@ typedef struct {
 typedef struct {
 	HWND hWnd;
 	BOOL continua;
+	int nEmpresas;
+	int limInf;
+	int limSup;
 }BoardGUIDados;
 //THREADS
 DWORD WINAPI trataComandosClientes(LPVOID data);

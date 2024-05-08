@@ -4,9 +4,10 @@
 #include "Resource.h"
 #include "..\utils.h"
 
-
+BoardGUIDados dados;
 LRESULT CALLBACK TrataEventos(HWND, UINT, WPARAM, LPARAM, PAINTSTRUCT);
-BOOL CALLBACK DialogBoxAbout(HWND, UINT, WPARAM, LPARAM, PAINTSTRUCT);
+BOOL CALLBACK DialogBoxAbout(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK DialogSettings(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI PaintThread(LPVOID dados);
 
 TCHAR szProgName[] = TEXT("Base"); // vai ser o nome do nosso programa, que vai aparecer no cantinho da janela
@@ -55,8 +56,8 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		WS_OVERLAPPEDWINDOW,	// Estilo da janela (WS_OVERLAPPED= normal)
 		CW_USEDEFAULT,		// Posi��o x pixels (default=� direita da ultima)
 		CW_USEDEFAULT,		// Posi��o y pixels (default=abaixo da ultima)
-		800,		// Largura da janela (em pixels)
-		600,		// Altura da janela (em pixels)
+		900,		// Largura da janela (em pixels)
+		500,		// Altura da janela (em pixels)
 		(HWND)HWND_DESKTOP,	// handle da janela pai (se se criar uma a partir de
 		// outra) ou HWND_DESKTOP se a janela for a primeira, 
 		// criada a partir do "desktop"
@@ -64,7 +65,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		(HINSTANCE)hInst,		// handle da instancia do programa actual ("hInst" � 
 		// passado num dos par�metros de WinMain()
 		0);
-
+	
 	
 	ShowWindow(hWnd, nCmdShow);	// "hWnd"= handler da janela, devolvido por 
 	// "CreateWindow"; "nCmdShow"= modo de exibi��o (p.e. 
@@ -74,6 +75,9 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 
 
 
+	dados.nEmpresas = 10;
+	dados.limInf = 0;
+	dados.limSup = 500;
 	while (GetMessage(&lpMsg, NULL, 0, 0) > 0) {
 		TranslateMessage(&lpMsg);	// Pr�-processamento da mensagem (p.e. obter c�digo 
 		// ASCII da tecla premida)
@@ -123,9 +127,6 @@ DWORD WINAPI PaintThread(LPVOID dados) {
 	}
 	while (bGUIdt->continua == 1)
 	{
-		TCHAR buffer[256];
-		wsprintf(buffer, TEXT("\nCheguei aqui '%d'"), bGUIdt->continua);
-		OutputDebugString(buffer);
 
 		WaitForSingleObject(hEvent, INFINITE);
 
@@ -133,18 +134,18 @@ DWORD WINAPI PaintThread(LPVOID dados) {
 
 		ReleaseMutex(hMutex);
 		InvalidateRect(bGUIdt->hWnd, NULL, TRUE);
-		Sleep(1000);
+		Sleep(500);
 	}
 
-	return 1;
+	return 50;
 }
 
 LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
-	HDC hdc;
+	HDC hdc, hvalores;
 
-	RECT rect;
+	RECT rect, rect2;
 	int xPos, yPos;
-	static BoardGUIDados dados;
+	
 	//static TCHAR curChar = '?';
 	dados.hWnd = hWnd;
 	dados.continua = 1;
@@ -156,13 +157,20 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 	DWORD Nempresas = 0;
 	empresaData empresasBoard[MAX_EMPRESAS];
 	HANDLE hThread = NULL;
-
+	TCHAR string3[20];
+	TCHAR string4[20];
+	int escalaPos = 0;
+	int escalaX = 50; // Posição horizontal da escala
+	int escalaYStart = 300; // Posição vertical inicial da escala
+	int escalaYEnd = 10; // Posição vertical final da escala
+	int numLinhasEscala = 10; // Número de linhas na escala
 	for (DWORD i = 0; i < MAX_EMPRESAS; i++)
 	{
 		_tcscpy(empresasBoard[i].nomeEmpresa, TEXT("-1"));
 		empresasBoard[i].nAções = 0;
 		empresasBoard[i].pAção = 0.0;
 	}
+
 
 	//###############################################################
 	//#																#
@@ -195,16 +203,17 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		
+
 		// Definir as dimensões e valores das barras
 		RECT bars[30];
 		//int values[5] = { 20, 50, 80, 30, 60 }; // Valores das barras
-		int barWidth = 40; // Largura das barras
+		int barWidth = 50; // Largura das barras
 		int barSpacing = 20; // Espaçamento entre as barras
-		int startX = 50; // Posição inicial das barras
-		int startY = 400; // Posição vertical das barras
+		int startX = 100; // Posição inicial das barras
+		int startY = 300; // Posição vertical das barras
 		int maxHeight = 300; // Altura máxima das barras
-		
+		int escalaY = dados.limSup/10;
+		int valorEscY = dados.limSup;
 		rect.left = 30;
 		rect.top = 415;
 
@@ -217,10 +226,13 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 				Nempresas++;
 
 		}
+		
+
+		SetTextColor(hdc, RGB(8,175, 13));
 		// Desenhar as barras
-		for (int i = 0; i < Nempresas; i++) {
+		for (int i = 0; i < dados.nEmpresas; i++) {
 			bars[i].left = startX + (barWidth + barSpacing) * i;
-			bars[i].top = startY - (maxHeight * empresasBoard[i].pAção / 500);
+			bars[i].top = startY - (maxHeight * empresasBoard[i].pAção / dados.limSup);
 			bars[i].right = bars[i].left + barWidth;
 			bars[i].bottom = startY;
 
@@ -231,11 +243,36 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 				RECT textRect = bars[i];
 				textRect.bottom = textRect.top;
 				textRect.top -= 20;
-				SetTextColor(hdc, RGB(rand() % 255, rand() % 255, rand() % 255));
-
-				DrawText(hdc, empresasBoard[i].nomeEmpresa, -1, &textRect, DT_SINGLELINE | DT_NOCLIP | DT_CENTER);
+				
+				swprintf(string3, sizeof(string3) / sizeof(TCHAR), TEXT("%.2f€"), empresasBoard[i].pAção);
+				DrawText(hdc, string3, -1, &textRect, DT_SINGLELINE | DT_NOCLIP | DT_CENTER);
+			}
+			if (_tcscmp(empresasBoard[i].nomeEmpresa, TEXT("-1")) != 0)
+			{
+				RECT textRect = bars[i];
+				//textRect.bottom = textRect.top+ 60;
+				textRect.bottom = 320;
+				
+				swprintf(string3, sizeof(string3) / sizeof(TCHAR), TEXT("%s"), empresasBoard[i].nomeEmpresa);
+				
+				DrawText(hdc, string3, -1, &textRect, DT_SINGLELINE | DT_NOCLIP | DT_BOTTOM| DT_WORDBREAK | DT_CENTER);
 			}
 		}
+
+
+
+		SetTextColor(hdc, RGB(166, 169, 178));//RGB(166, 169, 71)
+		for (int i = 0; i <= numLinhasEscala; i++) {
+			int y = escalaYStart - (escalaYStart - escalaYEnd) * i / numLinhasEscala; // Ajuste para cima
+			MoveToEx(hdc, escalaX, y, NULL);
+
+			TCHAR labelText[20]; // Defina o tamanho conforme necessário
+			swprintf(labelText, sizeof(labelText) / sizeof(TCHAR), TEXT("%.2f€"), (float)i * dados.limSup / numLinhasEscala);
+			RECT textRect = { escalaX - 50, y - 10, escalaX, y };
+			DrawText(hdc, labelText, -1, &textRect, DT_SINGLELINE | DT_NOCLIP); // Rótulos da escala
+		}
+
+
 
 		SetTextColor(hdc, RGB(38, 166, 154));
 		//SetTextColor(hdc, RGB(rand() % 255, rand() % 255, rand() % 255));
@@ -266,6 +303,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 
 		}
 
+
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_LBUTTONDOWN:
@@ -275,24 +313,23 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-		case IDM_EXIT:
-			if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
-				TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES)
-			{
-				DestroyWindow(hWnd);
-			}
-			break;
-		case IDM_ABOUT:
-			DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, DialogBoxAbout);
-
-			
-
-		case IDM_SETTINGS:
-			break;
-		default:
-			break;
+			case IDM_EXIT:
+				if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
+					TEXT("Confirmação"), MB_ICONQUESTION | MB_YESNO) == IDYES)
+				{
+					DestroyWindow(hWnd);
+				}
+				break;
+			case IDM_ABOUT:
+				DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, DialogBoxAbout);
+				break;
+			case ID_FILE_SETTINGS:
+				DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SETTINGS), hWnd, DialogSettings, (LPARAM)&dados);
+				break;
+			default:
+				break;
 		}
-
+		break;
 	case WM_CLOSE:
 
 		if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
@@ -319,27 +356,60 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 }
 
 
-BOOL CALLBACK DialogBoxAbout(HWND hWndialog, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
+BOOL CALLBACK DialogBoxAbout(HWND hWndialog, UINT messg, WPARAM wParam, LPARAM lParam) {
 
+	switch (messg) {
+		case WM_INITDIALOG:
+			return TRUE;
+		case WM_COMMAND:
+			switch (LOWORD(wParam)) {
+				case IDOK:
+					EndDialog(hWndialog, IDOK);
+					return TRUE;
+				//case IDCANCEL: 
+				//	EndDialog(hWnd, IDCANCEL);
+				//	return TRUE;
+			}
+		case WM_CLOSE:
+			EndDialog(hWndialog, IDOK); // janela criada com DialogBox()
+			DestroyWindow(hWndialog); // janela criado com CreateDialog()
+			return TRUE;
+		}
+	return FALSE;
+}
 
-
-
+BOOL CALLBACK DialogSettings(HWND hWndiaSet, UINT messg, WPARAM wParam, LPARAM lParam) {
+	
+	
 
 	switch (messg) {
 	case WM_INITDIALOG:
-		return TRUE;
+	{
+
+		SetDlgItemInt(hWndiaSet, IDC_EDIT1, dados.nEmpresas, FALSE);
+		SetDlgItemInt(hWndiaSet, IDC_EDIT2, dados.limInf, FALSE);
+		SetDlgItemInt(hWndiaSet, IDC_EDIT3, dados.limSup, FALSE);
+	}
+	return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 			case IDOK:
-				EndDialog(hWndialog, IDOK);
+				dados.nEmpresas = GetDlgItemInt(hWndiaSet, IDC_EDIT1, NULL, FALSE);
+				dados.limInf = GetDlgItemInt(hWndiaSet, IDC_EDIT2, NULL, FALSE);
+				dados.limSup = GetDlgItemInt(hWndiaSet, IDC_EDIT3, NULL, FALSE);
+				EndDialog(hWndiaSet, IDOK);
 				return TRUE;
-			//case IDCANCEL: 
-			//	EndDialog(hWnd, IDCANCEL);
-			//	return TRUE;
+				
+			case IDCANCEL: 
+				EndDialog(hWndiaSet, IDCANCEL);
+				return TRUE;
+				
 		}
+		break;
 	case WM_CLOSE:
-		EndDialog(hWndialog, IDOK); // janela criada com DialogBox()
-		DestroyWindow(hWndialog); // janela criado com CreateDialog()
+		//EndDialog(hWndiaSet, IDOK);
+		EndDialog(hWndiaSet, IDCANCEL);
+		//DestroyWindow(hWndiaSet);
 		return TRUE;
 	}
 	return FALSE;

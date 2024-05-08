@@ -1,6 +1,6 @@
 metromondego 1000 0.01
 Nélix 300 50
-spaceY 10 500
+spaceY 10 100
 AcruxTech 10 25.50
 Quantum 15 40.20
 Stellar 20 18.75

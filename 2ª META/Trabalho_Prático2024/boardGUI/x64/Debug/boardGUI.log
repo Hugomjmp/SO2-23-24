@@ -1,17 +1,19 @@
 ﻿  boardGUI.c
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(26,20): warning C4113: 'LRESULT (__cdecl *)(HWND,UINT,WPARAM,LPARAM,PAINTSTRUCT)' differs in parameter lists from 'WNDPROC'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(107,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(107,12): warning C4473: 'wprintf' : not enough arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(107,12):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(27,20): warning C4113: 'LRESULT (__cdecl *)(HWND,UINT,WPARAM,LPARAM,PAINTSTRUCT)' differs in parameter lists from 'WNDPROC'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(111,12): warning C4002: too many arguments for function-like macro invocation 'TEXT'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(111,12): warning C4473: 'wprintf' : not enough arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(111,12):
   placeholders and their parameters expect 1 variadic arguments, but 0 were provided
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(107,12):
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(111,12):
   the missing variadic argument 1 is required by format string '%d'
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(221,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(223,25): warning C4244: '=': conversion from 'float' to 'LONG', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(286,4): warning C4113: 'BOOL (__cdecl *)(HWND,UINT,WPARAM,LPARAM,PAINTSTRUCT)' differs in parameter lists from 'DLGPROC'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(286,4): warning C4133: 'function': incompatible types - from 'BOOL (__cdecl *)(HWND,UINT,WPARAM,LPARAM,PAINTSTRUCT)' to 'DLGPROC'
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(152,34): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(146,6): warning C4101: 'xPos': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(146,12): warning C4101: 'yPos': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(235,25): warning C4244: '=': conversion from 'float' to 'LONG', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(324,5): warning C4133: 'function': incompatible types - from 'BOOL (__cdecl *)(HWND,UINT,WPARAM,LPARAM)' to 'DLGPROC'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(327,80): warning C4133: 'function': incompatible types - from 'BOOL (__cdecl *)(HWND,UINT,WPARAM,LPARAM)' to 'DLGPROC'
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(153,34): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(146,13): warning C4101: 'rect2': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(144,11): warning C4101: 'hvalores': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(147,6): warning C4101: 'xPos': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(161,8): warning C4101: 'string4': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\boardGUI\boardGUI.c(147,12): warning C4101: 'yPos': unreferenced local variable
   boardGUI.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\boardGUI.exe

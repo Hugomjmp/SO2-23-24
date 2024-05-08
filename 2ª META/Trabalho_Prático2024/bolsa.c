@@ -1240,7 +1240,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 }
 
 
-//############################################################### //corrigir SHM
+//############################################################### 
 //#																#
 //#				Variação aleatoria de preços					#
 //#																#
