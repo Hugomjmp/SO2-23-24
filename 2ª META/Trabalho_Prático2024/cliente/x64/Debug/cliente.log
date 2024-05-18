@@ -8,11 +8,11 @@ C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª M
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,38): warning C4101: 'comando': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,23): warning C4101: 'password': unreferenced local variable
 C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(14,11): warning C4101: 'login': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(253,70): warning C4474: 'wprintf' : too many arguments passed for format string
-  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(253,70):
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(255,70): warning C4474: 'wprintf' : too many arguments passed for format string
+  C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(255,70):
   placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(190,11): warning C4101: 'buf': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(193,17): warning C4101: 'cliData': unreferenced local variable
-C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(195,17): warning C4101: 'empresas': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(191,11): warning C4101: 'buf': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(194,17): warning C4101: 'cliData': unreferenced local variable
+C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\cliente\cliente.c(196,17): warning C4101: 'empresas': unreferenced local variable
   cliente.vcxproj -> C:\Users\Hugo\Desktop\Eng. Informática\2º Ano\2º Semestre\SO2\SO2-23-24\2ª META\Trabalho_Prático2024\x64\Debug\cliente.exe

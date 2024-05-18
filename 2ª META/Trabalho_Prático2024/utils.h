@@ -28,6 +28,8 @@
 #define EVENT_NAME_O TEXT("EVENT_BOLSA_O")
 #define EVENT_NAME_C TEXT("EVENT_CLIENTE")
 #define EVENT_NAME_V TEXT("EVENT_VERIFICA")
+#define EVENT_NAME_P TEXT("EVENT_PAUSE")
+#define EVENT_NAME_B TEXT("EVENT_BROADCAST")
 
 //SEMAFOROS
 #define SEM_BOLSA TEXT("SEM_BOLSA")
@@ -56,6 +58,7 @@ typedef struct
 	TCHAR login[TAM];
 	TCHAR password[TAM];
 	TCHAR comando[300];
+
 }clienteData;
 
 typedef struct {
@@ -81,9 +84,12 @@ typedef	struct {
 	DWORD nAcoes;
 	float pAcao;
 }UltimaTransacao;
+
 typedef struct {
 	BOOL pause;
+	DWORD nSegundos;
 }ControlPause;
+
 typedef struct {
 	empresaData empresas[30];
 	carteiraAcoes cartAcoes[30];
@@ -100,6 +106,7 @@ typedef struct {
 	carteiraAcoes* cartAcoes;
 	ControlPause* ctrPause;
 	tDataInfo* ptd;
+	HANDLE hPipeClientes[10]; //acrescentei isto!!
 }ControlData;
 
 
@@ -119,6 +126,7 @@ typedef struct {
 	clienteData* clidData;
 	clienteResposta* cliRes;
 }DATA;
+
 typedef struct {
 	HWND hWnd;
 	BOOL continua;
@@ -126,6 +134,7 @@ typedef struct {
 	int limInf;
 	int limSup;
 }BoardGUIDados;
+
 //THREADS
 DWORD WINAPI trataComandosClientes(LPVOID data);
 DWORD WINAPI verificaClientes(LPVOID ctrlData);
@@ -133,6 +142,8 @@ DWORD WINAPI variaPreços(LPVOID empresas);
 DWORD WINAPI Organiza_dados(LPVOID empresas);
 DWORD WINAPI SMtoLocal(LPVOID empresas);
 DWORD WINAPI recebeMSG(LPVOID data);
+DWORD WINAPI pauseThread(LPVOID ctrPause);
+DWORD WINAPI broadCast(LPVOID ctrlData);
 
 //Prototipos das funções
 void CriaRegedit();
@@ -144,3 +155,4 @@ void mostra_tabela(empresasBoard, boardDt);
 void mostraTitulo();
 void mostraMenuCliente();
 void avisos(int x);
+void avisosBolsa(int x);

@@ -125,7 +125,7 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 		_tprintf(TEXT("Error: OpenFileMapping (%d)\n"), GetLastError());
 		return 1;
 	}
-	/*emP = (empresaData*)*/boardDt = (boardData*)MapViewOfFile(
+	boardDt = (boardData*)MapViewOfFile(
 		hMapFile,
 		FILE_MAP_ALL_ACCESS,
 		0,
@@ -133,20 +133,11 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 		sizeof(boardData)
 	);
 
-	if (boardDt/*emP*/ == NULL) {
+	if (boardDt == NULL) {
 		_tprintf(TEXT("ERROR: MapViewOfFile (%d)\n"), GetLastError());
 		return 1;
 	}
-	/*for (DWORD i = 0; i < MAX_EMPRESAS; i++)
-	{
-		_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
-		_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
-		_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
-		_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
-		//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
-		//emP[i].nAções = 0;
-		//emP[i].pAção = 0.0;
-	}*/
+
 	while(1){
 		WaitForSingleObject(hEvent, INFINITE);
 		WaitForSingleObject(hMutex, INFINITE);
@@ -156,19 +147,8 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 			empresasBoard[i] = boardDt->empresas[i];
 			
 		}
-		//for (DWORD i = 0; i < 30; i++)
-		//{
-		//	_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
-		//	_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
-		//	_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
-		//	_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
-		//	//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
-		//	//emP[i].nAções = 0;
-		//	//emP[i].pAção = 0.0;
-		//}
-		//REORGANIZAÇÃO.... está a duplicar... problema aqui
 		
-		//bolha
+		//organizar por ordem decrescente
 		for (int i = 0; i < MAX_EMPRESAS - 1; i++) {
 			for (int j = 0; j < MAX_EMPRESAS - i - 1; j++) {
 				if (empresasBoard[j].pAção < empresasBoard[j + 1].pAção) {
@@ -179,35 +159,12 @@ DWORD WINAPI Organiza_dados(LPVOID empresas) {
 			}
 		}
 
-		/*
-		for (int i = 0; i < MAX_EMPRESAS - 1; i++) {
-			for (int j = 0; j < MAX_EMPRESAS - i - 1; j++) {
-				if (empresasBoard[j].pAção < empresasBoard[j + 1].pAção) {
-					empresaData temp = empresasBoard[j];
-					empresasBoard[j] = empresasBoard[j + 1];
-					empresasBoard[j + 1] = temp;
-				}
-			}
-		}*/
-		/*
-		for (DWORD i = 0; i < MAX_EMPRESAS - 1; i++) {
-			DWORD maxIndex = i;
-			for (DWORD j = i + 1; j < MAX_EMPRESAS; j++) {
-				if (empresasBoard[j].pAção > empresasBoard[maxIndex].pAção) {
-					maxIndex = j;
-				}
-			}
-			if (maxIndex != i) {
-				empresaData temp = empresasBoard[i];
-				empresasBoard[i] = empresasBoard[maxIndex];
-				empresasBoard[maxIndex] = temp;
-			}
-		}*/
 
 
 
-		ReleaseMutex(hMutex);
+		
 		mostra_tabela(empresasBoard, boardDt);
+		ReleaseMutex(hMutex);
 		WaitForSingleObject(hMutexWrite, INFINITE);
 		CopyMemory(boardDt->empresas, empresasBoard, sizeof(empresaData) * MAX_EMPRESAS);
 		ReleaseMutex(hMutexWrite);
@@ -312,16 +269,6 @@ void mostra_tabela(empresaData* empresasBoard, boardData *boardDt){
 		_tprintf(TEXT(" |\t %.2f€ \t\t|"), boardDt->ultmTransacao->pAcao);
 
 
-
-
-	/*
-		if (_tcsicmp(boardDt->ultmTransacao->EmpresaNome,TEXT("-1")) != 0) {
-			_tprintf(TEXT("\t\t\t|\t %s\t\t| |\t %lu\t\t| "), boardDt->ultmTransacao->EmpresaNome,
-				boardDt->ultmTransacao->nAcoes);
-			_tprintf(TEXT("|\t %.2f €\t|\n"), boardDt->ultmTransacao->pAcao);
-		}
-		*/
-	
 
 	_tprintf(TEXT("\n\t\t\t close - Fechar o programa\n"));
 }

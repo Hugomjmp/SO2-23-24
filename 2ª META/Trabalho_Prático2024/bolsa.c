@@ -5,8 +5,8 @@ int _tmain(int argc, TCHAR* argv[])
 	CriaRegedit(); //TRATA DA VARIAVEL NCLIENTES
 	//HANDLES...
 
-	HANDLE hPipe, hPipeCliente[MAX_CLIENTES], hThreadArray[5] = {NULL,NULL,NULL,NULL,NULL},
-		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hSemClientes, hSemBolsa, hMutexClient;
+	HANDLE hPipe, hPipeCliente[MAX_CLIENTES], hThreadArray[6] = {NULL,NULL,NULL,NULL,NULL,NULL},
+		   hEvent, hMapFile, hMutex, hMutexRead, hEventRead, hEventPause, hEventBroadcast, hSemClientes, hSemBolsa, hMutexClient;
 
 	//Variáveis
 	DWORD nSegundos = 0, nAções = 0, linha, nBytes, numeros, contador = 0, continua = 1;
@@ -30,6 +30,7 @@ int _tmain(int argc, TCHAR* argv[])
 	ControlPause ctrPause[1];
 	tDataInfo tWrite[1];
 	ctrPause[0].pause = FALSE;
+	ctrPause[0].nSegundos = 0;
 	ControlData ctrlData = {.empresas = empresas, .users = users, .cartAcoes = cartAcoes , .ctrPause = ctrPause, .ptd = tWrite};
 	
 
@@ -90,7 +91,7 @@ int _tmain(int argc, TCHAR* argv[])
 	//verifica se o bolsa já está a funcionar
 	hSemBolsa = CreateSemaphore(NULL, 1, 1, SEM_BOLSA);
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		_tprintf(TEXT("[ERRO] O Bolsa já se encontra a executar\n"));
+		avisosBolsa(1);
 		system("pause");
 		CloseHandle(hSemBolsa);
 		return -1;
@@ -118,6 +119,26 @@ int _tmain(int argc, TCHAR* argv[])
 		EVENT_NAME_O	//lpName
 	);
 	if (hEventRead == NULL) {
+		_tprintf(TEXT("[ERRO] Falhou ao criar o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	hEventPause = CreateEvent(
+		NULL,			//lpEventAttributes
+		TRUE,			//bManualReset
+		FALSE,			//bInitialState
+		EVENT_NAME_P	//lpName
+	);
+	if (hEventPause == NULL) {
+		_tprintf(TEXT("[ERRO] Falhou ao criar o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	hEventBroadcast = CreateEvent(
+		NULL,			//lpEventAttributes
+		TRUE,			//bManualReset
+		FALSE,			//bInitialState
+		EVENT_NAME_B	//lpName
+	);
+	if (hEventBroadcast == NULL) {
 		_tprintf(TEXT("[ERRO] Falhou ao criar o evento. Código de erro: %d\n", GetLastError()));
 		return 1;
 	}
@@ -234,8 +255,8 @@ int _tmain(int argc, TCHAR* argv[])
 	hThreadArray[1] = CreateThread(
 		NULL,					// default security attributes
 		0,						// use default stack size
-		verificaClientes,	// thread function name
-		&ctrlData,					// argument to thread function
+		verificaClientes,		// thread function name
+		&ctrlData,				// argument to thread function
 		0,						// use default creation flags
 		NULL);
 	if (hThreadArray[1] == NULL) {
@@ -266,6 +287,29 @@ int _tmain(int argc, TCHAR* argv[])
 		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
 		return 1;
 	}
+	hThreadArray[4] = CreateThread(
+		NULL,					// default security attributes
+		0,						// use default stack size
+		pauseThread,				// thread function name
+		ctrPause,				// argument to thread function
+		0,						// use default creation flags
+		NULL);
+	if (hThreadArray[4] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+	hThreadArray[5] = CreateThread(
+		NULL,					// default security attributes
+		0,						// use default stack size
+		broadCast,				// thread function name
+		&ctrlData,				// argument to thread function
+		0,						// use default creation flags
+		NULL);
+	if (hThreadArray[5] == NULL) {
+		_tprintf(TEXT("Erro a criar a thread. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+
 	//---------------------------------------------------------------
 	
 	//###############################################################
@@ -467,10 +511,10 @@ int _tmain(int argc, TCHAR* argv[])
 			}
 			for (DWORD i = 0; i < contador; i++)
 			{
-				if (i < 9) { //corrige o espaçamento do ID
+				if (_tcslen(boardDt->cartAcoes[i].username) < 5) { //corrige o espaçamento do ID
 					_tprintf(TEXT("\t\t| %s |"), boardDt->cartAcoes[i].username);
 				}else{
-					_tprintf(TEXT("\t\t| %s |"), boardDt->cartAcoes[i].username);
+					_tprintf(TEXT("\t\t| %s|"), boardDt->cartAcoes[i].username);
 				}
 					if (_tcslen(boardDt->cartAcoes[i].nomeEmpresa) <= 5)
 					{
@@ -491,10 +535,10 @@ int _tmain(int argc, TCHAR* argv[])
 						numeros /= 10;
 						digitos++;
 					}
-					if (digitos <= 2)
-						_tprintf(TEXT(" |\t %.2f€ \t|"), boardDt->cartAcoes[i].valor);
-					else
+					if (digitos < 2)
 						_tprintf(TEXT(" |\t %.2f€ \t\t|"), boardDt->cartAcoes[i].valor);
+					else
+						_tprintf(TEXT(" |\t %.2f€ \t|"), boardDt->cartAcoes[i].valor);
 
 				_tprintf(TEXT("\n\t\t+------+-+----------------------+-+---------------------+-+---------------------+\n"));
 			}
@@ -505,23 +549,33 @@ int _tmain(int argc, TCHAR* argv[])
 		//TRATA DO COMANDO PAUSAR AS OPERAÇÕES DE COMPRA E VENDA
 		else if (_tcsicmp(TEXT("pause"), comandoAdmin) == 0) {
 			_tscanf(TEXT("%lu"), &nSegundos);
+
+			ctrPause[0].nSegundos = nSegundos;
+			SetEvent(hEventPause);
+			Sleep(200);
+			ResetEvent(hEventPause);
 			//ctrlData.pause = TRUE;
-			pause = TRUE;
-			ctrPause[0].pause = TRUE;
-			_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
-			Sleep(nSegundos * 1000); //em segundos
+			//pause = TRUE;
+			//ctrPause[0].pause = TRUE;
+			//_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
+			//Sleep(nSegundos * 1000); //em segundos
 
 			//ctrlData.pause = FALSE;
-			pause = FALSE;
-			ctrPause[0].pause = FALSE;
-			_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
-			_tprintf(TEXT("\nRecebi Comando: %s %lu com tamanho %zu"), comandoAdmin, nSegundos, _tcslen(comandoAdmin));
+			//pause = FALSE;
+			//ctrPause[0].pause = FALSE;
+			//_tprintf(TEXT("ctrlData.pause: '%d'\n"), ctrPause[0].pause);
+			//_tprintf(TEXT("\nRecebi Comando: %s %lu com tamanho %zu"), comandoAdmin, nSegundos, _tcslen(comandoAdmin));
 
 		}
 		else if (_tcsicmp(TEXT("clear"), comandoAdmin) == 0) { //limpa o ecra
 			system("cls");
 			mostraTitulo();
 
+		}
+		else if (_tcsicmp(TEXT("test"), comandoAdmin) == 0) {
+			SetEvent(hEventBroadcast);
+			Sleep(200);
+			ResetEvent(hEventBroadcast);
 		}
 		else if ((_tcsicmp(TEXT("close"), comandoAdmin) == 0)) {
 
@@ -534,7 +588,7 @@ int _tmain(int argc, TCHAR* argv[])
 		}
 
 	}
-	for (DWORD i = 0; i < 3; i++)
+	for (DWORD i = 0; i < 4; i++)
 		{
 			CloseHandle(hThreadArray[i]);
 		}
@@ -652,7 +706,7 @@ void escreveRegedit() {
 	
 }
 //---------------------------------------------------------------
-// Por acabar...
+
 DWORD WINAPI trataComandosClientes(LPVOID data) {
 	tDataInfo_EXTRA* ptd_extra = (tDataInfo_EXTRA*)data;
 	HANDLE hPipesloc;
@@ -669,7 +723,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	//novo
 	HANDLE hMapFile;
 	boardData* boardDt;
-	BOOL pause;
+	BOOL pause, sair = FALSE;
 	_tcscpy(ultmTransacao.EmpresaNome, TEXT("-1"));
 	ultmTransacao.nAcoes = 0;
 	ultmTransacao.pAcao = 0;
@@ -803,7 +857,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 		//RECEBE PEDIDO...
 		ret = ReadFile(hPipesloc, &cliData, sizeof(clienteData), &n, NULL);
 		if (!ret || !n) {
-			_tprintf(TEXT("[ERRO] %d %d... (ReadFile)\n"), ret, n);
+			//_tprintf(TEXT("[ERRO]Comandos %d %d... (ReadFile)\n"), ret, n);
 			break;
 		}
 		pause = ptd_extra->ctrPause[0].pause;
@@ -831,25 +885,25 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 		else if (_tcsncmp(TEXT("buy"), cliData.comando, _tcslen(TEXT("buy"))) == 0) {
 			registo = 0;
 			resposta = 0;
-			_tprintf(TEXT("\nCOMANDO: '%s' '%d'\n"), cliData.comando, _tcslen(cliData.comando));
+			sair = FALSE;
+			//_tprintf(TEXT("\nCOMANDO: '%s' '%d'\n"), cliData.comando, _tcslen(cliData.comando));
 			_stscanf(cliData.comando, TEXT("buy %s %lu"), nomeEmpresa, &nAções);
 			//_tprintf(TEXT("\nnomeEmpresa: '%s'\n"), nomeEmpresa);
 			//_tprintf(TEXT("nAções: '%lu'\n"), nAções);
 			//_tprintf(TEXT("ptd_extra->empresas->pause: '%d'\n"), pause);
 			if (pause==FALSE)
 			{
-				/*_tprintf(TEXT("UHH NO BUY FOR YOU!\n"));*/
-			
+				resposta = 3;
 				for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
-				
+					
 					if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0 &&
-						ptd_extra->empresas[i].nAções > 0) 
+						ptd_extra->empresas[i].nAções > 0 &&
+						ptd_extra->empresas[i].nAções >= nAções)
 					{
-
-						/*_tprintf(TEXT("nacoes: '%lu', '%s'\n"), ptd_extra->empresas[i].nAções, ptd_extra->empresas[i].nomeEmpresa);*/
+						
 						for (DWORD a = 0; a < 6; a++)//localizar o utilizador para descontar no saldo
 						{
-						
+							resposta = 0;
 							if ((_tcsicmp(ptd_extra->users[a].username, cliData.login) == 0)
 								&& ptd_extra->users[a].saldo >= (ptd_extra->empresas[i].pAção * nAções)
 								&& (_tcsicmp(ptd_extra->users[a].username, cliData.login)) == 0) {
@@ -858,7 +912,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 								{
 								
 									if (registo == 0 && (_tcsicmp(ptd_extra->cartAcoes[j].nomeEmpresa, TEXT("-1"))) == 0)
-										 {
+											{
 										//bloqueia no mutex
 										WaitForSingleObject(hMutex, INFINITE);
 										_tcscpy(ptd_extra->cartAcoes[j].nomeEmpresa, nomeEmpresa);
@@ -876,16 +930,6 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 										CopyMemory(boardDt->cartAcoes, ptd_extra->cartAcoes, sizeof(carteiraAcoes)*MAX_EMPRESAS);
 										CopyMemory(boardDt->empresas, ptd_extra->empresas, sizeof(empresaData)* MAX_EMPRESAS);
 										CopyMemory(boardDt->ultmTransacao, &ultmTransacao, sizeof(UltimaTransacao)/* * MAX_EMPRESAS*/);
-										//for (DWORD i = 0; i < 30; i++)
-										//{
-										//	_tprintf(TEXT("\nCARTEIRA DE ACOES DONO: %s"), boardDt->cartAcoes[i].nomeEmpresa);
-										//	_tprintf(TEXT("\nnCARTEIRA DE ACOES user: %s"), boardDt->cartAcoes[i].username);
-										//	_tprintf(TEXT("\nCARTEIRA DE ACOES nacaoes: %d"), boardDt->cartAcoes[i].nAções);
-										//	_tprintf(TEXT("\nCARTEIRA DE ACOES valor: %.2f"), boardDt->cartAcoes[i].valor);
-										//	//_tcscpy(emP[i].nomeEmpresa, TEXT("-1"));
-										//	//emP[i].nAções = 0;
-										//	//emP[i].pAção = 0.0;
-										//}
 										//relase ao mutex
 										ReleaseMutex(hMutex);
 										//evento
@@ -893,6 +937,8 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 										Sleep(500);
 										//resetEvento
 										ResetEvent(hEvent);
+										sair = TRUE;
+										break;
 									}
 									else if (registo == 0 && (_tcsicmp(ptd_extra->cartAcoes[j].nomeEmpresa, nomeEmpresa)) == 0
 										&& (_tcsicmp(ptd_extra->cartAcoes[j].username, cliData.login)) == 0) {
@@ -920,36 +966,32 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 										Sleep(500);
 										//resetEvento
 										ResetEvent(hEvent);
+										sair = TRUE;
+										break;
 									}
 									else {}
 								}
-
+								if (sair == TRUE) {
+									break;
+								}
 						
 							}
 						}
+						
+
 
 					}
-					/*else {
-						resposta = 3;
-					}*/
+
 				}
+
 			}
 			else {
 				resposta = 4;
 			}
 
-			//_tprintf(TEXT("\ntabela\n"));
-			//for (DWORD y = 0; y < 30; y++)
-			//{
-			//			
-			//	_tprintf(TEXT("|%s\t"), ptd_extra->cartAcoes[y].nomeEmpresa);
-			//	_tprintf(TEXT("%s\t"), ptd_extra->cartAcoes[y].username);
-			//	_tprintf(TEXT("%lu\t"), ptd_extra->cartAcoes[y].nAções);
-			//	_tprintf(TEXT("%.4f|\n"), ptd_extra->cartAcoes[y].valor);
-			//}
 			if (resposta == 0)
 			{
-				_tcscpy(cliRes.RESPOSTA, TEXT("\nSem saldo para realizar a compra!\n"));
+				_tcscpy(cliRes.RESPOSTA, TEXT("Sem saldo para realizar a compra!\n"));
 				if (!WriteFile(hPipesloc, &cliRes, sizeof(clienteResposta), &n, NULL)) {
 					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
 					exit(-1);
@@ -986,24 +1028,28 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 			registo = 0;
 			resposta = 0;
 			totalAcoes = 0;
-			
+			sair = FALSE;
 			_stscanf(cliData.comando, TEXT("sell %s %lu"), nomeEmpresa, &nAções);
-			_tprintf(TEXT("nAções: '%lu'\n"), nAções);
+			//_tprintf(TEXT("nAções: '%lu'\n"), nAções);
 			//_tprintf(TEXT("ptd_extra->empresas->pause: '%d'\n"), pause);
 			if (pause == FALSE)
 			{
+				resposta = 3;
 				for (DWORD i = 0; i < MAX_EMPRESAS; i++) {
 
 					if ((_tcsicmp(ptd_extra->empresas[i].nomeEmpresa, nomeEmpresa)) == 0) { //procura a empresa
 						//_tprintf(TEXT("EMPRESA: %s\n"), ptd_extra->empresas[i].nomeEmpresa);
 						for (DWORD a = 0; a < 6; a++)//localizar o utilizador para adicionar ao saldo
 						{
+							resposta = 0;
 							if ((_tcsicmp(ptd_extra->users[a].username, cliData.login)) == 0) { //procura o nome do utilizador
 								for (DWORD j = 0; j < 30; j++)
 								{
+
 									if ((_tcsicmp(ptd_extra->cartAcoes[j].nomeEmpresa, nomeEmpresa)) == 0 //verifica na carteira
-										&& (_tcsicmp(ptd_extra->cartAcoes[j].username, cliData.login)) == 0) {
-										
+										&& (_tcsicmp(ptd_extra->cartAcoes[j].username, cliData.login)) == 0
+										&& ptd_extra->cartAcoes[j].nAções >= nAções) {
+										//_tprintf(TEXT("ptd_extra->cartAcoes[j].nAções: '%lu'\n"), ptd_extra->cartAcoes[j].nAções);
 										
 											//bloqueia no mutex
 											WaitForSingleObject(hMutex, INFINITE);
@@ -1052,10 +1098,16 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 											Sleep(500);
 											//resetEvento
 											ResetEvent(hEvent);
+											sair = TRUE;
+											break;
 										}
 										
 									
 								}
+							}
+							if (sair == TRUE)
+							{
+								break;
 							}
 						}
 
@@ -1071,6 +1123,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 			else {
 				resposta = 4;
 			}
+			
 			//_tprintf(TEXT("tabela\n"), nAções);
 			//for (DWORD y = 0; y < 30; y++)
 			//{
@@ -1090,7 +1143,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 			}
 			if (resposta == 3)
 			{
-				_tcscpy(cliRes.RESPOSTA, TEXT("Empresa enixistente/ sem ações para vender!\n"));
+				_tcscpy(cliRes.RESPOSTA, TEXT("Empresa enixistente na carteira/ sem ações para vender!\n"));
 				if (!WriteFile(hPipesloc, &cliRes, sizeof(clienteResposta), &n, NULL)) {
 					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
 					exit(-1);
@@ -1106,7 +1159,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 			}
 			if (resposta == 0)
 			{
-				_tcscpy(cliRes.RESPOSTA, TEXT("\nSem saldo para realizar a compra!\n"));
+				_tcscpy(cliRes.RESPOSTA, TEXT("\nQuantidade enixistente na carteira!\n"));
 				if (!WriteFile(hPipesloc, &cliRes, sizeof(clienteResposta), &n, NULL)) {
 					_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
 					exit(-1);
@@ -1130,18 +1183,32 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 
 
 		}
+		else if (_tcsicmp(TEXT("exit"), cliData.comando) == 0) {
+			for (DWORD i = 0; i < 6; i++)
+			{
+				if (_tcsicmp(ptd_extra->users[i].username, cliData.login) == 0)
+				{
+
+					_tcscpy(cliRes.RESPOSTA, TEXT("SAIR"));
+					if (!WriteFile(hPipesloc, &cliRes, sizeof(clienteResposta), &n, NULL)) {
+						_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+						exit(-1);
+					}
+				}
+			}
+		}
 		//TRATA DA FALHA DO COMANDO
 		else {
-			_tprintf(TEXT("\nComando do cliente: '%s' introduzido com tamanho %d, não existe!"), cliData.comando, _tcslen(cliData.comando) - 1);
+			//_tprintf(TEXT("\nComando do cliente: '%s' introduzido com tamanho %d, não existe!"), cliData.comando, _tcslen(cliData.comando) - 1);
 		}
 
 
 
 
-		_tprintf(TEXT("[SERVIDOR] Enviei %d bytes ao cliente %d... (WriteFile)\n"), n, id);
+		//_tprintf(TEXT("[SERVIDOR] Enviei %d bytes ao cliente %d... (WriteFile)\n"), n, id);
 	} while (_tcscmp(cliData.comando, TEXT("exit")) != 0);
 	
-	_tprintf(TEXT("[SERVIDOR] Desligar o pipe %d (DisconnectNamedPipe)\n"), id);
+	//_tprintf(TEXT("[SERVIDOR] Desligar o pipe %d (DisconnectNamedPipe)\n"), id);
 	FlushFileBuffers(hPipesloc);
 	WaitForSingleObject(ptd_extra->ptd->hTrinco, INFINITE);
 	ptd_extra->ptd->hPipe[id] = NULL;
@@ -1152,7 +1219,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 		exit(-1);
 	}
 	
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++) // ver semáforo com os Nclientes...
 	{
 		if (_tcsicmp(ptd_extra->users[i].username, cliData.login) == 0){
 			ptd_extra->users[i].estado = 0;
@@ -1167,7 +1234,7 @@ DWORD WINAPI trataComandosClientes(LPVOID data) {
 	return 0;
 
 }
-//-------
+
 
 //###############################################################
 //#																#
@@ -1211,6 +1278,7 @@ DWORD WINAPI verificaClientes(LPVOID ctrlData) {
 		if (nCli < 10) {
 			WaitForSingleObject(tWrite.hTrinco, INFINITE);
 			tWrite.hPipe[nCli] = hPipe;
+			cdata->hPipeClientes[nCli] = hPipe;
 			ReleaseMutex(tWrite.hTrinco);
 			//cdata[nCli]->ptd = &tWrite;
 			//cdata[nCli]->id = nCli;
@@ -1457,27 +1525,123 @@ DWORD WINAPI SMtoLocal(LPVOID empresas) {
 }
 
 
+DWORD WINAPI pauseThread(LPVOID ctrPause) {
+	ControlPause* Pause = (ControlPause*)ctrPause;
+	HANDLE hPause;
+
+	hPause = OpenEvent(
+		SYNCHRONIZE,		//dwDesiredAccess,
+		FALSE,				//bInheritHandle,
+		EVENT_NAME_P		//lpName
+	);
+	if (hPause == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+
+	while (1)
+	{
+		WaitForSingleObject(hPause, INFINITE);
+		Pause[0].pause = TRUE;
+		Sleep(Pause[0].nSegundos*1000);
+		Pause[0].pause = FALSE;
+		_tprintf(TEXT("FIM DO PAUSE COM %ds\n"), Pause[0].nSegundos);
+
+	}
+
+	return 5000;
+}
+
+DWORD WINAPI broadCast(LPVOID ctrlData) {
+	ControlData* cData = (ControlData*)ctrlData;
+	clienteResposta cliRes;
+	DWORD n;
+	HANDLE hEvent;
+
+
+	//###############################################################
+	//#																#
+	//#						Eventos			 						#
+	//#																#
+	//###############################################################
+	hEvent = OpenEvent(
+		SYNCHRONIZE,	//dwDesiredAccess,
+		FALSE,			//bInheritHandle,
+		EVENT_NAME_B	//lpName
+	);
+	if (hEvent == NULL) {
+		_tprintf(TEXT("Erro ao abrir o evento. Código de erro: %d\n", GetLastError()));
+		return 1;
+	}
+
+	while (1)
+	{
+
+		WaitForSingleObject(hEvent, INFINITE);
+	
+		for (int i = 0; i < 10; i++)
+		{
+			if (cData->hPipeClientes[i] != NULL) {
+				
+				for (int j = 0; j < MAX_EMPRESAS; j++)
+				{
+					
+						_tcscpy(cliRes.RESPOSTA, TEXT("BROADCAST!!!!!!\n"));
+						if (!WriteFile(cData->hPipeClientes[i], &cliRes, sizeof(clienteResposta), &n, NULL)) {
+							_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+							exit(-1);
+						}
+					
+				}
+				
+
+			}
+		}
+		Sleep(1000);
+	}
+
+
+	return 6000;
+}
+
+
+
 void mostraMenu() {
-	_tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
-	_tprintf(TEXT("\n\t\t\t|\t\t\t\tMENU\t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
-	_tprintf(TEXT("\n\t\t\t| addc - Acrescentar uma empresa \t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t| adde - Acrescentar empresas via Empresas.txt \t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t| listc - Listar todas as empresas \t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t| stock - Redefinir custo das ações de uma empresa \t\t|"));
-	_tprintf(TEXT("\n\t\t\t| users - Listar utilizadores \t\t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t| pause - Pausar as operações de compra e venda \t\t|"));
-	_tprintf(TEXT("\n\t\t\t| cart - Mostra a carteira de ações dos utilizadores \t\t|"));
-	_tprintf(TEXT("\n\t\t\t| clear - Limpa o ecrã \t\t\t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t| close - Encerrar a plataforma \t\t\t\t|"));
-	_tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m\t\t\t\tMENU\t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33maddc\033[0m - Acrescentar uma empresa \t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33madde\033[0m - Acrescentar empresas via Empresas.txt \t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mlistc\033[0m - Listar todas as empresas \t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mstock\033[0m - Redefinir custo das ações de uma empresa \t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33musers\033[0m - Listar utilizadores \t\t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mpause\033[0m - Pausar as operações de compra e venda \t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mcart\033[0m - Mostra a carteira de ações dos utilizadores \t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mclear\033[0m - Limpa o ecrã \t\t\t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mclose\033[0m - Encerrar a plataforma \t\t\t\t\033[0;32m|\033[0m"));
+	_tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m"));
 	_tprintf(TEXT("\n\t\t\tComando: "));
 }
 
 void mostraTitulo() {
-	_tprintf(TEXT("\t\t\t#################################################################\n"));
-	_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
-	_tprintf(TEXT("\t\t\t#\t\t\tBOLSA DE VALORES SERVER\t\t\t#\n"));
-	_tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
-	_tprintf(TEXT("\t\t\t#################################################################\n"));
+	_tprintf(TEXT("\t\t\t\033[0;32m#################################################################\033[0m\n"));
+	_tprintf(TEXT("\t\t\t\033[0;32m#\033[0m\t\t\t\t\t\t\t\t\033[0;32m#\033[0m\n"));
+	_tprintf(TEXT("\t\t\t\033[0;32m#\033[0m\t\t\tBOLSA DE VALORES SERVER\t\t\t\033[0;32m#\033[0m\n"));
+	_tprintf(TEXT("\t\t\t\033[0;32m#\033[0m\t\t\t\t\t\t\t\t\033[0;32m#\033[0m\n"));
+	_tprintf(TEXT("\t\t\t\033[0;32m#################################################################\033[0m\n"));
+}
+
+void avisosBolsa(int x) {
+
+	if (x == 1)
+	{
+		_tprintf(TEXT("\n\t\t\t\033[1;31m      /\\    "));
+		_tprintf(TEXT("\n\t\t\t\033[1;31m     /  \\    "));
+		_tprintf(TEXT("\n\t\t\t\033[1;31m    /\033[0m |\033[1;31m  \\   "));
+		_tprintf(TEXT("\n\t\t\t\033[1;31m   /\033[0m  .\033[1;31m   \\  \033[0mO bolsa já se encontra ONLINE!"));
+		_tprintf(TEXT("\n\t\t\t\033[1;31m  /________\\ \033[0m\n"));
+	}
+
+
+
 }

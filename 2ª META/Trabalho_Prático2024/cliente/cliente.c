@@ -59,7 +59,8 @@ int _tmain(int argc, TCHAR* argv[])
 
     //_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), NAME_PIPE);
     if (!WaitNamedPipe(NAME_PIPE, NMPWAIT_WAIT_FOREVER)) {
-        _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), NAME_PIPE);
+        avisos(2);
+        //_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), NAME_PIPE);
         exit(-1);
     }
     //_tprintf(TEXT("\n[CLIENTE] Ligação ao pipe do escritor... (CreateFile)\n"));
@@ -144,7 +145,7 @@ int _tmain(int argc, TCHAR* argv[])
         //LER TECLADO...
         //ENVIAR PARA SERVIDOR...
         fflush(stdin);
-        Sleep(100);
+        Sleep(200);
         ZeroMemory(&ov, sizeof(ov));
         ov.hEvent = hEv;
         
@@ -220,7 +221,8 @@ DWORD WINAPI recebeMSG(LPVOID data) {
                 GetOverlappedResult(hPipe, &ov, &n, FALSE);
             }
             else {
-                _tprintf(TEXT("[ERRO] FALHOU O OVERLAPPED\n"));
+                _tprintf(TEXT("[ERRO] O SERVIDOR BOLSA FOI OFFLINE\n"));
+                _tprintf(TEXT("O programa Cliente vai ser desligado...\n"));
                 break;
             }
         }
@@ -293,32 +295,40 @@ DWORD WINAPI recebeMSG(LPVOID data) {
 
 
 void apresentacao() {
-    _tprintf(TEXT("\t\t\t#################################################################\n"));
-    _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
-    _tprintf(TEXT("\t\t\t#\t\t\tBOLSA DE VALORES ONLINE\t\t\t#\n"));
-    _tprintf(TEXT("\t\t\t#\t\t\t\t\t\t\t\t#\n"));
-    _tprintf(TEXT("\t\t\t#################################################################\n"));
+    _tprintf(TEXT("\t\t\t\033[0;32m#################################################################\033[0m\n"));
+    _tprintf(TEXT("\t\t\t\033[0;32m#\t\t\t\t\t\t\t\t\033[0;32m#\033[0m\n"));
+    _tprintf(TEXT("\t\t\t\033[0;32m#\t\t\tBOLSA DE VALORES ONLINE\t\t\t\033[0;32m#\033[0m\n"));
+    _tprintf(TEXT("\t\t\t\033[0;32m#\t\t\t\t\t\t\t\t\033[0;32m#\033[0m\n"));
+    _tprintf(TEXT("\t\t\t\033[0;32m#################################################################\033[0m\n"));
 }
 
 void mostraMenuCliente() {
-    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
-    _tprintf(TEXT("\n\t\t\t|\t\t\t\tMENU\t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+"));
-    _tprintf(TEXT("\n\t\t\t| listc   - Listar todas as empresas \t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t| buy     - Comprar ações\t\t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t| sell    - Vender ações\t\t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t| balance - Consultar saldo \t\t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t| exit    - Sair da plataforma\t\t\t\t\t|"));
-    _tprintf(TEXT("\n\t\t\t+---------------------------------------------------------------+\n"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\t\t\t\tMENU\t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mlistc\033[0m   - Listar todas as empresas \t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mbuy\033[0m     - Comprar ações\t\t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33msell\033[0m    - Vender ações\t\t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mbalance\033[0m - Consultar saldo \t\t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m|\033[0m \033[1;33mexit\033[0m    - Sair da plataforma\t\t\t\t\t\033[0;32m|\033[0m"));
+    _tprintf(TEXT("\n\t\t\t\033[0;32m+---------------------------------------------------------------+\033[0m\n"));
 }
 
 void avisos(int x) {
     if (x==1)
     {
-        _tprintf(TEXT("\n\t\t\t\033[1;31m     / \\    "));
-        _tprintf(TEXT("\n\t\t\t\033[1;31m    /\033[0m |\033[1;31m \\   "));
-        _tprintf(TEXT("\n\t\t\t\033[1;31m   /\033[0m  .\033[1;31m  \\  \033[0mJá tem uma sessão ativa com esse login!"));
-        _tprintf(TEXT("\n\t\t\t\033[1;31m  /_______\\ \033[0m\n"));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m      /\\    "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m     /  \\    "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m    /\033[0m |\033[1;31m  \\   "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m   /\033[0m  .\033[1;31m   \\  \033[0mJá tem uma sessão ativa com esse login!"));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m  /________\\ \033[0m\n"));
     }
-
+    if (x == 2)
+    {
+        _tprintf(TEXT("\n\t\t\t\033[1;31m      /\\    "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m     /  \\    "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m    /\033[0m |\033[1;31m  \\   "));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m   /\033[0m  .\033[1;31m   \\  \033[0mO servidor não se encontra ONLINE!"));
+        _tprintf(TEXT("\n\t\t\t\033[1;31m  /________\\ \033[0m\n"));
+    }
 }

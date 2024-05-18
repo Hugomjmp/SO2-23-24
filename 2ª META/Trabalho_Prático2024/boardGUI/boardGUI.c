@@ -4,11 +4,11 @@
 #include "Resource.h"
 #include "..\utils.h"
 
-BoardGUIDados dados;
+
 LRESULT CALLBACK TrataEventos(HWND, UINT, WPARAM, LPARAM, PAINTSTRUCT);
 BOOL CALLBACK DialogBoxAbout(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK DialogSettings(HWND, UINT, WPARAM, LPARAM);
-DWORD WINAPI PaintThread(LPVOID dados);
+DWORD WINAPI PaintThread(PVOID dados);
 
 TCHAR szProgName[] = TEXT("Base"); // vai ser o nome do nosso programa, que vai aparecer no cantinho da janela
 
@@ -40,10 +40,10 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 	wcApp.hCursor = LoadCursor(NULL, IDC_ARROW);	// "hCursor" = handler do cursor (rato) 
 	// "NULL" = Forma definida no Windows
 	// "IDC_ARROW" Aspecto "seta" 
-	wcApp.lpszMenuName = MAKEINTRESOURCE(IDC_BOARDGUI);			// Classe do menu que a janela pode ter
+	wcApp.lpszMenuName = MAKEINTRESOURCE(IDC_BOARDGUI);	// Classe do menu que a janela pode ter
 	// (NULL = não tem menu)
 	wcApp.cbClsExtra = 0;				// Livre, para uso particular
-	wcApp.cbWndExtra = 0;				// Livre, para uso particular
+	wcApp.cbWndExtra = sizeof(BoardGUIDados*);				// Livre, para uso particular
 	wcApp.hbrBackground = CreateSolidBrush(RGB(22, 26, 37));
 	
 	if (!RegisterClassEx(&wcApp))
@@ -57,7 +57,7 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 		CW_USEDEFAULT,		// Posi��o x pixels (default=� direita da ultima)
 		CW_USEDEFAULT,		// Posi��o y pixels (default=abaixo da ultima)
 		900,		// Largura da janela (em pixels)
-		500,		// Altura da janela (em pixels)
+		900,		// Altura da janela (em pixels)
 		(HWND)HWND_DESKTOP,	// handle da janela pai (se se criar uma a partir de
 		// outra) ou HWND_DESKTOP se a janela for a primeira, 
 		// criada a partir do "desktop"
@@ -75,9 +75,6 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 
 
 
-	dados.nEmpresas = 10;
-	dados.limInf = 0;
-	dados.limSup = 500;
 	while (GetMessage(&lpMsg, NULL, 0, 0) > 0) {
 		TranslateMessage(&lpMsg);	// Pr�-processamento da mensagem (p.e. obter c�digo 
 		// ASCII da tecla premida)
@@ -92,11 +89,12 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPTSTR lpCmdLine, int
 
 
 
-DWORD WINAPI PaintThread(LPVOID dados) {
+DWORD WINAPI PaintThread(PVOID dados) {
 	BoardGUIDados* bGUIdt = (BoardGUIDados*)dados;
+
 	HANDLE hEvent, hMutex;
 	DWORD aqui = 0;
-
+	TCHAR buffer[256];
 	//###############################################################
 	//#																#
 	//#						Eventos			 						#
@@ -128,27 +126,61 @@ DWORD WINAPI PaintThread(LPVOID dados) {
 	while (bGUIdt->continua == 1)
 	{
 
+		//wsprintf(buffer, TEXT("\nCheguei aqui '%d'"), bGUIdt->continua);
+		//OutputDebugString(buffer);
 		WaitForSingleObject(hEvent, INFINITE);
 
 		WaitForSingleObject(hMutex, INFINITE);
 
 		ReleaseMutex(hMutex);
 		InvalidateRect(bGUIdt->hWnd, NULL, TRUE);
-		Sleep(500);
+		Sleep(200);
 	}
 
 	return 50;
 }
 
+BOOL CALLBACK DialogSettings(HWND hWndsettings, UINT messg, WPARAM wParam, LPARAM lParam) {
+	BoardGUIDados* ptd = (BoardGUIDados*)GetWindowLongPtr(GetParent(hWndsettings), 0);
+	int nEmpresas = 0, limInf = 0, limSup = 0;
+	switch (messg) {
+		case WM_INITDIALOG:
+			SetDlgItemInt(hWndsettings, IDC_EDIT1, ptd->nEmpresas, FALSE);
+			SetDlgItemInt(hWndsettings, IDC_EDIT2, ptd->limInf, FALSE);
+			SetDlgItemInt(hWndsettings, IDC_EDIT3, ptd->limSup, FALSE);
+			return TRUE;
+		case WM_COMMAND:
+			switch (LOWORD(wParam)) {
+				case IDOK:
+					ptd->nEmpresas = GetDlgItemInt(hWndsettings, IDC_EDIT1, NULL, FALSE);
+					ptd->limInf = GetDlgItemInt(hWndsettings, IDC_EDIT2, NULL, FALSE);
+					ptd->limSup = GetDlgItemInt(hWndsettings, IDC_EDIT3, NULL, FALSE);
+					InvalidateRect(ptd->hWnd, NULL, TRUE);
+					EndDialog(hWndsettings, IDOK);
+					return TRUE;
+				case IDCANCEL:
+					EndDialog(hWndsettings, IDCANCEL);
+					return TRUE;
+			}
+			break;
+		case WM_CLOSE:
+			EndDialog(hWndsettings, IDCANCEL);
+			DestroyWindow(hWndsettings);
+			return TRUE;
+	}
+	return FALSE;
+}
+
+
 LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam, PAINTSTRUCT ps) {
 	HDC hdc, hvalores;
-
 	RECT rect, rect2;
 	int xPos, yPos;
-	
+	BoardGUIDados* dados = (BoardGUIDados*)GetWindowLongPtr(hWnd, 0);
+
+
 	//static TCHAR curChar = '?';
-	dados.hWnd = hWnd;
-	dados.continua = 1;
+	
 	float angulo = 45.0;
 	float anguloemradianos = angulo * (3.14 / 180.0);
 	HANDLE hMapFile;
@@ -198,7 +230,16 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 
 	switch (messg) {
 	case WM_CREATE:
-		hThread = CreateThread(NULL, 0, PaintThread, &dados, 0, NULL);
+		dados = (BoardGUIDados*)malloc(sizeof(BoardGUIDados));
+		SetWindowLongPtr(hWnd, 0, (LONG_PTR)dados);
+		dados->hWnd = hWnd;
+		dados->continua = 1;
+
+		dados->nEmpresas = 10;
+		dados->limInf = 0;
+		dados->limSup = 500;
+
+		hThread = CreateThread(NULL, 0, PaintThread, (LPVOID)dados, 0, NULL);
 		
 		break;
 	case WM_PAINT:
@@ -212,8 +253,8 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		int startX = 100; // Posição inicial das barras
 		int startY = 300; // Posição vertical das barras
 		int maxHeight = 300; // Altura máxima das barras
-		int escalaY = dados.limSup/10;
-		int valorEscY = dados.limSup;
+		int escalaY = dados->limSup/10;
+		int valorEscY = dados->limSup;
 		rect.left = 30;
 		rect.top = 415;
 
@@ -230,9 +271,9 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 
 		SetTextColor(hdc, RGB(8,175, 13));
 		// Desenhar as barras
-		for (int i = 0; i < dados.nEmpresas; i++) {
+		for (int i = 0; i < dados->nEmpresas; i++) {
 			bars[i].left = startX + (barWidth + barSpacing) * i;
-			bars[i].top = startY - (maxHeight * empresasBoard[i].pAção / dados.limSup);
+			bars[i].top = startY - (maxHeight * empresasBoard[i].pAção / dados->limSup);
 			bars[i].right = bars[i].left + barWidth;
 			bars[i].bottom = startY;
 
@@ -267,7 +308,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 			MoveToEx(hdc, escalaX, y, NULL);
 
 			TCHAR labelText[20]; // Defina o tamanho conforme necessário
-			swprintf(labelText, sizeof(labelText) / sizeof(TCHAR), TEXT("%.2f€"), (float)i * dados.limSup / numLinhasEscala);
+			swprintf(labelText, sizeof(labelText) / sizeof(TCHAR), TEXT("%.2f€"), (float)i * dados->limSup / numLinhasEscala);
 			RECT textRect = { escalaX - 50, y - 10, escalaX, y };
 			DrawText(hdc, labelText, -1, &textRect, DT_SINGLELINE | DT_NOCLIP); // Rótulos da escala
 		}
@@ -306,12 +347,8 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 
 		EndPaint(hWnd, &ps);
 		break;
-	case WM_LBUTTONDOWN:
-
-		break;
-	
 	case WM_COMMAND:
-		switch (LOWORD(wParam))
+		switch (wParam)
 		{
 			case IDM_EXIT:
 				if (MessageBox(hWnd, TEXT("Tem a certeza que quer sair?"),
@@ -324,7 +361,7 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 				DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, DialogBoxAbout);
 				break;
 			case ID_FILE_SETTINGS:
-				DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SETTINGS), hWnd, DialogSettings, (LPARAM)&dados);
+				DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SETTINGS), hWnd, DialogSettings);
 				break;
 			default:
 				break;
@@ -337,10 +374,13 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		{
 			DestroyWindow(hWnd);
 		}
-		dados.continua = 0;
+		dados->continua = 0;
 		break;
 	case WM_DESTROY:	// Destruir a janela e terminar o programa 
-		// "PostQuitMessage(Exit Status)"		
+		// "PostQuitMessage(Exit Status)"	
+		UnmapViewOfFile(hMapFile);
+		CloseHandle(hThread);	
+		free(dados);
 		PostQuitMessage(0);
 		break;
 	default:
@@ -350,8 +390,8 @@ LRESULT CALLBACK TrataEventos(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPara
 		break;  // break tecnicamente desnecess�rio por causa do return
 	}
 
-	CloseHandle(hThread);
-	UnmapViewOfFile(hMapFile);
+	
+
 	return 0;
 }
 
@@ -378,39 +418,3 @@ BOOL CALLBACK DialogBoxAbout(HWND hWndialog, UINT messg, WPARAM wParam, LPARAM l
 	return FALSE;
 }
 
-BOOL CALLBACK DialogSettings(HWND hWndiaSet, UINT messg, WPARAM wParam, LPARAM lParam) {
-	
-	
-
-	switch (messg) {
-	case WM_INITDIALOG:
-	{
-
-		SetDlgItemInt(hWndiaSet, IDC_EDIT1, dados.nEmpresas, FALSE);
-		SetDlgItemInt(hWndiaSet, IDC_EDIT2, dados.limInf, FALSE);
-		SetDlgItemInt(hWndiaSet, IDC_EDIT3, dados.limSup, FALSE);
-	}
-	return TRUE;
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-			case IDOK:
-				dados.nEmpresas = GetDlgItemInt(hWndiaSet, IDC_EDIT1, NULL, FALSE);
-				dados.limInf = GetDlgItemInt(hWndiaSet, IDC_EDIT2, NULL, FALSE);
-				dados.limSup = GetDlgItemInt(hWndiaSet, IDC_EDIT3, NULL, FALSE);
-				EndDialog(hWndiaSet, IDOK);
-				return TRUE;
-				
-			case IDCANCEL: 
-				EndDialog(hWndiaSet, IDCANCEL);
-				return TRUE;
-				
-		}
-		break;
-	case WM_CLOSE:
-		//EndDialog(hWndiaSet, IDOK);
-		EndDialog(hWndiaSet, IDCANCEL);
-		//DestroyWindow(hWndiaSet);
-		return TRUE;
-	}
-	return FALSE;
-}
