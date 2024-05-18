@@ -11,10 +11,6 @@
       "RelativeMoniker": "D:0:0:{C5C41949-1791-4959-AEBF-381368BA32A0}|boardGUI\\boardGUI.vcxproj|solutionrelative:boardGUI\\Resource.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|C:\\USERS\\HUGO\\DESKTOP\\ENG. INFORM\u00C1TICA\\2\u00BA ANO\\2\u00BA SEMESTRE\\SO2\\SO2-23-24\\2\u00AA META\\TRABALHO_PR\u00C1TICO2024\\UTILS.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{000A1958-0A1C-4FE3-A3BE-597CC87513F8}|Trabalho_Pr\u00E1tico2024.vcxproj|solutionrelative:UTILS.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{07B3D143-93A6-40F3-AAC5-8438D3331AB7}|board\\board.vcxproj|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{07B3D143-93A6-40F3-AAC5-8438D3331AB7}|board\\board.vcxproj|solutionrelative:board\\board.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -25,6 +21,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{6B5E1CBC-3552-448F-B955-C191BC43B0DD}|cliente\\cliente.vcxproj|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\cliente\\cliente.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{6B5E1CBC-3552-448F-B955-C191BC43B0DD}|cliente\\cliente.vcxproj|solutionrelative:cliente\\cliente.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|Itens de Solu\u00E7\u00E3o{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|Itens de Solu\u00E7\u00E3o{D6DF50CC-F8FC-495C-BCC1-8CE5ED6E4437}|solutionrelative:utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,12 +46,11 @@
               "RelativeToolTip": "boardGUI\\resource.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-05-18T21:23:46.413Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-18T21:23:46.413Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "utils.h",
               "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\utils.h",
               "RelativeDocumentMoniker": "utils.h",
@@ -59,12 +58,11 @@
               "RelativeToolTip": "utils.h",
               "ViewState": "AQIAAHYAAAAAAAAAAAAAAIUAAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-05-04T19:36:57.58Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-04T19:36:57.58Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "board.c",
               "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\board\\board.c",
               "RelativeDocumentMoniker": "board\\board.c",
@@ -72,12 +70,11 @@
               "RelativeToolTip": "board\\board.c",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
-              "WhenOpened": "2024-04-24T11:06:54.751Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-24T11:06:54.751Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "bolsa.c",
               "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\bolsa.c",
               "RelativeDocumentMoniker": "bolsa.c",
@@ -85,12 +82,11 @@
               "RelativeToolTip": "bolsa.c",
               "ViewState": "AQIAAIYEAAAAAAAAAAAAALoEAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
-              "WhenOpened": "2024-05-04T14:47:25.747Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-04T14:47:25.747Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "cliente.c",
               "DocumentMoniker": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\cliente\\cliente.c",
               "RelativeDocumentMoniker": "cliente\\cliente.c",
@@ -98,8 +94,7 @@
               "RelativeToolTip": "cliente\\cliente.c",
               "ViewState": "AQIAACQBAAAAAAAAAAAAAD0BAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
-              "WhenOpened": "2024-04-27T20:05:53.528Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-27T20:05:53.528Z"
             },
             {
               "$type": "Document",
@@ -109,7 +104,7 @@
               "RelativeDocumentMoniker": "boardGUI\\boardGUI.c",
               "ToolTip": "C:\\Users\\Hugo\\Desktop\\Eng. Inform\u00E1tica\\2\u00BA Ano\\2\u00BA Semestre\\SO2\\SO2-23-24\\2\u00AA META\\Trabalho_Pr\u00E1tico2024\\boardGUI\\boardGUI.c",
               "RelativeToolTip": "boardGUI\\boardGUI.c",
-              "ViewState": "AQIAAB4AAAAAAAAAAAAAACgAAAAeAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACgAAAAeAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2024-05-04T21:20:17.985Z",
               "EditorCaption": ""
